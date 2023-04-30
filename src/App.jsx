@@ -3,21 +3,25 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 import { useState } from "react";
 import { Container } from 'react-bootstrap';
+/*
 import VideoBg from "reactjs-videobg";
 import FilterBgPoster from "/images/filtering.png";
 import FilterBgVideo from "/videos/filtering.webm";
 
 import SearchForm from 'components/SearchForm/SearchForm';
 import DragDropList from 'components/DndContainer/DragDropList';
+*/
 import ErrorBoundary from 'components/ErrorBoundary'
 
 import Home from 'components/Pages/Home/Home';
-//import Navbar from 'components/Pages/Navbar/Navbar';
+/*
+import Navbar from 'components/Pages/Navbar/Navbar';
 import NotFound from 'components/Pages/NotFound/NotFound';
 import About from 'components/Pages/About/About';
 import GameDetails from 'components/Pages/GameDetails/GameDetails';
 import AddGame from 'components/Pages/AddGame/AddGame';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+*/
 
 // NOTE:
 //  All icons can be found via https://react-icons.github.io/react-icons
