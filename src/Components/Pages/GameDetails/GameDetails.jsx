@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Card, Container, Button } from "react-bootstrap";
+import { resolveUrl } from "utils/resolveUrl";
+
+const apiUrlBase = import.meta.env.VITE_API_BASEPATH || "http://localhost/api";
+const apiUrlGames = resolveUrl(apiUrlBase, 'games');
 
 const GameDetails = () => {
   const params = useParams();
   const [game, setGame] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:4000/api/games/${params.gameId}`)
+    fetch(resolveUrl(apiUrlGames, params.gameId))
       .then((res) => res.json())
       .then((data) => setGame(data));
   }, [game]);

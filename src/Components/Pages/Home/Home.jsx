@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import ImageAsset from 'components/ImageAsset';
+import LoginModal from 'components/ModalDialogs/LoginModal';
 import './Home.css';
 
 function Home()
 {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
+    setShowModal(true);
   };
-
+  
   const handleLogout = () => {
     setIsLoggedIn(false);
   };
-
+  
   return (
     <div className="d-flex flex-column min-vh-100 min-vw-100 border-bottom border-primary">
       
@@ -49,6 +51,7 @@ function Home()
 
           </Container>
         </Navbar>
+        <LoginModal show={showModal} onHide={() => setShowModal(false)} />
       </header>
 
       {/* Main Content */}

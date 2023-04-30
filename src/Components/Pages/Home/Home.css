@@ -89,6 +89,29 @@
   background-image: radial-gradient(rgba(255, 255, 255, 0.6667), rgba(0, 0, 0, 0.3333));
 }
 
+/*
+// Fullscreen modal backdrop
+*/
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1040;
+  background-color: rgba(0, 0, 0, 0.5);
+  -webkit-filter: blur(5px);
+  filter: blur(5px);
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+body.modal-open .modal-backdrop {
+  display: block;
+}
+
 
 /*
 // Main logo and content
