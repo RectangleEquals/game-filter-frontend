@@ -9,7 +9,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(process.cwd(), './src'),
+      'assets': path.resolve(process.cwd(), './src/assets'),
+      'components': path.resolve(process.cwd(), './src/Components'),
+      'react-router-dom': path.resolve(process.cwd(), 'node_modules/react-router-dom'),
       '~bootstrap': path.resolve(process.cwd(), 'node_modules/react-bootstrap')
     }
-  }
+  },
+  optimizeDeps: {
+    include: [
+      'react-router-dom'
+    ],
+  },
 });
