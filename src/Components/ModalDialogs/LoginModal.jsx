@@ -13,7 +13,7 @@ const LoginModal = ({ shown, setShowModal, setLoginStatus }) =>
   const [loginController, setLoginController] = useState(new AbortController());
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [alertMessage, setAlertMessage] = useState({variant: 'info', title: 'Please choose a login provider:', message: ''});
+  const [alertMessage, setAlertMessage] = useState({variant: 'info', title: 'Please choose a login provider:'});
 
   useEffect(() =>
   {
@@ -154,6 +154,14 @@ const LoginModal = ({ shown, setShowModal, setLoginStatus }) =>
             disabled={isLoading}
             onClick={() => handleLogin("epic")}> 
             Epic Games
+          </Button>
+          <hr></hr>
+          <Button
+            className="flox-grow-1 w-50"
+            variant="warning"
+            disabled={false}
+            onClick={async() => { setAlertMessage({...alertMessage, message: await getExternalIP()})}}>
+            Show IP
           </Button>
         </Container>
       </Modal.Footer>
