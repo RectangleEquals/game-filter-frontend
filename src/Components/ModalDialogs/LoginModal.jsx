@@ -44,10 +44,20 @@ const LoginModal = ({ shown, setShowModal, setLoginStatus }) =>
         .catch(err => {
           setIsLoggingIn(false);
           setAlertMessage({variant: 'danger', title: 'Error', message: err.message})
-          setTimeout(() => setShown(false), 3000);
+          setTimeout(() => setShown(false), 2000);
         });
     })();
   }, [isLoggingIn]);
+
+  useEffect(() => {
+    if(isLoading) {
+      setAlertMessage({
+        variant: 'info',
+        title: alertMessage.title,
+        message: 'Please wait...'
+      })
+    }
+  }, [isLoading])
 
   const abortRequest = () => {
     loginController.abort('User-initiated login cancellation');
@@ -82,7 +92,7 @@ const LoginModal = ({ shown, setShowModal, setLoginStatus }) =>
         handleClose();
       else {
         setAlertMessage({variant: 'warning', title: 'Login Failed', message: `Server response: ${data.status}`})
-        setTimeout(() => setShown(true), 3000);
+        setTimeout(() => setShown(true), 2000);
       }
     }
   }
@@ -122,28 +132,28 @@ const LoginModal = ({ shown, setShowModal, setLoginStatus }) =>
             variant="primary"
             disabled={isLoading}
             onClick={() => handleLogin("discord")}>
-            {isLoading ? "Loading..." : "Discord"}
+            Discord
           </Button>
           <Button
             className="flex-grow-1 w-100 mb-1"
             variant="primary"
             disabled={isLoading}
             onClick={() => handleLogin("steam")}> 
-            {isLoading ? "Loading..." : "Steam"}
+            Steam
           </Button>
           <Button
             className="flex-grow-1 w-100 mb-1"
             variant="primary"
             disabled={isLoading}
             onClick={() => handleLogin("microsoft")}> 
-            {isLoading ? "Loading..." : "Microsoft"}
+            Microsoft
           </Button>
           <Button
             className="flex-grow-1 w-100"
             variant="primary"
             disabled={isLoading}
             onClick={() => handleLogin("epic")}> 
-            {isLoading ? "Loading..." : "Epic Games"}
+            Epic Games
           </Button>
         </Container>
       </Modal.Footer>
