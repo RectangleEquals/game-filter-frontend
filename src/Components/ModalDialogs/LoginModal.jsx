@@ -136,33 +136,26 @@ const LoginModal = ({ shown, setShowModal, setLoginStatus }) =>
           </Button>
           <Button
             className="flex-grow-1 w-100 mb-1"
-            variant="primary"
+            variant="secondary"
             disabled={isLoading}
             onClick={() => handleLogin("steam")}> 
             Steam
           </Button>
           <Button
             className="flex-grow-1 w-100 mb-1"
-            variant="primary"
+            variant="success"
             disabled={isLoading}
             onClick={() => handleLogin("microsoft")}> 
             Microsoft
           </Button>
           <Button
             className="flex-grow-1 w-100"
-            variant="primary"
+            variant="warning"
             disabled={isLoading}
             onClick={() => handleLogin("epic")}> 
             Epic Games
           </Button>
           <hr></hr>
-          <Button
-            className="flox-grow-1 w-50"
-            variant="warning"
-            disabled={false}
-            onClick={async() => { setAlertMessage({...alertMessage, message: await getExternalIP()})}}>
-            Show IP
-          </Button>
         </Container>
       </Modal.Footer>
     </Modal>
