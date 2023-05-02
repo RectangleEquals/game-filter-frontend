@@ -43,7 +43,7 @@ const LoginModal = ({ shown, setShowModal, setLoginStatus }) =>
         .then(response => handleResponse(response))
         .catch(err => {
           setIsLoggingIn(false);
-          setAlertMessage({variant: 'danger', title: 'Error', message: err.message})
+          setAlertMessage({variant: 'danger', title: `Error (${authUrl})`, message: err.message})
           setTimeout(() => setShown(false), 2000);
         });
     })();
@@ -83,15 +83,15 @@ const LoginModal = ({ shown, setShowModal, setLoginStatus }) =>
     */
 
     // Validate that we are still attempting to log in, and that all response data is valid
-    if(isLoggingIn && data && data.status) {
+    if(isLoggingIn && data && data.message) {
       // Update login status, then close the dialog
-      const loginStatus = data.status === 'ok';
+      const loginStatus = data.message === 'ok';
       setLoginStatus(loginStatus);
       setIsLoggingIn(false);
       if(loginStatus)
         handleClose();
       else {
-        setAlertMessage({variant: 'warning', title: 'Login Failed', message: `Server response: ${data.status}`})
+        setAlertMessage({variant: 'warning', title: 'Login Failed', message: `Server response: ${data.message}`})
         setTimeout(() => setShown(true), 2000);
       }
     }
