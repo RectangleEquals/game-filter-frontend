@@ -150,7 +150,7 @@ const LoginModal = ({ shown, setShowModal, setLoginStatus }) =>
           </Button>
           <Button
             className="flex-grow-1 w-100"
-            variant="warning"
+            variant="danger"
             disabled={isLoading}
             onClick={() => handleLogin("epic")}> 
             Epic Games
