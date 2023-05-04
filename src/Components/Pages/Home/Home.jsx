@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import ImageAsset from 'components/ImageAsset';
-import LoginModal from 'components/ModalDialogs/LoginModal';
+//import LoginModal from 'components/ModalDialogs/LoginModal';
+import LoginOrRegisterModal from 'components/ModalDialogs/LoginOrRegisterModal';
 import './Home.css';
 
 function Home()
@@ -54,7 +55,7 @@ function Home()
                   </Nav.Link>
                 ) : (
                   <Nav.Link href="#" className='d-flex flex-row justify-content-center align-items-center' onClick={handleLoginRequest}>
-                    <span className="discord-name">Login</span>
+                    <span className="discord-name">Login / Register</span>
                     <ImageAsset className="asset-discord-logo img-discord-logo img-show-border" />
                   </Nav.Link>
                 )}
@@ -63,7 +64,7 @@ function Home()
 
           </Container>
         </Navbar>
-        <LoginModal shown={showModal} setShowModal={setShowModal} setLoginStatus={handleLoginChange} />
+        <LoginOrRegisterModal shown={showModal} setShowModal={setShowModal} />
       </header>
 
       {/* Main Content */}
