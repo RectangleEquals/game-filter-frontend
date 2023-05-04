@@ -24,13 +24,23 @@ export default function LoginOrRegisterModal({ shown, setShowModal }) {
     e.preventDefault();
     // handle login logic here
     setIsLoading(true);
+
     setAlertMessage({variant: "info", message: "Logging in..."});
+    setTimeout(() => {
+      setAlertMessage({variant: "danger", message: "Login failed!"});
+      setIsLoading(false);
+    }, 2000);
   };
 
   const handleRegister = (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setAlertMessage({variant: "danger", message: "Registration failed!"});
+
+    setAlertMessage({variant: "info", message: "Registering..."});
+    setTimeout(() => {
+      setAlertMessage({variant: "danger", message: "Registration failed!"});
+      setIsLoading(false);
+    }, 2000);
   };
 
   const handleTabChange = (tab) => {
@@ -43,14 +53,24 @@ export default function LoginOrRegisterModal({ shown, setShowModal }) {
     }
   };
 
+  const tabStyle = {
+    pointerEvents: isLoading ? "none" : "auto",
+    opacity: isLoading ? "0.5" : "1"
+  };
+
   return (
     <Modal className="login-register-modal" show={shown} onHide={handleClose} centered>
       <Modal.Header className='login-register-modal-header' closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        <Tabs activeKey={activeTab} onSelect={handleTabChange}>
-          <Tab eventKey="login" title="Login" className="login-tab" disabled={isLoading}>
+      <Modal.Body className='login-register-modal-body'>
+        <Tabs activeKey={activeTab} onSelect={handleTabChange} variant="tabs">
+          <Tab
+            eventKey="login"
+            title="Login"
+            disabled={isLoading}
+            className="login-tab"
+            style={tabStyle} >
             <Tab.Content className="login-tab-content">
               <Form onSubmit={handleLogin}>
                 <Form.Group controlId="formBasicEmail">
@@ -90,7 +110,12 @@ export default function LoginOrRegisterModal({ shown, setShowModal }) {
               </Form>
             </Tab.Content>
           </Tab>
-          <Tab eventKey="register" title="Register" className="register-tab" disabled={isLoading}>
+          <Tab
+            eventKey="register"
+            title="Register"
+            disabled={isLoading}
+            className="register-tab"
+            style={tabStyle} >
             <Tab.Content className="register-tab-content">
               <Form onSubmit={handleRegister}>
                 <Form.Group controlId="formBasicDisplayName">
