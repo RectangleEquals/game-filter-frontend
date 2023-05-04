@@ -7,12 +7,15 @@ export default function LoginOrRegisterModal({ shown, setShowModal }) {
   const [activeTab, setActiveTab] = useState('login');
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-  const [registerDisplayName, setregisterDisplayName] = useState('');
+  const [registerDisplayName, setRegisterDisplayName] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [alertMessage, setAlertMessage] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleClose = () => {
+    if(isLoading)
+      return;
     setShowModal(false);
     setTimeout(() => setAlertMessage({}), 200);
   }
@@ -20,11 +23,13 @@ export default function LoginOrRegisterModal({ shown, setShowModal }) {
   const handleLogin = (e) => {
     e.preventDefault();
     // handle login logic here
+    setIsLoading(true);
     setAlertMessage({variant: "info", message: "Logging in..."});
   };
 
   const handleRegister = (e) => {
     e.preventDefault();
+    setIsLoading(true);
     setAlertMessage({variant: "danger", message: "Registration failed!"});
   };
 
@@ -45,14 +50,16 @@ export default function LoginOrRegisterModal({ shown, setShowModal }) {
       </Modal.Header>
       <Modal.Body>
         <Tabs activeKey={activeTab} onSelect={handleTabChange}>
-          <Tab eventKey="login" title="Login" className="login-tab">
+          <Tab eventKey="login" title="Login" className="login-tab" disabled={isLoading}>
             <Tab.Content className="login-tab-content">
               <Form onSubmit={handleLogin}>
                 <Form.Group controlId="formBasicEmail">
                   <Form.Label>Email Address</Form.Label>
                   <Form.Control
+                    className="mb-2"
                     type="email"
                     placeholder="Enter email"
+                    disabled={isLoading}
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                   />
@@ -63,6 +70,7 @@ export default function LoginOrRegisterModal({ shown, setShowModal }) {
                   <Form.Control
                     type="password"
                     placeholder="Password"
+                    disabled={isLoading}
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                   />
@@ -76,20 +84,22 @@ export default function LoginOrRegisterModal({ shown, setShowModal }) {
                 }
                 
                 <hr/>
-                <Button className="flex-grow-1 w-100 mb-1" variant="light" type="submit">
+                <Button className="flex-grow-1 w-100 mb-1" variant="light" type="submit" disabled={isLoading}>
                   Login
                 </Button>
               </Form>
             </Tab.Content>
           </Tab>
-          <Tab eventKey="register" title="Register" className="register-tab">
+          <Tab eventKey="register" title="Register" className="register-tab" disabled={isLoading}>
             <Tab.Content className="register-tab-content">
               <Form onSubmit={handleRegister}>
                 <Form.Group controlId="formBasicDisplayName">
                   <Form.Label>Display Name</Form.Label>
                   <Form.Control
+                    className="mb-2"
                     type="text"
                     placeholder="Enter display name"
+                    disabled={isLoading}
                     value={registerDisplayName}
                     onChange={(e) => setRegisterDisplayName(e.target.value)}
                   />
@@ -98,8 +108,10 @@ export default function LoginOrRegisterModal({ shown, setShowModal }) {
                 <Form.Group controlId="formBasicEmail">
                   <Form.Label>Email Address</Form.Label>
                   <Form.Control
+                    className="mb-2"
                     type="email"
                     placeholder="Enter email"
+                    disabled={isLoading}
                     value={registerEmail}
                     onChange={(e) => setRegisterEmail(e.target.value)}
                   />
@@ -108,8 +120,10 @@ export default function LoginOrRegisterModal({ shown, setShowModal }) {
                 <Form.Group controlId="formBasicPassword">
                   <Form.Label>Password</Form.Label>
                   <Form.Control
+                    className="mb-2"
                     type="password"
                     placeholder="Password"
+                    disabled={isLoading}
                     value={registerPassword}
                     onChange={(e) => setRegisterPassword(e.target.value)}
                   />
@@ -123,7 +137,7 @@ export default function LoginOrRegisterModal({ shown, setShowModal }) {
                 }
 
                 <hr/>
-                <Button className="flex-grow-1 w-100 mb-1" variant="light" type="submit">
+                <Button className="flex-grow-1 w-100 mb-1" variant="light" type="submit" disabled={isLoading}>
                   Register
                 </Button>
               </Form>
