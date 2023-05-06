@@ -1,15 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar, Nav, Container } from 'react-bootstrap';
+import resolveUrl from "utils/resolveUrl";
 import ImageAsset from 'components/ImageAsset';
 //import LoginModal from 'components/ModalDialogs/LoginModal';
 import LoginOrRegisterModal from 'components/ModalDialogs/LoginOrRegisterModal';
 import './Home.css';
 
+const apiUrlBase = import.meta.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
+const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
+
 function Home()
 {
+  const [userId, setUserId] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    checkSession();
+  }, [wasLoggedIn]);
+
+  const checkSession = () => {
+    // Check for the existence of the 'user' cookie
+    let cookie = document.cookie;
+    let index = cookie.indexOf('user=');
+    if (index !== -1) {
+      // Validate the cookie
+      let uid = cookie.substring(index + 5);
+      setUserId(uid);
+      
+      // User is logged in
+      setIsLoggedIn(true);
+      console.log('User is logged in');
+    } else {
+      // User is not logged in
+      setIsLoggedIn(false);
+      console.log('User is not logged in');
+    }
+  }
+
+  const sendLogoutRequest = () => {
+    let data = new FormData();
+    data.append('id', userId);
+
+    fetch(apiUrlLogout, {
+      method: 'POST',
+      credentials: 'include',
+      body: data
+    })
+    .then(response => {
+      if (response.status === 200) {
+        // Update the isLoggedIn state
+        setIsLoggedIn(false);
+        console.log('User logged out');
+      }
+    })
+    .catch(error => console.error(error));
+  }
 
   const handleLoginRequest = () => {
     setShowModal(true);
@@ -27,6 +74,11 @@ function Home()
     if(loginStatus != wasLoggedIn) {
       console.log('handleLoginChange: ' + loginStatus);
     }
+
+    // Tell the server to end the session, then refresh the page
+    if(loginStatus === false)
+      sendLogoutRequest();
+
     setWasLoggedIn(loginStatus);
   }
  
@@ -64,7 +116,7 @@ function Home()
 
           </Container>
         </Navbar>
-        <LoginOrRegisterModal shown={showModal} setShowModal={setShowModal} />
+        <LoginOrRegisterModal shown={showModal} onShowModal={setShowModal} onHandleLoginChange={handleLoginChange}/>
       </header>
 
       {/* Main Content */}
