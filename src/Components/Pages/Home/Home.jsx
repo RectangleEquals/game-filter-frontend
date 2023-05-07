@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import resolveUrl from "utils/resolveUrl";
 import ImageAsset from 'components/ImageAsset';
@@ -11,14 +11,18 @@ const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
 
 function Home()
 {
+  const didMountRef = useRef(false);
   const [userId, setUserId] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    checkSession();
-  }, [wasLoggedIn]);
+    if (!didMountRef.current) {
+      checkSession();
+      didMountRef.current = true;
+    }
+  });
 
   const checkSession = () => {
     // Check for the existence of the 'user' cookie
@@ -30,11 +34,15 @@ function Home()
       setUserId(uid);
       
       // User is logged in
-      setIsLoggedIn(true);
+      if(!isLoggedIn)
+        handleLoginChange(true);
+
       console.log('User is logged in');
     } else {
       // User is not logged in
-      setIsLoggedIn(false);
+      if(isLoggedIn)
+        handleLoginChange(false);
+
       console.log('User is not logged in');
     }
   }
