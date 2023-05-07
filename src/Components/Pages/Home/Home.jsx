@@ -53,8 +53,12 @@ function Home()
 
     fetch(apiUrlLogout, {
       method: 'POST',
+      body: data,
+      mode: 'cors',
       credentials: 'include',
-      body: data
+      withCredentials: true,
+      sameSite: 'none',
+      secure: true
     })
     .then(response => {
       if (response.status === 200) {

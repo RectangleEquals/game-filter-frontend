@@ -38,8 +38,12 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
     const data = new FormData(formRef.current);
     fetch(apiUrlLogin, {
       method: 'POST',
+      body: data,
+      mode: 'cors',
       credentials: 'include',
-      body: data
+      withCredentials: true,
+      sameSite: 'none',
+      secure: true
     })
     .then(response => handleResponse(response))
     .catch(err => {
