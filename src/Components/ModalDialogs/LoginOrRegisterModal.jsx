@@ -191,6 +191,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                     placeholder="Enter email"
                     disabled={isLoading}
                     value={registerEmail}
+                    autocomplete="email"
                     onChange={(e) => setRegisterEmail(e.target.value)}
                   />
                 </Form.Group>
