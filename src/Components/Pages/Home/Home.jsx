@@ -8,8 +8,8 @@ import './Home.css';
 
 const apiUrlBase = import.meta.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
-const buildId = import.meta.env.VERCEL_GIT_COMMIT_SHA;
-const commitId = import.meta.env.VERCEL_GIT_COMMIT_REF;
+const buildId = import.meta.env.VERCEL_GIT_COMMIT_SHA || "1.0.0";
+const commitId = import.meta.env.VERCEL_GIT_COMMIT_REF || "alpha";
 
 function Home()
 {
@@ -145,20 +145,15 @@ function Home()
         </p>
       </main>
 
-      {buildId && commitId &&
-        <footer>
-          <Navbar bg="light" expand="lg" fixed="bottom">
-            <Container fluid>
-              <Nav className="ml-auto">
-                <Nav.Link>{`Commit: ${commitId}`}</Nav.Link>
-              </Nav>
-              <Nav className="mr-auto">
-                <Nav.Link>{`Build: ${buildId}`}</Nav.Link>
-              </Nav>
-            </Container>
-          </Navbar>
-        </footer>
-      }
+      <footer>
+        <Navbar bg="light" expand="lg" variant="dark" fixed="bottom" style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}>
+          <Container fluid className="w-100">
+            <Nav className="ml-auto" style={{pointerEvents: 'none'}}>
+              <Nav.Link style={{ color: '#ffffff', fontFamily: "'Bruno Ace SC', cursive", textShadow: "1px 3px 4px #0e92c2, 0 0 1em #5865F2, 0 0 0.2em rgba(88, 101, 242, 0.588)" }}>{`Version: ${buildId} ${commitId}`}</Nav.Link>
+            </Nav>
+          </Container>
+        </Navbar>
+      </footer>
 
     </div>
   );
