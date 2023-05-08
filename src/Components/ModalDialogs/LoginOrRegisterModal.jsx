@@ -121,7 +121,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
             style={tabStyle} >
             <Tab.Content className="login-tab-content">
               <Form ref={activeTab == "login" ? formRef : null} onSubmit={handleLogin}>
-                <Form.Group controlId="formBasicEmail">
+                <Form.Group controlId="loginFormEmail">
                   <Form.Label>Email Address</Form.Label>
                   <Form.Control
                     name="email"
@@ -134,7 +134,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                   />
                 </Form.Group>
 
-                <Form.Group controlId="formBasicPassword">
+                <Form.Group controlId="loginFormEmail">
                   <Form.Label>Password</Form.Label>
                   <Form.Control
                     name="password"
@@ -142,6 +142,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                     placeholder="Password"
                     disabled={isLoading}
                     value={loginPassword}
+                    autocomplete="current-password"
                     onChange={(e) => setLoginPassword(e.target.value)}
                   />
                 </Form.Group>
@@ -168,7 +169,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
             style={tabStyle} >
             <Tab.Content className="register-tab-content">
               <Form ref={activeTab == "register" ? formRef : null} onSubmit={handleRegister}>
-                <Form.Group controlId="formBasicDisplayName">
+                <Form.Group controlId="registerFormDisplayName">
                   <Form.Label>Display Name</Form.Label>
                   <Form.Control
                     name="displayname"
@@ -181,7 +182,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                   />
                 </Form.Group>
 
-                <Form.Group controlId="formBasicEmail">
+                <Form.Group controlId="registerFormEmail">
                   <Form.Label>Email Address</Form.Label>
                   <Form.Control
                     name="email"
@@ -194,7 +195,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                   />
                 </Form.Group>
 
-                <Form.Group controlId="formBasicPassword">
+                <Form.Group controlId="registerFormPassword">
                   <Form.Label>Password</Form.Label>
                   <Form.Control
                     name="password"
@@ -203,6 +204,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                     placeholder="Password"
                     disabled={isLoading}
                     value={registerPassword}
+                    autocomplete="current-password"
                     onChange={(e) => setRegisterPassword(e.target.value)}
                   />
                 </Form.Group>
