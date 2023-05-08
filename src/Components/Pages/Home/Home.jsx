@@ -5,7 +5,6 @@ import ImageAsset from 'components/ImageAsset';
 //import LoginModal from 'components/ModalDialogs/LoginModal';
 import LoginOrRegisterModal from 'components/ModalDialogs/LoginOrRegisterModal';
 import './Home.css';
-import { build } from 'vite';
 
 const apiUrlBase = import.meta.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
