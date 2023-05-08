@@ -5,6 +5,7 @@ import ImageAsset from 'components/ImageAsset';
 //import LoginModal from 'components/ModalDialogs/LoginModal';
 import LoginOrRegisterModal from 'components/ModalDialogs/LoginOrRegisterModal';
 import './Home.css';
+import Footer from '../Navbar/Footer';
 
 const apiUrlBase = import.meta.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
@@ -101,7 +102,7 @@ function Home()
       
       <header>
         {/* Navigation Bar */}
-        <Navbar className="navbar" expand="lg" variant="dark">
+        <Navbar className="navbar-header" expand="lg" variant="dark">
           <Container fluid className="w-100">
 
             {/* Website Logo and Title */}
@@ -145,15 +146,7 @@ function Home()
         </p>
       </main>
 
-      <footer>
-        <Navbar bg="light" expand="lg" variant="dark" fixed="bottom" style={{ backgroundColor: 'rgba(255, 255, 255, 0.3)' }}>
-          <Container fluid className="w-100">
-            <Nav className="ml-auto" style={{pointerEvents: 'none'}}>
-              <Nav.Link style={{ color: '#ffffff', fontFamily: "'Bruno Ace SC', cursive", textShadow: "1px 3px 4px #0e92c2, 0 0 1em #5865F2, 0 0 0.2em rgba(88, 101, 242, 0.588)" }}>{`Version: ${buildId} ${commitId}`}</Nav.Link>
-            </Nav>
-          </Container>
-        </Navbar>
-      </footer>
+      <Footer buildId={buildId} commitId={commitId}></Footer>
 
     </div>
   );
