@@ -134,7 +134,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                   />
                 </Form.Group>
 
-                <Form.Group controlId="loginFormEmail">
+                <Form.Group controlId="loginFormPassword">
                   <Form.Label>Password</Form.Label>
                   <Form.Control
                     name="password"
