@@ -5,9 +5,12 @@ import ImageAsset from 'components/ImageAsset';
 //import LoginModal from 'components/ModalDialogs/LoginModal';
 import LoginOrRegisterModal from 'components/ModalDialogs/LoginOrRegisterModal';
 import './Home.css';
+import { build } from 'vite';
 
 const apiUrlBase = import.meta.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
+const buildId = import.meta.env.VERCEL_GIT_COMMIT_SHA;
+const commitId = import.meta.env.VERCEL_GIT_COMMIT_REF;
 
 function Home()
 {
@@ -142,6 +145,21 @@ function Home()
           Currently under maintenance. We are working hard to get things up and running, so stay tuned!
         </p>
       </main>
+
+      {buildId && commitId &&
+        <footer>
+          <Navbar bg="light" expand="lg" fixed="bottom">
+            <Container fluid>
+              <Nav className="ml-auto">
+                <Nav.Link>{`Commit: ${commitId}`}</Nav.Link>
+              </Nav>
+              <Nav className="mr-auto">
+                <Nav.Link>{`Build: ${buildId}`}</Nav.Link>
+              </Nav>
+            </Container>
+          </Navbar>
+        </footer>
+      }
 
     </div>
   );
