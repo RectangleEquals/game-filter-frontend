@@ -1,4 +1,6 @@
-import config from './src/config.js';
+//import config from './src/config.js';
+import dotenv from 'dotenv';
+dotenv.config();
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
@@ -33,7 +35,7 @@ export default defineConfig({
   },
   server: {
     host: 'localhost',
-    port: config.VITE_PORT || config.PORT || 3000,
+    port: process.env.VITE_PORT || process.env.PORT || 80,
     nodePolyfills: ['url'],
   }
 });

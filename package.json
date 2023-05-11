@@ -1,16 +1,17 @@
 {
   "name": "game-filter-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host --port 3000",
+    "dev": "vite --host --port 80",
     "production": "npx vite",
     "build": "npx vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "bootstrap": "^5.2.3",
+    "form-data-body": "^0.1.0",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-bootstrap": "^2.7.2",

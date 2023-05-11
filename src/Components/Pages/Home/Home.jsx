@@ -6,36 +6,46 @@ import ImageAsset from 'components/ImageAsset';
 import LoginOrRegisterModal from 'components/ModalDialogs/LoginOrRegisterModal';
 import './Home.css';
 import Footer from '../Navbar/Footer';
+import formDataBody from 'form-data-body';
+import VerifyAccountModal from '../../ModalDialogs/VerifyAccountModal';
 
 const apiUrlBase = import.meta.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
 const buildId = import.meta.env.VERCEL_GIT_COMMIT_SHA || "1.0.0";
 const commitId = import.meta.env.VERCEL_GIT_COMMIT_REF || "alpha";
+const sessionName = import.meta.env.SESSION_COOKIE_NAME || "__gfsid";
 
 function Home()
 {
   const didMountRef = useRef(false);
-  const [userId, setUserId] = useState('');
+  const [accessToken, setAccessToken] = useState(sessionStorage.getItem(sessionName));
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
+    updateToken();
+
     if (!didMountRef.current) {
       checkSession();
       didMountRef.current = true;
     }
-  });
+  }, []);
+
+  const updateToken = () => {
+    // Check for the existence of a previous session
+    const token = sessionStorage.getItem(sessionName);
+  
+    // Update the session
+    if (token !== accessToken) {
+      setAccessToken(token);
+    }
+
+    return token;
+  }
 
   const checkSession = () => {
-    // Check for the existence of the 'user' cookie
-    let cookie = document.cookie;
-    let index = cookie.indexOf('user=');
-    if (index !== -1) {
-      // Validate the cookie
-      let uid = cookie.substring(index + 5);
-      setUserId(uid);
-      
+    if (accessToken) {
       // User is logged in
       if(!isLoggedIn)
         handleLoginChange(true);
@@ -50,28 +60,31 @@ function Home()
     }
   }
 
-  const sendLogoutRequest = () => {
-    let data = new FormData();
-    data.append('id', userId);
-
+  const sendLogoutRequest = () =>
+  {
+    const boundary = formDataBody.generateBoundary();
+    const header = {
+      'Content-Type': `multipart/form-data; boundary=${boundary}`
+    }
+    const body = formDataBody({ accessToken: updateToken() }, boundary);
+  
     fetch(apiUrlLogout, {
       method: 'POST',
-      body: data,
+      body: body,
       mode: 'cors',
-      credentials: 'include',
-      withCredentials: true,
-      sameSite: 'none',
-      secure: true
+      headers: header
     })
     .then(response => {
       if (response.status === 200) {
         // Update the isLoggedIn state
         setIsLoggedIn(false);
+        sessionStorage.removeItem(sessionName);
+        updateToken();
         console.log('User logged out');
       }
     })
     .catch(error => console.error(error));
-  }
+  }   
 
   const handleLoginRequest = () => {
     setShowModal(true);
@@ -95,6 +108,11 @@ function Home()
       sendLogoutRequest();
 
     setWasLoggedIn(loginStatus);
+  }
+
+  const handleRegister = () => {
+    // Send a verification email, and show a dialog
+    //  asking for the user to verify their email
   }
  
   return (
@@ -131,7 +149,8 @@ function Home()
 
           </Container>
         </Navbar>
-        <LoginOrRegisterModal shown={showModal} onShowModal={setShowModal} onHandleLoginChange={handleLoginChange}/>
+        <LoginOrRegisterModal shown={showModal} onShowModal={setShowModal} onHandleLogin={handleLoginChange} onHandleRegister={handleRegister} />
+        {/* <VerifyAccountModal shown={true} onShowModal={setShowModal} /> */}
       </header>
 
       {/* Main Content */}
