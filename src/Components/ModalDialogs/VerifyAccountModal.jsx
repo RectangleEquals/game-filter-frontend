@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 
-function VerifyAccountModal({ shown, onShowModal })
+function VerifyAccountModal({ token })
 {
-  const [show, setShown] = useState(shown);
+  const [show, setShown] = useState(true);
 
   const handleClose = () => {
     setShown(false);
@@ -21,6 +21,7 @@ function VerifyAccountModal({ shown, onShowModal })
         </p>
       </Modal.Body>
       <Modal.Footer>
+        { token && <p>Token: {token}</p> }
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>

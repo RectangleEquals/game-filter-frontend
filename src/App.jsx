@@ -1,4 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.css';
+import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from "react-router-dom";
 //import './App.css';
 
 import { useState } from "react";
@@ -11,16 +12,14 @@ import FilterBgVideo from "/videos/filtering.webm";
 import SearchForm from 'components/SearchForm/SearchForm';
 import DragDropList from 'components/DndContainer/DragDropList';
 */
-import ErrorBoundary from 'components/ErrorBoundary'
-
+import Root from './Components/Pages/Root';
 import Home from 'components/Pages/Home/Home';
+import NotFound from 'components/Pages/NotFound/NotFound';
 /*
 import Navbar from 'components/Pages/Navbar/Navbar';
-import NotFound from 'components/Pages/NotFound/NotFound';
 import About from 'components/Pages/About/About';
 import GameDetails from 'components/Pages/GameDetails/GameDetails';
 import AddGame from 'components/Pages/AddGame/AddGame';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 */
 
 // NOTE:
@@ -29,28 +28,22 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 // TODO: Setup SASS and research theme colors
 //  from https://getbootstrap.com/docs/5.0/customize/color/#theme-colors
 
-function App(props) {
+const router = createBrowserRouter(createRoutesFromElements(
+  <Route path="/" element={<Root />}>
+    <Route index path="/" element={<Home />} errorElement={<p>Something went wrong</p>} />
+    <Route path="verify/:verification" element={<Home />}/>
+    <Route path="*" element={<NotFound />}/>
+  </Route>
+));
+
+function App() {
   return (
     <div className='App'>
       {/* <VideoBg poster={FilterBgPoster}>
         <VideoBg.Source src={FilterBgVideo} type="video/webm" />
       </VideoBg> */}
 
-      <ErrorBoundary fallback={<p>Something went wrong</p>}>
-        <Home/>
-      </ErrorBoundary>
-
-      {/* <Router>
-        <Navbar />
-        <Routes>
-          <Route exact path="/" element={<Home/>} />
-          <Route exact path="/game/add/:gameId" element={<AddGame />} />
-          <Route exact path="/game/:gameId" element={<GameDetails />} />
-          <Route exact path="/about" element={<About />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router> */}
-
+      <RouterProvider router={router} />
 
       {/* <Container className='shadow-lg d-flex flex-column rounded m-0 p-3 searchform'>
         <DragDropList rowCount="4"/>

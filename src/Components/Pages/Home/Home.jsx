@@ -4,10 +4,11 @@ import resolveUrl from "utils/resolveUrl";
 import ImageAsset from 'components/ImageAsset';
 //import LoginModal from 'components/ModalDialogs/LoginModal';
 import LoginOrRegisterModal from 'components/ModalDialogs/LoginOrRegisterModal';
-import './Home.css';
 import Footer from '../Navbar/Footer';
 import formDataBody from 'form-data-body';
+import { useParams } from "react-router-dom";
 import VerifyAccountModal from '../../ModalDialogs/VerifyAccountModal';
+import './Home.css';
 
 const apiUrlBase = import.meta.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
@@ -18,12 +19,14 @@ const sessionName = import.meta.env.SESSION_COOKIE_NAME || "__gfsid";
 function Home()
 {
   const didMountRef = useRef(false);
+  const { verification } = useParams();
   const [accessToken, setAccessToken] = useState(sessionStorage.getItem(sessionName));
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
+    console.log(`/${verification}`);
     updateToken();
 
     if (!didMountRef.current) {
@@ -116,8 +119,7 @@ function Home()
   }
  
   return (
-    <div className="d-flex flex-column min-vh-100 min-vw-100 border-bottom border-primary">
-      
+    <>      
       <header>
         {/* Navigation Bar */}
         <Navbar className="navbar-header" expand="lg" variant="dark">
@@ -150,7 +152,7 @@ function Home()
           </Container>
         </Navbar>
         <LoginOrRegisterModal shown={showModal} onShowModal={setShowModal} onHandleLogin={handleLoginChange} onHandleRegister={handleRegister} />
-        {/* <VerifyAccountModal shown={true} onShowModal={setShowModal} /> */}
+        {verification && <VerifyAccountModal token={verification} />}
       </header>
 
       {/* Main Content */}
@@ -166,8 +168,7 @@ function Home()
       </main>
 
       <Footer buildId={buildId} commitId={commitId}></Footer>
-
-    </div>
+    </>
   );
 }
 

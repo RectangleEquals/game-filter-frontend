@@ -2,6 +2,8 @@ import WebsiteLogo from 'assets/react.svg';
 import UserAvatar from 'assets/avatar.svg';
 import DiscordLogo from 'assets/discord.svg';
 import MainLogo from 'assets/logo.svg';
+import Tumbleweed from 'assets/tumbleweed.png';
+import UFO from 'assets/ufo.gif';
 
 export default function ImageAsset(props) {
   const { className } = props;
@@ -15,6 +17,10 @@ export default function ImageAsset(props) {
         return DiscordLogo;
       else if(props.className.startsWith('asset-website-logo'))
         return WebsiteLogo;
+      else if(props.className.startsWith('asset-tumbleweed'))
+        return Tumbleweed;
+      else if(props.className.startsWith('asset-ufo'))
+        return UFO;
       else
         return MainLogo;
     }
@@ -55,8 +61,13 @@ export default function ImageAsset(props) {
   }
 
   return (
-    <div className={getDivStyle()}>
-      <img src={getAsset()} className={getImageStyle()}/>
-    </div>
+    props && props.style ? 
+      <div className={getDivStyle()} style={props.style}>
+        <img src={getAsset()} className={getImageStyle()} />
+      </div> 
+    : 
+      <div className={getDivStyle()}>
+        <img src={getAsset()} className={getImageStyle()} />
+      </div>
   );
 }
