@@ -32,16 +32,33 @@ export default function NotFound() {
   const [ufoSpeed, setUfoSpeed] = useState(8000);
   const [ufoPosition, setUfoPosition] = useState({ x: window.innerWidth + ufoImageSize, y: ufoImageSize });
   const [pageOpacity, setPageOpacity] = useState(100);
-  const [beamWidth, setBeamWidth] = useState(10);
-  const [beamHeight, setBeamHeight] = useState(0);
+  const [beamSize, setBeamSize] = useState({ width: "10%", height: "0%" });
+  const [beamPosition, setBeamPosition] = useState({ x: window.innerWidth / 2, y: 0 });
+  const beamSpeed = 2000;
 
   const ufoProps = useSpring({
+    zIndex: 100,
     position: 'absolute',
     top: ufoPosition.y,
     left: ufoPosition.x,
-    zIndex: 100,
+    pointerEvents: 'none',
     config: {
       duration: ufoSpeed
+    }
+  });
+
+  const beamProps = useSpring({
+    zIndex: 99,
+    position: 'absolute',
+    top: beamPosition.y,
+    left: beamPosition.x,
+    width: beamSize.width,
+    height: beamSize.height,
+    pointerEvents: 'none',
+    background: 'linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(0, 0, 0, 0) 100%)',
+    opacity: `${pageOpacity}%`,
+    config: {
+      duration: beamSpeed
     }
   });
 
@@ -58,11 +75,11 @@ export default function NotFound() {
   }, []);
 
   const beginUfoAnimation = () => {
-    setBeamHeight(0);
+    setBeamSize({ width: "0%", height: "0%" });
+    setBeamPosition({ x: window.innerWidth / 2, y: 0 });
     flyUfo();
     setTimeout(_ => {
-      setBeamWidth(10);
-      setBeamHeight(100);
+      setBeamSize({ width: "10%", height: "100%" });
       setTimeout(_ => {
         setPageOpacity(0);
       }, 3000);
@@ -128,27 +145,10 @@ export default function NotFound() {
     transition: 'opacity 1.5s ease-in-out'
   };
 
-  const beamDivStyle = {
-    position: 'absolute',
-    top: 0,
-    left: ufoPosition.x - ufoImageSize / 2,
-    width: `${beamWidth}%`,
-    height: `${beamHeight}%`,
-    background: 'linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(0, 0, 0, 0) 100%)',
-    zIndex: 99,
-    opacity: `${pageOpacity}%`,
-    transition: 'height 2s ease-in-out, width 1.5s ease-out, opacity 14s ease-out'
-  }
-
   return (
     <Container className="d-flex align-items-center justify-content-center m-0 p-0" style={rootContainerStyle}>
-      <animated.img
-        src="/src/assets/ufo.gif"
-        alt="UFO"
-        style={ufoProps}/>
-      <div className=""
-        style={beamDivStyle}
-      />
+      <animated.img src="/src/assets/ufo.gif" style={ufoProps}/>
+      <animated.div style={beamProps} />
 
       <Container className="d-flex align-items-center justify-content-center m-0 p-0" style={mainContainerStyle}>
         <Container className="m-0 p-0" style={innerContainerStyle}>
