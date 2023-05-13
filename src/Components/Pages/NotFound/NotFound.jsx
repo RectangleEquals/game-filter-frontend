@@ -171,7 +171,7 @@ export default function NotFound() {
         </Container>
       </Container>
       <div className='text-center' style={{opacity: 1 - pageOpacity}}>
-        <h4 style={{fontSize: '22px', margin: 0, padding: 0}}>404</h4><hr style={{margin: 0, padding: '0.1rem'}}/>
+        <h4 style={{fontSize: '22px', margin: 0, padding: 0}}>40404</h4><hr style={{margin: 0, padding: '0.1rem'}}/>
         <p className='lead' style={{fontSize: '12px', margin: 0, padding: 0}}>The 404 page not found</p>
       </div>
     </Container>
