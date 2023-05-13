@@ -34,18 +34,20 @@ export default function NotFound() {
   const [pageOpacity, setPageOpacity] = useState(100);
   const [beamSize, setBeamSize] = useState({ width: "10%", height: "0%" });
   const [beamPosition, setBeamPosition] = useState({ x: window.innerWidth / 2, y: 0 });
-  const beamSpeed = 2000;
-
-  const ufoProps = useSpring({
-    zIndex: 100,
-    position: 'absolute',
-    top: ufoPosition.y,
-    left: ufoPosition.x,
-    pointerEvents: 'none',
-    config: {
-      duration: ufoSpeed
+  const beamSpeed = 1200;
+  
+  const ufoProps = useSpring(
+    {
+      zIndex: 100,
+      position: 'absolute',
+      top: ufoPosition.y,
+      left: ufoPosition.x,
+      pointerEvents: 'none',
+      config: {
+        duration: ufoSpeed
+      }
     }
-  });
+  );
 
   const beamProps = useSpring({
     zIndex: 99,
@@ -57,6 +59,7 @@ export default function NotFound() {
     pointerEvents: 'none',
     background: 'linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(0, 0, 0, 0) 100%)',
     opacity: `${pageOpacity}%`,
+    transform: 'translate(-50%, 0%)',
     config: {
       duration: beamSpeed
     }
@@ -89,8 +92,8 @@ export default function NotFound() {
   const flyUfo = () => {
     setUfoPosition({ x: window.innerWidth / 2 - 50, y: ufoImageSize });
     setTimeout(_ => {
-      setUfoSpeed(3500);
-      setUfoPosition({ x: -ufoImageSize, y: ufoImageSize })
+      setUfoSpeed(2000);
+      setUfoPosition({ x: -ufoImageSize, y: ufoImageSize });
     }, 14500);
   };
 
@@ -100,7 +103,8 @@ export default function NotFound() {
     top: 0,
     bottom: 0,
     left: 0,
-    right: 0
+    right: 0,
+    userSelect: 'none'
   };
   
   const mainContainerStyle = {
@@ -161,14 +165,15 @@ export default function NotFound() {
             <div style={{fontFamily: 'Times New Roman', fontSize: "8pt"}}><p>All your page are belong to us: {(brightness * 100).toFixed(2)}%</p></div>
             <Button onClick={beginUfoAnimation}>Fly</Button>
           </Container>
-          <div className="tumbleweed" style={{
-            position: 'absolute',
-            bottom: '5%',
-          }}>
+          <div className="tumbleweed">
             <ImageAsset className="asset-tumbleweed" />
           </div>
         </Container>
       </Container>
+      <div className='text-center' style={{opacity: 1 - pageOpacity}}>
+        <h4 style={{fontSize: '22px', margin: 0, padding: 0}}>404</h4><hr style={{margin: 0, padding: '0.1rem'}}/>
+        <p className='lead' style={{fontSize: '12px', margin: 0, padding: 0}}>The 404 page not found</p>
+      </div>
     </Container>
   );
 };
