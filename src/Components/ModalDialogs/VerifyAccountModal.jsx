@@ -39,11 +39,11 @@ function VerifyAccountModal({ token, onAccountVerified })
         const result = await response.text();
         switch(status) {
           case 400:
-            if(status === 'verified') {
+            if(result === 'verified') {
               setAlertMessage({ variant: 'warning', title: 'Oops!', message: `Your account has already been verified!<br/>Feel free to login` });
-            } else if(status === 'pending') {
+            } else if(result === 'pending') {
               setAlertMessage({ variant: 'warning', title: 'Oops!', message: `Your account is still pending verification!<br/>Try waiting a while before logging in` });
-            } else if(status === 'invalid') {
+            } else if(result === 'invalid') {
               setAlertMessage({ variant: 'warning', title: 'Oops!', message: `Invalid or expired invitation<br/>Try registering again` });
             } else {
               setAlertMessage({ variant: 'danger', title: 'Oops!', message: `Something went wrong!<br/>Response: ${result}` });
