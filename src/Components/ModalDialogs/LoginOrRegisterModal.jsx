@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Modal, Form, Button, Tab, Tabs, Alert } from 'react-bootstrap';
 import resolveUrl from "utils/resolveUrl";
-import setCookie from "utils/setCookie";
+import DOMPurify from 'dompurify';
 import './LoginOrRegisterModal.css';
 
 const apiUrlBase = import.meta.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
@@ -78,21 +78,28 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
   const handleLoginResponse = (response) =>
   {
     setIsLoading(false);
+    setIsRegistering(false);
 
     if (response.ok) {
       response.json().then(data => {
         sessionStorage.setItem(sessionName, data.accessToken);
-        onHandleLogin(true);
         setLoginEmail("");
         setLoginPassword("");
+        setAlertMessage({variant: 'info', title: '', message: ''});
         onShowModal(false);
+        onHandleLogin(true);
       });
     } else {
-      setAlertMessage({
-        variant: "danger",
-        title: "Error",
-        message: `Error: ${response.status} ${response.statusText}`,
-      });
+      response.text().then(text => {
+        setAlertMessage({
+          variant: "danger",
+          title: "Error",
+          message: `${text}`,
+        });
+      }).catch(err => {
+        setAlertMessage({ variant: "danger", title: "Error", message: `Error: ${err.message}`});
+        setIsRegistering(false);
+      })
     }
   }
 
@@ -102,20 +109,43 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
 
     if (response.ok) {
       response.json().then(data => {
-        sessionStorage.setItem(sessionName, data.accessToken);
-        onHandleRegistration(true);
         setLoginEmail("");
         setLoginPassword("");
-        onShowModal(false);
+        setAlertMessage({variant: 'success', title: 'Account Verification', message: 'Please verify your account by visiting your registered email address and clicking the provided link'});
+        setIsRegistering(false);
+        if(onHandleRegistration)
+          onHandleRegistration(data.token);
       });
     } else {
-      setAlertMessage({
-        variant: "danger",
-        title: "Error",
-        message: `Error: ${response.status} ${response.statusText}`,
-      });
+      if(response.status === 418) {
+        response.text().then(text => {
+          if(text === 'verified') {
+            setAlertMessage({variant: 'warning', title: 'Account Verification', message: 'That account has already been registered'});
+          } else if(text === 'pending') {
+            setAlertMessage({variant: 'warning', title: 'Account Verification', message: 'That account is still pending verification<br/>Try checking the spam folders in your email'});
+          } else {
+            setAlertMessage({
+              variant: "danger",
+              title: text === 'invalid_name' || text === 'invalid_email' ? "Invalid" : "Unallowed",
+              message: text === 'invalid_name' ?
+                "DisplayNames can only contain letters, numbers, and single underscores" :
+                text === 'invalid_email' ?
+                "Please enter a valid email address" :
+                "DisplayNames cannot contain any profane, obscene or overly offensive material"
+            });
+          }
+          setIsRegistering(false);
+        }).catch(err => {
+          setAlertMessage({ variant: "danger", title: "Error", message: `Error: ${err.message}`});
+          setIsRegistering(false);
+        })
+      } else {
+        setAlertMessage({ variant: "danger", title: "Error", message: `Error: ${response.status} ${response.statusText}` });
+        setIsRegistering(false);
+      }
     }
   }
+
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setAlertMessage({});
@@ -197,7 +227,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                 <Form.Group controlId="registerFormDisplayName">
                   <Form.Label>Display Name</Form.Label>
                   <Form.Control
-                    name="displayname"
+                    name="displayName"
                     type="text"
                     className="mb-2"
                     placeholder="Enter display name"
@@ -238,8 +268,8 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                 {alertMessage && alertMessage.variant && alertMessage.message && alertMessage.message.length > 0 &&
                   <Alert className="pt-0 pb-2" variant={alertMessage.variant} style={{marginTop: '20px', marginBottom: '20px', wordWrap: 'break-word'}}>
                     <Alert.Heading>{alertMessage.title}</Alert.Heading>
-                    {alertMessage.message}
-                  </Alert>
+                    <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(alertMessage.message) }} />
+                 </Alert>
                 }
 
                 <hr/>

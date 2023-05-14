@@ -10,6 +10,7 @@ import { useParams } from "react-router-dom";
 import VerifyAccountModal from '../../ModalDialogs/VerifyAccountModal';
 import './Home.css';
 
+const clientUrlBase = import.meta.env.VITE_CLIENT_BASEPATH || "http://localhost";
 const apiUrlBase = import.meta.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
 const buildId = import.meta.env.VERCEL_GIT_COMMIT_SHA || "1.0.0";
@@ -113,9 +114,14 @@ function Home()
     setWasLoggedIn(loginStatus);
   }
 
-  const handleRegister = () => {
-    // Send a verification email, and show a dialog
-    //  asking for the user to verify their email
+  const handleRegister = (token) => {
+    if(token)
+      console.log(`[TOKEN]: ${token}`);
+  }
+
+  const handleVerification = () => {
+    console.log("SUCCESS!");
+    location.href = clientUrlBase;
   }
  
   return (
@@ -152,7 +158,7 @@ function Home()
           </Container>
         </Navbar>
         <LoginOrRegisterModal shown={showModal} onShowModal={setShowModal} onHandleLogin={handleLoginChange} onHandleRegister={handleRegister} />
-        {verification && <VerifyAccountModal token={verification} />}
+        {verification && <VerifyAccountModal token={verification} onAccountVerified={handleVerification}/>}
       </header>
 
       {/* Main Content */}
