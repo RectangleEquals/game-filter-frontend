@@ -28,6 +28,7 @@ const initialBrightness = calculateBrightness().brightness;
 const ufoImageSize = 90
 
 export default function NotFound() {
+  const [isButtonActive, setIsButtonActive] = useState(false);
   const [brightness, setBrightness] = useState(initialBrightness);
   const [ufoSpeed, setUfoSpeed] = useState(8000);
   const [ufoPosition, setUfoPosition] = useState({ x: window.innerWidth + ufoImageSize, y: ufoImageSize });
@@ -35,7 +36,7 @@ export default function NotFound() {
   const [beamSize, setBeamSize] = useState({ width: "10%", height: "0%" });
   const [beamPosition, setBeamPosition] = useState({ x: window.innerWidth / 2, y: 0 });
   const beamSpeed = 1200;
-  
+
   const ufoProps = useSpring(
     {
       zIndex: 100,
@@ -69,10 +70,15 @@ export default function NotFound() {
     const intervalId = setInterval(() => {
       let cb = calculateBrightness();
       setBrightness(cb.brightness);
-      if(cb.date === (new Date()).setHours(0, 0, 0, 0)) {
-        beginUfoAnimation();
-      }
+      const now = new Date();
+      const isMidnight = now.getHours() === 0 && now.getMinutes() <= 2;
+      setIsButtonActive(isMidnight);
     }, 1000);
+
+    // Hide the button after two minutes
+    setTimeout(() => {
+      setIsButtonActive(false);
+    }, 2 * 60 * 1000);
 
     return () => clearInterval(intervalId);
   }, []);
@@ -162,8 +168,14 @@ export default function NotFound() {
             <h2 className="display-4">Oops! Page not found</h2>
             <hr/>
             <p className="lead">The page you are looking for might have been removed or is<br/>temporarily unavailable or was probably eaten by a dog.</p>
-            <div style={{fontFamily: 'Times New Roman', fontSize: "8pt"}}><p>All your page are belong to us: {(brightness * 100).toFixed(2)}%</p></div>
-            <Button onClick={beginUfoAnimation}>Fly</Button>
+            {!isButtonActive &&
+              <div style={{fontFamily: 'Times New Roman', fontSize: "8pt"}}><p>All your page are belong to us: {(brightness * 100).toFixed(2)}%</p></div>
+            }
+            {isButtonActive &&
+              <Button variant="primary" onClick={beginUfoAnimation} disabled={!isButtonActive}>
+                All your page are belong to us
+              </Button>
+            }
           </Container>
           <div className="tumbleweed">
             <ImageAsset className="asset-tumbleweed" />
