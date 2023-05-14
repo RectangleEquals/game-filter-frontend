@@ -49,6 +49,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
     .catch(err => {
       setAlertMessage({variant: 'danger', title: `Error (${apiUrlLogin})`, message: err.message})
       setIsLoading(false);
+      setIsLoggingIn(false);
     });
   };
 
@@ -79,6 +80,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
   {
     setIsLoading(false);
     setIsRegistering(false);
+    setIsLoggingIn(false);
 
     if (response.ok) {
       response.json().then(data => {
