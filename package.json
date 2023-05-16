@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node -r dotenv/config $(npx vite --host --port 80)",
-    "prod": "npx vite",
-    "build": "npx vite build",
+    "build": "npx vite build && npx vite",
     "preview": "vite preview"
   },
   "dependencies": {
