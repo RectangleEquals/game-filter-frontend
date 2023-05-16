@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host --port 80",
-    "production": "npx vite",
+    "dev": "node -r dotenv/config $(npx vite --host --port 80)",
+    "prod": "npx vite",
     "build": "npx vite build",
     "preview": "vite preview"
   },
