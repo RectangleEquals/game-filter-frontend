@@ -4,10 +4,11 @@ import resolveUrl from "utils/resolveUrl";
 import DOMPurify from 'dompurify';
 import './LoginOrRegisterModal.css';
 
-const apiUrlBase = import.meta.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
+//const apiUrlBase = "http://gamefilter.servegame.com:4000/api/auth";
+const apiUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlLogin = resolveUrl(apiUrlBase, 'login');
 const apiUrlRegister = resolveUrl(apiUrlBase, 'register');
-const sessionName = import.meta.env.SESSION_COOKIE_NAME || "__gfsid";
+const sessionName = process.env.SESSION_COOKIE_NAME || "__gfsid";
 
 export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin, onHandleRegistration }) {
   const [title, setTitle] = useState('Login');
@@ -93,11 +94,15 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
       });
     } else {
       response.text().then(text => {
+      if(text == "User hasn't verified their account") {
+        setAlertMessage({ variant: "warning", title: "Unverified Account", message: 'That account is still pending verification<br/>Try checking the spam folders in your email' });
+      } else {
         setAlertMessage({
           variant: "danger",
           title: "Error",
           message: `${text}`,
         });
+      }
       }).catch(err => {
         setAlertMessage({ variant: "danger", title: "Error", message: `Error: ${err.message}`});
         setIsRegistering(false);
@@ -207,7 +212,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                 {alertMessage && alertMessage.variant && alertMessage.message && alertMessage.message.length > 0 &&
                   <Alert className="pt-0 pb-2" variant={alertMessage.variant} style={{marginTop: '20px', marginBottom: '20px', wordWrap: 'break-word'}}>
                     <Alert.Heading>{alertMessage.title}</Alert.Heading>
-                    {alertMessage.message}
+                    <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(alertMessage.message) }} />
                   </Alert>
                 }
                 

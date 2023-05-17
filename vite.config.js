@@ -1,10 +1,9 @@
 //import config from './src/config.js';
-import dotenv from 'dotenv';
-dotenv.config();
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import path from 'path';
+import fs from 'fs';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -18,6 +17,7 @@ export default defineConfig({
       '@': path.resolve(process.cwd(), './src'),
       'assets': path.resolve(process.cwd(), './src/assets'),
       'components': path.resolve(process.cwd(), './src/Components'),
+      'modals': path.resolve(process.cwd(), './src/Components/ModalDialogs'),
       'utils': path.resolve(process.cwd(), './src/utility'),
       'react-router-dom': path.resolve(process.cwd(), 'node_modules/react-router-dom'),
       '~bootstrap': path.resolve(process.cwd(), 'node_modules/react-bootstrap')
@@ -37,5 +37,32 @@ export default defineConfig({
     host: 'localhost',
     port: process.env.VITE_PORT || process.env.PORT || 80,
     nodePolyfills: ['url'],
+  },
+  define: {
+    'process.env': processEnv(),
   }
 });
+
+function processEnv() {
+  if (process.env.NODE_ENV === 'production') {
+    // Use environment variables directly from the system
+    return undefined;
+  } else {
+    // Use environment variables from dotenv in development
+    return JSON.stringify(loadEnv());
+  }
+}
+
+function loadEnv() {
+  const envPath = path.resolve(__dirname, '.env');
+  const envFile = fs.readFileSync(envPath, 'utf8');
+  const lines = envFile.split('\n');
+  const env = {};
+
+  for (const line of lines) {
+    const [key, value] = line.split('=');
+    env[key] = value;
+  }
+
+  return env;
+}

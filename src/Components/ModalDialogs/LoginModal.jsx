@@ -4,7 +4,8 @@ import resolveUrl from "utils/resolveUrl";
 import getExternalIP from "utils/getExternalIP";
 import { Container, Alert } from "react-bootstrap";
 
-const apiUrlBase = import.meta.env.VITE_API_BASEPATH || "http://localhost/api";
+const apiUrlBase = process.env.VITE_API_BASEPATH || "http://localhost/api";
+//const apiUrlBase = "http://gamefilter.servegame.com:4000/api";
 const apiUrlAuth = resolveUrl(apiUrlBase, 'auth');
 
 const LoginModal = ({ shown, setShowModal, setLoginStatus }) =>

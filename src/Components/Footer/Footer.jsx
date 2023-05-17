@@ -1,9 +1,13 @@
+import './Footer.css';
 import { useState } from "react";
 import { Button, Navbar, Nav, Container } from "react-bootstrap";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
-import '../Home/Home.css';
 
-function Footer({ buildId, commitId }) {
+const buildId = process.env.VERCEL_GIT_COMMIT_SHA || "1.0.0";
+const commitId = process.env.VERCEL_GIT_COMMIT_REF || "alpha";
+
+export default function Footer()
+{
   const [visible, setVisible] = useState(false);
 
   const toggleVisible = () => {
@@ -75,5 +79,3 @@ function Footer({ buildId, commitId }) {
     </footer>
   );
 }
-
-export default Footer;

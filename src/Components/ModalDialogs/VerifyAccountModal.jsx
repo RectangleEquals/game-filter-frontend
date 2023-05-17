@@ -4,7 +4,8 @@ import resolveUrl from "utils/resolveUrl";
 import DOMPurify from 'dompurify';
 import './VerifyAccountModal.css';
 
-const apiUrlBase = import.meta.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
+const apiUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
+//const apiUrlBase = "http://gamefilter.servegame.com:4000/api/auth";
 const apiUrlVerify = resolveUrl(apiUrlBase, 'verify');
 
 function VerifyAccountModal({ token, onAccountVerified })
