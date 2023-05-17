@@ -1,0 +1,47 @@
+.settings-overlay {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background-color: #ffffff;
+}
+
+.social-account-links {
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+}
+
+.social-account-button {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.social-account-logo {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+.account-status {
+  margin-left: auto;
+  color: green;
+}
+
+.social-circles {
+  margin: 8px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.action-button {
+  margin-left: 8px;
+}

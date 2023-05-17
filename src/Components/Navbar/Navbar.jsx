@@ -1,6 +1,7 @@
 import './Navbar.css'
 import { useState, useEffect, useRef } from 'react';
 import { Container, Navbar as BootstrapNavbar, Nav } from 'react-bootstrap';
+import useAuthContext from 'components/AuthContext/AuthContext';
 import LoginOrRegisterModal from "modals/LoginOrRegisterModal";
 import VerifyAccountModal from "modals/VerifyAccountModal";
 import ImageAsset from 'components/ImageAsset';
@@ -14,10 +15,10 @@ const sessionName = process.env.SESSION_COOKIE_NAME || "__gfsid";
 
 export default function Navbar({verification})
 {
-  const [accessToken, setAccessToken] = useState(sessionStorage.getItem(sessionName));
   const didMountRef = useRef(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
+  const [accessToken, setAccessToken] = useState(sessionStorage.getItem(sessionName));
+  const authContext = useAuthContext();
+  const [wasLoggedIn, setWasLoggedIn] = useState(authContext.isLoggedIn);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -45,13 +46,13 @@ export default function Navbar({verification})
   const checkSession = () => {
     if (accessToken) {
       // User is logged in
-      if(!isLoggedIn)
+      if(!authContext.isLoggedIn)
         handleLoginChange(true);
 
       console.log('User is logged in');
     } else {
       // User is not logged in
-      if(isLoggedIn)
+      if(authContext.isLoggedIn)
         handleLoginChange(false);
 
       console.log('User is not logged in');
@@ -75,7 +76,7 @@ export default function Navbar({verification})
     .then(response => {
       if (response.status === 200) {
         // Update the isLoggedIn state
-        setIsLoggedIn(false);
+        authContext.setIsLoggedIn(false);
         sessionStorage.removeItem(sessionName);
         updateToken();
         console.log('User logged out');
@@ -90,13 +91,13 @@ export default function Navbar({verification})
   
   const handleLogoutRequest = () => {
     console.log('handleLogout');
-    if(isLoggedIn)
+    if(authContext.isLoggedIn)
       handleLoginChange(false);
     setShowModal(false);
   };
 
   const handleLoginChange = (loginStatus) => {
-    setIsLoggedIn(loginStatus);
+    authContext.setIsLoggedIn(loginStatus);
     if(loginStatus != wasLoggedIn) {
       console.log('handleLoginChange: ' + loginStatus);
     }
@@ -126,7 +127,7 @@ export default function Navbar({verification})
 
           {/* Website Logo and Title */}
           <BootstrapNavbar.Brand className="d-flex align-items-center" href={clientUrlBase}>
-            <a href={clientUrlBase}><ImageAsset className="asset-main-logo img-website-logo img-show-border" /></a>
+            <ImageAsset className="asset-main-logo img-website-logo img-show-border" />
             <span className="website-name flex-fill text-center">Game Filter</span>
           </BootstrapNavbar.Brand>
 
@@ -134,7 +135,7 @@ export default function Navbar({verification})
           <BootstrapNavbar.Toggle aria-controls="navbar-nav" />
           <BootstrapNavbar.Collapse id="navbar-nav" className="justify-content-end align-items-center">
             <Nav>
-              {isLoggedIn ? (
+              {authContext.isLoggedIn ? (
                 <Nav.Link href="#" className='d-flex flex-row justify-content-center align-items-center' onClick={handleLogoutRequest}>
                   <span className="user-name">Logout</span>
                   <ImageAsset className="asset-user-avatar img-user-avatar img-show-border" />

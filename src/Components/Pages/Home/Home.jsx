@@ -1,5 +1,6 @@
 import Footer from "components/Footer/Footer";
 import ImageAsset from 'components/ImageAsset';
+//import Settings from "components/Settings/Settings";
 import './Home.css';
 
 function Home()
