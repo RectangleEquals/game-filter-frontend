@@ -28,7 +28,10 @@ const initialBrightness = calculateBrightness().brightness;
 const ufoImageSize = 90
 
 export default function NotFound() {
+  const [isButtonVisible, setIsButtonVisible] = useState(false);
   const [isButtonActive, setIsButtonActive] = useState(false);
+  const [isMidnight, setIsMidnight] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [brightness, setBrightness] = useState(initialBrightness);
   const [ufoSpeed, setUfoSpeed] = useState(8000);
   const [ufoPosition, setUfoPosition] = useState({ x: window.innerWidth + ufoImageSize, y: ufoImageSize });
@@ -37,18 +40,16 @@ export default function NotFound() {
   const [beamPosition, setBeamPosition] = useState({ x: window.innerWidth / 2, y: 0 });
   const beamSpeed = 1200;
 
-  const ufoProps = useSpring(
-    {
-      zIndex: 100,
-      position: 'absolute',
-      top: ufoPosition.y,
-      left: ufoPosition.x,
-      pointerEvents: 'none',
-      config: {
-        duration: ufoSpeed
-      }
+  const ufoProps = useSpring({
+    zIndex: 100,
+    position: 'absolute',
+    top: ufoPosition.y,
+    left: ufoPosition.x,
+    pointerEvents: 'none',
+    config: {
+      duration: ufoSpeed
     }
-  );
+  });
 
   const beamProps = useSpring({
     zIndex: 99,
@@ -66,27 +67,44 @@ export default function NotFound() {
     }
   });
 
-  useEffect(() => {
+  useEffect(() =>
+  {
     const intervalId = setInterval(() => {
       let cb = calculateBrightness();
       setBrightness(cb.brightness);
       const now = new Date();
-      const isMidnight = now.getHours() === 0 && now.getMinutes() <= 2;
-      setIsButtonActive(isMidnight);
+      setIsMidnight(now.getHours() === 0 && now.getMinutes() <= 2);
     }, 1000);
 
     // Hide the button after two minutes
     setTimeout(() => {
-      setIsButtonActive(false);
+      setIsButtonVisible(false);
     }, 2 * 60 * 1000);
 
     return () => clearInterval(intervalId);
   }, []);
 
+  useEffect(_ => {
+    setIsButtonVisible(isMidnight);
+  }, [isMidnight])
+
+  useEffect(_ => {
+    setIsButtonActive(isButtonVisible && !isAnimating);
+  }, [isButtonVisible, isAnimating]);
+
   const beginUfoAnimation = () => {
+    setIsAnimating(true);
     setBeamSize({ width: "0%", height: "0%" });
     setBeamPosition({ x: window.innerWidth / 2, y: 0 });
-    flyUfo();
+
+    // UFO Animation
+    setUfoPosition({ x: window.innerWidth / 2 - 50, y: ufoImageSize });
+    setTimeout(_ => {
+      setUfoSpeed(2000);
+      setUfoPosition({ x: -ufoImageSize, y: ufoImageSize });
+    }, 14500);
+
+    // Beam Animation
     setTimeout(_ => {
       setBeamSize({ width: "10%", height: "100%" });
       setTimeout(_ => {
@@ -94,14 +112,6 @@ export default function NotFound() {
       }, 3000);
     }, 10000);
   }
-  
-  const flyUfo = () => {
-    setUfoPosition({ x: window.innerWidth / 2 - 50, y: ufoImageSize });
-    setTimeout(_ => {
-      setUfoSpeed(2000);
-      setUfoPosition({ x: -ufoImageSize, y: ufoImageSize });
-    }, 14500);
-  };
 
   const rootContainerStyle = {
     minWidth: '100vw',
@@ -168,10 +178,10 @@ export default function NotFound() {
             <h2 className="display-4">Oops! Page not found</h2>
             <hr/>
             <p className="lead">The page you are looking for might have been removed or is<br/>temporarily unavailable or was probably eaten by a dog.</p>
-            {!isButtonActive &&
+            {!isButtonVisible &&
               <div style={{fontFamily: 'Times New Roman', fontSize: "8pt"}}><p>All your page are belong to us: {(brightness * 100).toFixed(2)}%</p></div>
             }
-            {isButtonActive &&
+            {isButtonVisible &&
               <Button variant="primary" onClick={beginUfoAnimation} disabled={!isButtonActive}>
                 All your page are belong to us
               </Button>
