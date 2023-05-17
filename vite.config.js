@@ -45,7 +45,7 @@ export default defineConfig({
 function processEnv() {
   if (process.env.NODE_ENV === 'production') {
     // Use environment variables directly from the system
-    return undefined;
+    return import.meta.env;
   } else {
     // Use environment variables from dotenv in development
     return JSON.stringify(loadEnv());

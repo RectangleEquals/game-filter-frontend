@@ -4,7 +4,6 @@ import resolveUrl from "utils/resolveUrl";
 import DOMPurify from 'dompurify';
 import './LoginOrRegisterModal.css';
 
-//const apiUrlBase = "http://gamefilter.servegame.com:4000/api/auth";
 const apiUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlLogin = resolveUrl(apiUrlBase, 'login');
 const apiUrlRegister = resolveUrl(apiUrlBase, 'register');

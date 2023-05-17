@@ -4,7 +4,6 @@ import { Card, Container, Button } from "react-bootstrap";
 import { resolveUrl } from "utils/resolveUrl";
 
 const apiUrlBase = process.env.VITE_API_BASEPATH || "http://localhost/api";
-//const apiUrlBase = "http://gamefilter.servegame.com:4000/api";
 const apiUrlGames = resolveUrl(apiUrlBase, 'games');
 
 const GameDetails = () => {
