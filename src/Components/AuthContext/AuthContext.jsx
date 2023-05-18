@@ -47,7 +47,7 @@ export function AuthProvider({ children })
       headers: header
     }).then(async response => {
       if(response.ok) {
-        const userData = response.json().then(userData => {
+        response.json().then(userData => {
           setUserInfo(userData);
         }).catch(err => {
           console.error(`[ERROR]: ${err}`);

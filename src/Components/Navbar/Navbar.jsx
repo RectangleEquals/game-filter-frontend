@@ -23,9 +23,9 @@ const sessionName = process.env.SESSION_COOKIE_NAME || "__gfsid";
 
 export default function Navbar({verification})
 {
+  const authContext = useAuthContext();
   const didMountRef = useRef(false);
   const [accessToken, setAccessToken] = useState(sessionStorage.getItem(sessionName));
-  const authContext = useAuthContext();
   const [wasLoggedIn, setWasLoggedIn] = useState(authContext.isLoggedIn);
   const [showModal, setShowModal] = useState(false);
 
