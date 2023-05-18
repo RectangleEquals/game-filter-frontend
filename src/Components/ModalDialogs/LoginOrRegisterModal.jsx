@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
 import { Modal, Form, Button, Tab, Tabs, Alert } from 'react-bootstrap';
-import resolveUrl from "utils/resolveUrl";
+import resolveUrl from 'utils/resolveUrl';
 import DOMPurify from 'dompurify';
+import formDataBody from 'form-data-body';
 import './LoginOrRegisterModal.css';
 
 const apiUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
@@ -39,11 +40,19 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
     setIsLoggingIn(true);
     setAlertMessage({variant: "info", message: "Logging in..."});
     
-    const data = new FormData(formRef.current);
+    const boundary = formDataBody.generateBoundary();
+    const body = formDataBody({
+      email: loginEmail,
+      password: loginPassword
+    }, boundary);
+
     fetch(apiUrlLogin, {
       method: 'POST',
-      body: data,
-      mode: 'cors'
+      body: body,
+      mode: 'cors',
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`
+      }
     })
     .then(response => handleLoginResponse(response))
     .catch(err => {
@@ -62,11 +71,20 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
     setIsRegistering(true);
     setAlertMessage({variant: "info", message: "Registering..."});
     
-    const data = new FormData(formRef.current);
+    const boundary = formDataBody.generateBoundary();
+    const body = formDataBody({
+      displayName: registerDisplayName,
+      email: registerEmail,
+      password: registerPassword
+    }, boundary);
+
     fetch(apiUrlRegister, {
       method: 'POST',
-      body: data,
-      mode: 'cors'
+      body: body,
+      mode: 'cors',
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`
+      }
     })
     .then(response => handleRegisterResponse(response))
     .catch(err => {
@@ -191,7 +209,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                     placeholder="Enter email"
                     disabled={isLoading}
                     value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
+                    onChange={e => setLoginEmail(e.target.value)}
                   />
                 </Form.Group>
 
@@ -204,7 +222,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                     disabled={isLoading}
                     value={loginPassword}
                     autoComplete="current-password"
-                    onChange={(e) => setLoginPassword(e.target.value)}
+                    onChange={e => setLoginPassword(e.target.value)}
                   />
                 </Form.Group>
 
@@ -239,7 +257,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                     placeholder="Enter display name"
                     disabled={isLoading}
                     value={registerDisplayName}
-                    onChange={(e) => setRegisterDisplayName(e.target.value)}
+                    onChange={e => setRegisterDisplayName(e.target.value)}
                   />
                 </Form.Group>
 
@@ -253,7 +271,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                     disabled={isLoading}
                     value={registerEmail}
                     autoComplete="email"
-                    onChange={(e) => setRegisterEmail(e.target.value)}
+                    onChange={e => setRegisterEmail(e.target.value)}
                   />
                 </Form.Group>
 

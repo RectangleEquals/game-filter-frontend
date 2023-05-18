@@ -13,6 +13,14 @@ const apiUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
 const sessionName = process.env.SESSION_COOKIE_NAME || "__gfsid";
 
+// TODO: Remove the `Logout` text, and only display `Login / Register`
+//  text when there is no valid session or valid, logged in user
+
+// TODO: Create a drop-down menu for the avatar with the following contents:
+// - Currently logged in user's DisplayName
+// - A `Settings` entry, to display the `Settings` component
+// - A `Logout` entry, to log the user out
+
 export default function Navbar({verification})
 {
   const didMountRef = useRef(false);
