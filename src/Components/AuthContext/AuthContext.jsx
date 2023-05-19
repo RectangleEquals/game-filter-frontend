@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import resolveUrl from "utils/resolveUrl";
 import formDataBody from 'form-data-body';
 
+const isMaintenanceMode = process.env.NODE_ENV !== "production";
 const apiUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlUser = resolveUrl(apiUrlBase, 'user');
 const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
@@ -12,6 +13,7 @@ export const AuthContext = createContext();
 export function AuthProvider({ children })
 {
   const didMountRef = useRef(false);
+  const [maintenanceMode, setMaintenanceMode] = useState(isMaintenanceMode);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(sessionStorage.getItem(sessionName));
   const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
@@ -150,6 +152,8 @@ export function AuthProvider({ children })
   return (
     <AuthContext.Provider
       value={{
+        maintenanceMode,
+        setMaintenanceMode,
         isLoggedIn,
         setIsLoggedIn,
         accessToken,

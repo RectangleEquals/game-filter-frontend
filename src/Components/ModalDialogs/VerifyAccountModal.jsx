@@ -7,7 +7,7 @@ import './VerifyAccountModal.css';
 const apiUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlVerify = resolveUrl(apiUrlBase, 'verify');
 
-function VerifyAccountModal({ token, onAccountVerified })
+export default function VerifyAccountModal({ token, onAccountVerified })
 {
   const [show, setShown] = useState(true);
   const [isVerifying, setIsVerifying] = useState(true);
@@ -90,5 +90,3 @@ function VerifyAccountModal({ token, onAccountVerified })
     </Modal>
   );
 }
-
-export default VerifyAccountModal;

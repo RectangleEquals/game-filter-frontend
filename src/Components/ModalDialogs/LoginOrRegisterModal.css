@@ -5,7 +5,7 @@
 .login-register-modal .login-register-modal-header {
   background: linear-gradient(to right, #5865F2 0%, #5865F2 33%, #0ebad1 100%);
   color: #d3faff;
-  text-shadow: 2px 3px 2px #0e92c2, 0 0 1em #5865F2, 0 0 0.2em rgba(88, 101, 242, 0.588);
+  text-shadow: 2px 3px 2px #0e92c2, 0 0 1em #5865F2, 0 0 0.2em #5865f296;
   font-family: 'Bruno Ace SC', cursive;
   font-size: 19px;
   box-shadow: 2px 1px 6px rgba(0, 0, 0, 0.3);

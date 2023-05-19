@@ -41,7 +41,7 @@ export default function Navbar({verification})
     <header>
       {/* Navigation Bar */}
       <BootstrapNavbar className="navbar-header" expand="lg" variant="dark">
-        <Container fluid className="w-100">
+        <Container fluid className="w-100" style={{userSelect: 'none'}}>
 
           {/* Website Logo and Title */}
           <BootstrapNavbar.Brand className="d-flex align-items-center" href={clientUrlBase}>

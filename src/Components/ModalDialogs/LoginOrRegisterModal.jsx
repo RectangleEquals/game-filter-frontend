@@ -11,7 +11,8 @@ const apiUrlLogin = resolveUrl(apiUrlBase, 'login');
 const apiUrlRegister = resolveUrl(apiUrlBase, 'register');
 const sessionName = process.env.SESSION_COOKIE_NAME || "__gfsid";
 
-export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin, onHandleRegistration }) {
+export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin, onHandleRegistration })
+{
   const authContext = useAuthContext();
   const [title, setTitle] = useState('Login');
   const [activeTab, setActiveTab] = useState('login');

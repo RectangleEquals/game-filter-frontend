@@ -1,7 +1,10 @@
 import WebsiteLogo from 'assets/react.svg';
+import MainLogo from 'assets/logo.svg';
 import UserAvatar from 'assets/avatar.svg';
 import DiscordLogo from 'assets/discord.svg';
-import MainLogo from 'assets/logo.svg';
+import SteamLogo from 'assets/steam.svg';
+import MicrosoftLogo from 'assets/xbox.svg';
+import EpicLogo from 'assets/epic.svg';
 import Tumbleweed from 'assets/tumbleweed.png';
 import UFO from 'assets/ufo.gif';
 
@@ -11,12 +14,18 @@ export default function ImageAsset(props) {
   const getAsset = () => {
     // Determines which asset to load
     if (props && props.className) {
-      if(props.className.startsWith('asset-user-avatar'))
+      if(props.className.startsWith('asset-website-logo'))
+        return WebsiteLogo;
+      else if(props.className.startsWith('asset-user-avatar'))
         return UserAvatar;
       else if(props.className.startsWith('asset-discord-logo'))
         return DiscordLogo;
-      else if(props.className.startsWith('asset-website-logo'))
-        return WebsiteLogo;
+      else if(props.className.startsWith('asset-steam-logo'))
+        return SteamLogo;
+      else if(props.className.startsWith('asset-microsoft-logo'))
+        return MicrosoftLogo;
+      else if(props.className.startsWith('asset-epic-logo'))
+        return EpicLogo;
       else if(props.className.startsWith('asset-tumbleweed'))
         return Tumbleweed;
       else if(props.className.startsWith('asset-ufo'))

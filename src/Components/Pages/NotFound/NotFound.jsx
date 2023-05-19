@@ -27,7 +27,8 @@ const maxBrightness = 1.0
 const initialBrightness = calculateBrightness().brightness;
 const ufoImageSize = 90
 
-export default function NotFound() {
+export default function NotFound()
+{
   const [isButtonVisible, setIsButtonVisible] = useState(false);
   const [isButtonActive, setIsButtonActive] = useState(false);
   const [isMidnight, setIsMidnight] = useState(false);

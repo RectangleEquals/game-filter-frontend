@@ -4,13 +4,36 @@
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 9999;
-  background-color: #ffffff;
+  background: linear-gradient(to right, #DAF5F8 0%, #B1E8F0 33%, #DAEFF8 100%);
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 16px 0px;
+  border-radius: 22px;
+  overflow-y: auto;
+}
+
+.settings-overlay .settings-header {
+  background: linear-gradient(to right, #5865F2 0%, #5865F2 33%, #0ebad1 100%);
+  color: #d3faff;
+  text-shadow: 2px 3px 2px #0e92c2, 0 0 1em #5865F2, 0 0 0.2em #5865f296;
+  font-family: 'Bruno Ace SC', cursive;
+  font-size: 19px;
+  box-shadow: 2px 1px 6px rgba(0, 0, 0, 0.3);
+  margin: 0px 0px 0px 0px;
+  padding: 10px 0px 4px 20px;
+  border-radius: 20px 20px 0px 0px;
+}
+
+.social-container {
+  display: flex;
+  flex-direction: column;
+  margin: 0px 0px 0px 0px;
+  padding: 20px 20px 0px 20px;
 }
 
 .social-account-links {
   display: flex;
-  flex-direction: column;
-  width: 20%;
+  flex-direction: row;
+  width: 320px;
 }
 
 .social-account-button {
@@ -21,19 +44,14 @@
   width: 100%;
 }
 
-.social-account-logo {
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
-}
-
 .account-status {
   margin-left: auto;
   color: green;
 }
 
 .social-circles {
-  margin: 8px;
+  margin: 0px 0px 0px 0px;
+  padding: 8px 0 8px 0;
 }
 
 .action-buttons {
