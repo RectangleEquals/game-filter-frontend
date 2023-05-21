@@ -1,9 +1,9 @@
 import './Home.css';
+import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import Footer from "components/Footer/Footer";
-import ImageAsset from 'components/ImageAsset';
-import useAuthContext from 'components/AuthContext/AuthContext';
-import { useState, useEffect } from 'react';
+import ImageAsset from "components/ImageAsset";
+import useAuthContext from "components/AuthContext/AuthContext";
 import Settings from "components/Pages/Settings/Settings";
 
 const debugModeKeySequence = 'humbug';
@@ -23,8 +23,11 @@ export default function Home({page}) {
       } catch { /* Do nothing */ }
     };
 
-    if(page === "settings")
+    if(page === "settings") {
+      if(authContext.message) {
+      }
       setShowSettings(true);
+    }
 
     window.addEventListener('keydown', handleKeyDown);
 

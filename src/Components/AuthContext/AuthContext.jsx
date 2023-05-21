@@ -9,7 +9,7 @@ const sessionName = process.env.SESSION_COOKIE_NAME || "__gfsid";
 
 export const AuthContext = createContext();
 
-export function AuthProvider({ children })
+export function AuthProvider({ message, children })
 {
   const didMountRef = useRef(false);
   const [maintenanceMode, setMaintenanceMode] = useState(isMaintenanceMode);
@@ -18,6 +18,8 @@ export function AuthProvider({ children })
   const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
 
   useEffect(_ => {
+    if(message)
+      message = atob(message);
     updateToken();
 
     if (!didMountRef.current) {
@@ -101,6 +103,7 @@ export function AuthProvider({ children })
   return (
     <AuthContext.Provider
       value={{
+        message,
         maintenanceMode,
         setMaintenanceMode,
         isLoggedIn,

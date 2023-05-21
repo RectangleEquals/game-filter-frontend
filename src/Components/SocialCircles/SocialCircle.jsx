@@ -1,9 +1,10 @@
 import './SocialCircle.css';
 import { useEffect, useState } from 'react';
-import { Button, Form, ListGroup } from 'react-bootstrap';
+import { Form, ListGroup } from 'react-bootstrap';
 import useSocialCircleContext from './SocialCircleContext';
 
-export default function SocialCircle() {
+export default function SocialCircle()
+{
   const socialCircleContext = useSocialCircleContext();
   const [searchText, setSearchText] = useState('');
 

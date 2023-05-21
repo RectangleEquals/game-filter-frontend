@@ -11,6 +11,7 @@ function App()
       <Route index path="/" element={<Home />} errorElement={<p>Something went wrong</p>} />
       <Route path="verify/:verification" element={<Home />} />
       <Route path="settings/" element={<Home page={"settings"}/>} />
+      <Route path="settings/:message" element={<Home page={"settings"}/>} />
       <Route path="*" element={<NotFound />}/>
     </Route>
   ));

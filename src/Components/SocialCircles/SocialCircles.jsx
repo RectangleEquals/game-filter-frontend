@@ -1,5 +1,5 @@
 import './SocialCircles.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Container, Form, ListGroup } from 'react-bootstrap';
 import ImageAsset from 'components/ImageAsset';
 import SocialCircle from './SocialCircle';
@@ -15,6 +15,27 @@ export default function SocialCircles()
   const [socialCircles, setSocialCircles] = useState([]);
   const [circleName, setCircleName] = useState('');
 
+  useEffect(_ => {
+    for(const account of socialCircleContext.socialData) {
+      if(account.provider === 'epic') {
+        handleLinkAccount('Epic Games');
+        handleSelectAccount('Epic Games');
+      }
+      if(account.provider === 'microsoft') {
+        handleLinkAccount('Microsoft');
+        handleSelectAccount('Microsoft');
+      }
+      if(account.provider === 'steam') {
+        handleLinkAccount('Steam');
+        handleSelectAccount('Steam');
+      }
+      if(account.provider === 'discord') {
+        handleLinkAccount('Discord');
+        handleSelectAccount('Discord');
+      }
+    }
+  }, [socialCircleContext.socialData]);
+
   // Handler function for linking social accounts
   const handleLinkAccount = (account) => {
     setLinkedAccounts(prevLinkedAccounts =>
@@ -27,6 +48,15 @@ export default function SocialCircles()
   // Handler function for selecting an account from the dropdown
   const handleSelectAccount = (account) => {
     setSelectedAccount(account || '');
+    if(account === 'Discord') {
+      let data = socialCircleContext.socialData[0].data;
+      let guilds = [];
+      for(const guild of data.guilds) {
+        guilds.push(guild.name);
+      }
+      guilds.sort((a, b) => a.localeCompare(b));
+      socialCircleContext.setFriends(guilds);
+    }
   };
 
   // Handler function for saving a social circle

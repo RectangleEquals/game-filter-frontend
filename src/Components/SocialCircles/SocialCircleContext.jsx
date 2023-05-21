@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import useAuthContext from 'components/AuthContext/AuthContext';
 import generateNames from 'utils/generateNames';
 import formDataBody from 'form-data-body';
@@ -10,7 +10,7 @@ const initialFriends = generateNames(5);
 
 export const SocialCircleContext = createContext();
 
-export function SocialCircleProvider({ onSetLinkedSocials, children })
+export function SocialCircleProvider({ children })
 {
   const authContext = useAuthContext();
   const [friends, setFriends] = useState(initialFriends);
@@ -19,7 +19,7 @@ export function SocialCircleProvider({ onSetLinkedSocials, children })
 
   useEffect(_ => {
     requestSocialData();
-  });
+  }, []);
 
   const requestAccountLink = async(provider) =>
   {
@@ -82,17 +82,18 @@ export function SocialCircleProvider({ onSetLinkedSocials, children })
 
   const handleSocialDataResponse = async(response) => {
     try {
-      
+      const userData = await response.json();
+      setSocialData(userData);
     } catch (err) {
-      
+      console.error(err.message);
     }
   }
 
   return (
     <SocialCircleContext.Provider
       value={{
+        socialData,
         requestAccountLink,
-        requestFriends,
         friends,
         setFriends,
         filteredFriends,
