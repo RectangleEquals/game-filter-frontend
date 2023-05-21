@@ -24,7 +24,7 @@ export default function Settings()
         </Container>
         <Container className="social-container">
           <div className="social-circles">
-            <SocialCircleProvider>
+            <SocialCircleProvider onSetLinkedSocials={linkedSocials => setLinkedSocials(linkedSocials)}>
               <SocialCircles linkedSocials={linkedSocials} />
             </SocialCircleProvider>
           </div>

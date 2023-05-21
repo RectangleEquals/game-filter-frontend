@@ -1,20 +1,25 @@
 import { createContext, useContext, useState } from 'react';
 import useAuthContext from 'components/AuthContext/AuthContext';
-import generateNames from '../../utility/generateNames';
+import generateNames from 'utils/generateNames';
 import formDataBody from 'form-data-body';
 
 const discordAuthUrl = process.env.DISCORD_AUTHURL;
+const socialDataUrl = process.env.SOCIAL_DATA_URL;
 const sessionName = process.env.SESSION_COOKIE_NAME || "__gfsid";
-const socialLinksName = process.env.SESSION_SOCIAL_LINK_NAME || "__gflink";
 const initialFriends = generateNames(5);
 
 export const SocialCircleContext = createContext();
 
-export function SocialCircleProvider({ children })
+export function SocialCircleProvider({ onSetLinkedSocials, children })
 {
   const authContext = useAuthContext();
   const [friends, setFriends] = useState(initialFriends);
   const [filteredFriends, setFilteredFriends] = useState(initialFriends);
+  const [socialData, setSocialData] = useState([]);
+
+  useEffect(_ => {
+    requestSocialData();
+  });
 
   const requestAccountLink = async(provider) =>
   {
@@ -33,9 +38,7 @@ export function SocialCircleProvider({ children })
     }
 
     const boundary = formDataBody.generateBoundary();
-    const body = formDataBody({
-      accessToken: sessionStorage.getItem(sessionName)
-    }, boundary);
+    const body = formDataBody({ accessToken: authContext.accessToken }, boundary);
 
     fetch(apiUrl, {
       method: 'POST',
@@ -49,36 +52,39 @@ export function SocialCircleProvider({ children })
     .catch(err => console.error(err));
   }
 
-  // TODO: Have this function fetch the user's social account friends
-  const requestFriends = async(provider) =>
+  const requestSocialData = async() =>
   {
-    switch(provider) {
-      case 'Discord':
-        break;
-      case 'Steam':
-        break;
-      case 'Microsoft':
-        break;
-      case 'Epic':
-        break;
-      default:
-        setFriends([]);
-    }
-    return friends;
+    const boundary = formDataBody.generateBoundary();
+    const body = formDataBody({ accessToken: authContext.accessToken }, boundary);
+
+    fetch(socialDataUrl, {
+      method: 'POST',
+      body: body,
+      mode: 'cors',
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`
+      }
+    })
+    .then(response => handleSocialDataResponse(response))
+    .catch(err => console.error(err));
   }
 
   const handleAccountLinkResponse = async(provider, response) => {
     try {
-      // Set the provider in session storage for AuthContext
-      //  to see once we are redirected back to our website
-      sessionStorage.setItem(socialLinksName, provider);
-
       if(response.ok) {
         const apiUrl = await response.text();
         location.href = apiUrl;
       }
     } catch (err) {
-      err => console.error(err);  
+      console.error(err);  
+    }
+  }
+
+  const handleSocialDataResponse = async(response) => {
+    try {
+      
+    } catch (err) {
+      
     }
   }
 

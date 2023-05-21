@@ -6,7 +6,9 @@ import useAuthContext from 'components/AuthContext/AuthContext';
 import { useState, useEffect } from 'react';
 import Settings from "components/Pages/Settings/Settings";
 
-export default function Home() {
+const debugModeKeySequence = 'humbug';
+
+export default function Home({page}) {
   const authContext = useAuthContext();
   const [debugMode, setDebugMode] = useState(false);
   const [showButton, setShowButton] = useState(false);
@@ -21,6 +23,9 @@ export default function Home() {
       } catch { /* Do nothing */ }
     };
 
+    if(page === "settings")
+      setShowSettings(true);
+
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
@@ -29,7 +34,7 @@ export default function Home() {
   }, []);
 
   useEffect(_ => {
-    if (keySequence === 'debug')
+    if (keySequence === debugModeKeySequence)
       setDebugMode(true);
   }, [keySequence]);
 
@@ -65,7 +70,7 @@ export default function Home() {
           </p>
         )}
 
-        {showSettings && <Settings />}
+        {debugMode && showSettings && <Settings />}
       </main>
 
       <Footer />

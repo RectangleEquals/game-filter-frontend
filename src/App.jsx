@@ -10,6 +10,7 @@ function App()
     <Route path="/" element={ <Root /> }>
       <Route index path="/" element={<Home />} errorElement={<p>Something went wrong</p>} />
       <Route path="verify/:verification" element={<Home />} />
+      <Route path="settings/" element={<Home page={"settings"}/>} />
       <Route path="*" element={<NotFound />}/>
     </Route>
   ));

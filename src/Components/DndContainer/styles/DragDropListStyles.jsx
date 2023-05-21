@@ -1,4 +1,4 @@
-import { COLORS, colorWithOpacity } from '../../../utility/colors';
+import { COLORS, colorWithOpacity } from 'utils/colors';
 
 export const styles =
 {

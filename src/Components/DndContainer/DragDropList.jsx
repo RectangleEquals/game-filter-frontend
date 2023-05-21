@@ -2,7 +2,7 @@ import React, { useReducer } from 'react';
 import { Container } from 'react-bootstrap';
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import { StrictModeDroppable as Droppable } from '../StrictModeDroppable';
-import { reorder } from '../../utility/reorder';
+import { reorder } from 'utils/reorder';
 import DragDropRow from './DragDropRow';
 import { getDroppableStyle, getDraggableStyle } from './styles/DragDropListStyles';
 
