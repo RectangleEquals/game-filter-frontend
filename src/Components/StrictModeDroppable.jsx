@@ -4,8 +4,8 @@ import { Droppable } from "react-beautiful-dnd";
 export const StrictModeDroppable = ({ children, ...props }) => {
   const [enabled, setEnabled] = useState(false);
 
-  useEffect(() => {
-    const animation = requestAnimationFrame(() => setEnabled(true));
+  useEffect(_ => {
+    const animation = requestAnimationFrame(_ => setEnabled(true));
 
     return () => {
       cancelAnimationFrame(animation);

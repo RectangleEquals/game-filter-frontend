@@ -9,7 +9,7 @@ export default function SocialCircle() {
 
   const handleRemoveFriend = (friend) => {
     socialCircleContext.setFriends(prevFriends =>
-      prevFriends.filter((f) => f !== friend)
+      prevFriends.filter(f => f !== friend)
     );
   };
 
@@ -22,10 +22,10 @@ export default function SocialCircle() {
     setSearchText('');
   };
 
-  useEffect(() => {
+  useEffect(_ => {
     socialCircleContext.setFilteredFriends(
       searchText && searchText.length > 0
-        ? socialCircleContext.friends.filter((friend) =>
+        ? socialCircleContext.friends.filter(friend =>
             friend.toLowerCase().includes(searchText.toLowerCase())
           )
         : socialCircleContext.friends
@@ -50,7 +50,7 @@ export default function SocialCircle() {
       </div>
       <div className="friend-list-container">
         <ListGroup className="mt-3">
-          {socialCircleContext.filteredFriends.map((friend) => (
+          {socialCircleContext.filteredFriends.map(friend => (
             <ListGroup.Item key={friend}>
               {friend}
               <span

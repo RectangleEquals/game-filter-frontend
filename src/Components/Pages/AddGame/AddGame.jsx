@@ -26,8 +26,8 @@ const AddGame = () => {
       },
       body: JSON.stringify(formData),
     })
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         console.log("Game added successfully!", data);
         setFormData({
           title: "",
@@ -40,7 +40,7 @@ const AddGame = () => {
           features: "",
         });
       })
-      .catch((error) => {
+      .catch(error => {
         console.error("Error adding game:", error);
       });
   };

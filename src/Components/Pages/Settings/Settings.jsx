@@ -11,7 +11,7 @@ export default function Settings()
   const [linkedSocials, setLinkedSocials] = useState([]);
   const [discordLinked, setDiscordLinked] = useState(false);
 
-  useEffect(() => {
+  useEffect(_ => {
     if (discordLinked) {
       setLinkedSocials(['Discord']);
     }

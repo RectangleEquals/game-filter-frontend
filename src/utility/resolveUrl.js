@@ -3,7 +3,7 @@ import { URL } from 'url';
 export default function resolveUrl(...paths) {
   const url = new URL(paths.shift());
 
-  paths.forEach((path) => {
+  paths.forEach(path => {
     if (path.startsWith('/')) {
       path = path.substring(1);
     }

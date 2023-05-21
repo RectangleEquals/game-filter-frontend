@@ -31,7 +31,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
     if(isLoading)
       return;
     onShowModal(false);
-    setTimeout(() => setAlertMessage({}), 200);
+    setTimeout(_ => setAlertMessage({}), 200);
   }
 
   const handleLogin = (e) => {

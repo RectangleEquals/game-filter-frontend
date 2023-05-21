@@ -9,7 +9,7 @@ export default function generateRandomNames(numNames = 50) {
     "Wyatt", "Aubrey", "Gabriel", "Zoey"
   ];
 
-  const shuffledNames = names.sort(() => 0.5 - Math.random());
+  const shuffledNames = names.sort(_ => 0.5 - Math.random());
   const selectedNames = shuffledNames.slice(0, Math.min(numNames, names.length));
 
   return selectedNames;

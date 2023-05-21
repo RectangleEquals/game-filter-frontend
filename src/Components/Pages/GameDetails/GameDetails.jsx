@@ -10,10 +10,10 @@ const GameDetails = () => {
   const params = useParams();
   const [game, setGame] = useState(null);
 
-  useEffect(() => {
+  useEffect(_ => {
     fetch(resolveUrl(apiUrlGames, params.gameId))
-      .then((res) => res.json())
-      .then((data) => setGame(data));
+      .then(res => res.json())
+      .then(data => setGame(data));
   }, [game]);
 
   const validateGame = () => {

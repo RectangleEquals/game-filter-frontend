@@ -68,9 +68,9 @@ export default function NotFound()
     }
   });
 
-  useEffect(() =>
+  useEffect(_ =>
   {
-    const intervalId = setInterval(() => {
+    const intervalId = setInterval(_ => {
       let cb = calculateBrightness();
       setBrightness(cb.brightness);
       const now = new Date();
@@ -78,7 +78,7 @@ export default function NotFound()
     }, 1000);
 
     // Hide the button after two minutes
-    setTimeout(() => {
+    setTimeout(_ => {
       setIsButtonVisible(false);
     }, 2 * 60 * 1000);
 

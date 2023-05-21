@@ -13,10 +13,12 @@ export default function Home() {
   const [showSettings, setShowSettings] = useState(false);
   const [keySequence, setKeySequence] = useState('');
 
-  useEffect(() => {
+  useEffect(_ => {
     const handleKeyDown = (event) => {
-      const keyPressed = event.key.toLowerCase();
-      setKeySequence(prevSequence => prevSequence + keyPressed);
+      try {
+        const keyPressed = event.key.toLowerCase();
+        setKeySequence(prevSequence => prevSequence + keyPressed);        
+      } catch { /* Do nothing */ }
     };
 
     window.addEventListener('keydown', handleKeyDown);

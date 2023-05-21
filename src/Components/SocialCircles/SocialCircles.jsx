@@ -5,7 +5,7 @@ import ImageAsset from 'components/ImageAsset';
 import SocialCircle from './SocialCircle';
 import useSocialCircleContext from './SocialCircleContext';
 
-const accounts = ["Discord", "Steam", "Microsoft", "Epic Games"];
+const providers = ["Discord", "Steam", "Microsoft", "Epic Games"];
 
 export default function SocialCircles()
 {
@@ -52,7 +52,7 @@ export default function SocialCircles()
     <Container className="social-circle-container">
       <div className="social-accounts-container d-flex flex-wrap justify-content-center align-items-center">
         {/* Social account buttons */}
-        {accounts.map(account => {
+        {providers.map(account => {
 
           let accountImage = account;
           if(accountImage.startsWith("Epic"))
@@ -63,7 +63,7 @@ export default function SocialCircles()
               className="social-account-links d-flex flex-wrap justify-content-center align-items-center"
               variant={`${linkedAccounts.includes(account) ? 'info' : 'primary'}`}
               key={account}
-              onClick={() => handleLinkAccount(account)}
+              onClick={_ => socialCircleContext.requestAccountLink(account)}
               disabled={linkedAccounts.includes(account)}
             >
               {/* Logo image */}

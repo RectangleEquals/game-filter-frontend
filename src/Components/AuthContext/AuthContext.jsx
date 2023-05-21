@@ -7,6 +7,7 @@ const apiUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlUser = resolveUrl(apiUrlBase, 'user');
 const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
 const sessionName = process.env.SESSION_COOKIE_NAME || "__gfsid";
+const socialLinksName = process.env.SESSION_SOCIAL_LINK_NAME || "__gflink";
 
 export const AuthContext = createContext();
 
@@ -19,8 +20,9 @@ export function AuthProvider({ children })
   const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
   //const [userInfo, setUserInfo] = useState({ displayName: 'User' });
 
-  useEffect(() => {
+  useEffect(_ => {
     updateToken();
+    updateSocialLinks();
 
     if (!didMountRef.current) {
       checkSession();
@@ -38,6 +40,23 @@ export function AuthProvider({ children })
     }
 
     return token;
+  }
+
+  const updateSocialLinks = () => {
+    // Check for the existence of a previous session
+    const provider = sessionStorage.getItem(socialLinksName);
+    if(!provider)
+      return;
+
+    // Determine the strategy of the previous session
+    switch(provider) {
+      case 'Discord':
+        break;
+      default:
+        break;
+    }
+
+    // TODO: Do more stuff
   }
 
   const checkSession = () => {
