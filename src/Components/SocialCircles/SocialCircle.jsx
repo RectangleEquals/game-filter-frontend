@@ -8,22 +8,8 @@ export default function SocialCircle()
   const socialCircleContext = useSocialCircleContext();
   const [searchText, setSearchText] = useState('');
 
-  const handleRemoveFriend = (friend) => {
-    socialCircleContext.setFriends(prevFriends =>
-      prevFriends.filter(f => f !== friend)
-    );
-  };
-
-  const handleSearch = (event) => {
-    const { value } = event.target;
-    setSearchText(value);
-  };
-
-  const clearSearch = () => {
-    setSearchText('');
-  };
-
   useEffect(_ => {
+    console.log('[SocialCircle] > useEffect(searchText, socialCircleContext.friends)');
     socialCircleContext.setFilteredFriends(
       searchText && searchText.length > 0
         ? socialCircleContext.friends.filter(friend =>
@@ -32,6 +18,24 @@ export default function SocialCircle()
         : socialCircleContext.friends
     );
   }, [searchText, socialCircleContext.friends]);
+
+  const handleRemoveFriend = (friend) => {
+    console.log('[SocialCircle] > handleRemoveFriend');
+    socialCircleContext.setFriends(prevFriends =>
+      prevFriends.filter(f => f !== friend)
+    );
+  };
+
+  const handleSearch = (event) => {
+    console.log('[SocialCircle] > handleSearch');
+    const { value } = event.target;
+    setSearchText(value);
+  };
+
+  const clearSearch = () => {
+    console.log('[SocialCircle] > clearSearch');
+    setSearchText('');
+  };
 
   return (
     <>
