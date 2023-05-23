@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import resolveUrl from "utils/resolveUrl";
 import formDataBody from 'form-data-body';
 
+const debugModeKeySequence = 'humbug';
 const isMaintenanceMode = process.env.NODE_ENV !== "production";
 const apiUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
@@ -12,21 +13,42 @@ export const AuthContext = createContext();
 export function AuthProvider({ message, children })
 {
   const didMountRef = useRef(false);
+  const [debugMode, setDebugMode] = useState(false);
   const [maintenanceMode, setMaintenanceMode] = useState(isMaintenanceMode);
+  const [keySequence, setKeySequence] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(sessionStorage.getItem(sessionName));
   const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
 
   useEffect(_ => {
+    const handleKeyDown = (event) => {
+      try {
+        const keyPressed = event.key.toLowerCase();
+        setKeySequence(prevSequence => prevSequence + keyPressed);        
+      } catch { /* Do nothing */ }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    // TODO: Fix the ability to receive and decode base64 `message`
     if(message)
       message = atob(message);
+  
     updateToken();
 
     if (!didMountRef.current) {
       checkSession();
       didMountRef.current = true;
     }
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
+
+  useEffect(() => {
+    if (keySequence === debugModeKeySequence)
+      setDebugMode(true);
+  }, [keySequence]);
 
   const updateToken = () => {
     // Check for the existence of a previous session
@@ -103,6 +125,7 @@ export function AuthProvider({ message, children })
   return (
     <AuthContext.Provider
       value={{
+        debugMode,
         message,
         maintenanceMode,
         setMaintenanceMode,

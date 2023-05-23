@@ -44,6 +44,26 @@
   animation-fill-mode: both;
 }
 
+/* Add the following style to your existing CSS file */
+.animate.fade-in.hovered[title] {
+  position: relative;
+  cursor: help;
+}
+
+.animate.fade-in.hovered[title]::before {
+  content: attr(title);
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(150%);
+  background-color: #f0f0f0; /* Change to your desired tooltip background color */
+  color: #555; /* Change to your desired tooltip text color */
+  font-size: 12px; /* Change to your desired tooltip font size */
+  padding: 2px 4px; /* Change to your desired tooltip padding */
+  white-space: nowrap;
+  z-index: 1;
+}
+
 .tree-icon-column {
   margin: 0px 0px 0px 0px;
   padding: 0px 0px 0px 0px;

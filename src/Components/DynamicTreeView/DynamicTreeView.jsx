@@ -3,9 +3,11 @@ import { useState, useEffect, Fragment } from 'react';
 import { Container, ListGroup, Row, Col, Form } from 'react-bootstrap';
 import { BsChevronLeft, BsChevronRight } from 'react-icons/bs';
 import { AiOutlineClose } from 'react-icons/ai';
+import useAuthContext from "components/AuthContext/AuthContext";
 import ImageAsset from 'components/ImageAsset';
 
 export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColumn = true, config = null }) {
+  const authContext = useAuthContext();
   const [data, setData] = useState(jsonData);
   const [parentDataStack, setParentDataStack] = useState([]);
   const [animateDirection, setAnimateDirection] = useState(null);
@@ -13,6 +15,7 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
   const [searchFilter, setSearchFilter] = useState('');
   const [filteredData, setFilteredData] = useState(jsonData);
   const [expanded, setExpanded] = useState({});
+  const [hoveredElement, setHoveredElement] = useState(null);
 
   useEffect(_ => {
     if (searchFilter) {
@@ -79,22 +82,62 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
     setShowSearchFilter(showFilter);
   }
 
-  const renderValue = (key, value) => {
+  const renderValue = (key, value, parentPath) =>
+  {
     if (value === undefined || value === null) {
       return null;
     }
 
-    if (Array.isArray(value))
-    {
+    const path = parentPath ? `${parentPath}.${key}` : key;
+
+    // Find the matching path rule in the config
+    const matchingRules = config.paths.filter((rule) => {
+      if (rule.key === '*') {
+        // Check if value matches the '*' rule
+        return rule.value === value;
+      } else {
+        // Check if path matches the rule key
+        const rulePathParts = rule.key.split('.');
+        const pathParts = path.split('.');
+        if (rulePathParts.length !== pathParts.length) {
+          return false;
+        }
+        for (let i = 0; i < rulePathParts.length; i++) {
+          if (rulePathParts[i] !== '*' && rulePathParts[i] !== pathParts[i]) {
+            return false;
+          }
+        }
+        return true;
+      }
+    });
+
+    // Sort the matching rules based on their position in the config.paths array
+    matchingRules.sort((a, b) => {
+      const indexA = config.paths.indexOf(a);
+      const indexB = config.paths.indexOf(b);
+      return indexA - indexB;
+    });
+
+    // Get the icon from the highest priority matching rule (last rule in the sorted array)
+    const icon = matchingRules.length > 0 ? matchingRules[matchingRules.length - 1].icon : 'website-logo';
+
+    // Use the ImageAsset component with the appropriate className for the icon
+    const iconComponent = icon ? (
+      <ImageAsset className={`asset-${icon} div-tree-icon-div img-tree-icon-image div-show-border`} />
+    ) : null;
+  
+    if (Array.isArray(value)) {
       if (value.length < 1) return null;
 
-      const icon = config && getConfigIcon(key);
       return (
-        <Container key={key} className="animate fade-in">
+        <Container
+          key={path}
+          className={`animate fade-in ${hoveredElement === path && authContext.debugMode ? 'hovered' : ''}`}
+          onMouseEnter={() => setHoveredElement(path)}
+          onMouseLeave={() => setHoveredElement(null)}
+          title={authContext.debugMode ? path : ''}>
           <Row>
-            {icon && (
-              <Col xs="auto" className="tree-icon-column">{icon}</Col>
-            )}
+            {iconComponent && <Col xs="auto" className="tree-icon-column">{iconComponent}</Col>}
             <Col>
               <strong>{key}</strong>
             </Col>
@@ -108,7 +151,7 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
                 const itemKey = `${key}.${index}`;
                 return (
                   <Fragment key={itemKey}>
-                    {renderValue(itemKey, item)}
+                    {renderValue(itemKey, item, `${path}.${itemKey}`)}
                   </Fragment>
                 );
               })}
@@ -121,14 +164,16 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
     if (typeof value === 'object' && value !== null) {
       const entries = Object.entries(value);
       if (entries.length < 1) return null;
-      const icon = config && getConfigIcon(key);
   
       return (
-        <Container key={key} className="animate fade-in">
+        <Container
+          key={path}
+          className={`animate fade-in ${hoveredElement === path && authContext.debugMode ? 'hovered' : ''}`}
+          onMouseEnter={() => setHoveredElement(path)}
+          onMouseLeave={() => setHoveredElement(null)}
+          title={authContext.debugMode ? path : ''}>
           <Row>
-            {icon && (
-              <Col xs="auto" className="tree-icon-column">{icon}</Col>
-            )}
+            {iconComponent && <Col xs="auto" className="tree-icon-column">{iconComponent}</Col>}
             <Col>
               <strong>{key}</strong>
             </Col>
@@ -142,7 +187,7 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
                 const nestedItemKey = `${key}.${nestedKey}`;
                 return (
                   <Fragment key={nestedItemKey}>
-                    {renderValue(nestedItemKey, nestedValue)}
+                    {renderValue(nestedItemKey, nestedValue, `${path}.${nestedItemKey}`)}
                   </Fragment>
                 );
               })}
@@ -152,13 +197,15 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
       );
     }
   
-    const icon = config && getConfigIcon(key);
     return (
-      <Container key={key} className="animate fade-in">
+      <Container
+        key={path}
+        className={`animate fade-in ${hoveredElement === path && authContext.debugMode ? 'hovered' : ''}`}
+        onMouseEnter={() => setHoveredElement(path)}
+        onMouseLeave={() => setHoveredElement(null)}
+        title={authContext.debugMode ? path : ''}>
         <Row>
-          {icon && (
-            <Col xs="auto" className="tree-icon-column">{icon}</Col>
-          )}
+          {iconComponent && <Col xs="auto" className="tree-icon-column">{iconComponent}</Col>}
           <Col>
             <strong>{key}:</strong> {value}
           </Col>
@@ -168,47 +215,9 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
   };
 
   const filterData = (data, searchFilter) => {
-    // Implement your filtering logic here
-    // You can modify this function based on your specific requirements
+    // TODO: Implement filtering logic here
     return data;
   };
-
-  const getConfigIcon = (value) => {
-    if (!config || !config.paths) {
-      return null;
-    }
-
-    for (const { key, icon } of config.paths) {
-      if (matchesPath(value, key)) {
-        return (
-          <ImageAsset className={`asset-${icon} div-tree-icon-div img-tree-icon-image div-show-border`} />
-        );
-      }
-    }
-
-    return null;
-  };
-
-  const matchesPath = (value, xpath) => {
-    // Split the xpath into individual keys
-    const keys = xpath.split('.');
-  
-    // Start traversing the value object using the keys
-    let currentValue = value;
-    for (const key of keys) {
-      // Check if the current key exists in the value object
-      if (currentValue.hasOwnProperty(key)) {
-        // Update the current value to the nested value
-        currentValue = currentValue[key];
-      } else {
-        // If any key is not found, return false
-        return false;
-      }
-    }
-  
-    // If the traversal is successful and the current value is truthy, return true
-    return Boolean(currentValue);
-  };  
 
   return (
     <Container>
@@ -248,7 +257,7 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
         }
         {filteredData &&
           Object.entries(filteredData).map(([key, value]) => {
-            const renderedValue = renderValue(key, value);
+            const renderedValue = renderValue(key, value, '');
             return renderedValue && (
               <ListGroup.Item
                 key={key}

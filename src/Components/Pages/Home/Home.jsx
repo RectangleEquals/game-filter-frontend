@@ -6,48 +6,26 @@ import ImageAsset from "components/ImageAsset";
 import useAuthContext from "components/AuthContext/AuthContext";
 import Settings from "components/Pages/Settings/Settings";
 
-const debugModeKeySequence = 'humbug';
-
 export default function Home({page})
 {
   const authContext = useAuthContext();
-  const [debugMode, setDebugMode] = useState(false);
   const [showButton, setShowButton] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [keySequence, setKeySequence] = useState('');
 
   useEffect(_ => {
-    const handleKeyDown = (event) => {
-      try {
-        const keyPressed = event.key.toLowerCase();
-        setKeySequence(prevSequence => prevSequence + keyPressed);        
-      } catch { /* Do nothing */ }
-    };
-
     if(page === "settings") {
       if(authContext.message) {
       }
       setShowSettings(true);
     }
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
   }, []);
 
-  useEffect(_ => {
-    if (keySequence === debugModeKeySequence)
-      setDebugMode(true);
-  }, [keySequence]);
-
-  useEffect(_ => {
-    if(debugMode) {
+  useEffect(() => {
+    if (authContext.debugMode) {
       authContext.setMaintenanceMode(false);
       setShowButton(true);
     }
-  }, [debugMode]);
+  }, [authContext.debugMode]);
 
   const handleButtonClick = () => {
     setShowButton(false);
@@ -64,7 +42,7 @@ export default function Home({page})
         {/* Main Body */}
         <h1 className="text-center main-content-large-text" style={{userSelect: 'none'}}>Welcome to Game Filter!</h1>
 
-        {debugMode || (authContext && authContext.isLoggedIn && !authContext.maintenanceMode) ? (
+        {authContext && (authContext.debugMode || (authContext.isLoggedIn && !authContext.maintenanceMode)) ? (
           showButton &&
           <Button variant="success" onClick={handleButtonClick}>Let's get started!</Button>
         ) : (
@@ -74,7 +52,7 @@ export default function Home({page})
           </p>
         )}
 
-        {debugMode && showSettings && <Settings />}
+        {authContext.debugMode && showSettings && <Settings />}
       </main>
 
       <Footer />

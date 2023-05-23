@@ -7,17 +7,13 @@ import data from '../../../testdata/userData_02.json'
 const treeConfig = {
   // Only show search field if there are at least this many elements shown
   visibleSearchThreshold: 10,
-  // Array of unique keys in the form of 'root.parent.id' to associate an icon with.
-  //  For example, if the data contains the root elements 'id' and 'provider', and
-  //  'provider' contains the elements 'discord', 'steam' and 'microsoft', then you
-  //  should be able to associate the 'discord' element with an icon using the key
-  //  'provider.discord', and the 'steam' element's key would be 'provider.steam'
-  //  and so forth. Wildcards are also acceptable, so if your only path is '*',
-  //  then every element in the tree will have the associated icon. Or if you use
-  //  'provider.*' then all three 'discord', 'steam' and 'microsoft' elements
-  //  would have the associated icon.
   paths: [
-    { key: 'data.guilds', icon: 'discord-logo' }
+    { key: 'provider', icon: 'discord-logo' },
+    { key: 'data.discordId', icon: 'steam-logo' },
+    { key: '*', value: 'Zekeonia', icon: 'microsoft-logo' },
+    { key: '*', icon: 'website-logo' },
+    { key: '*', value: 'VIP_REGIONS', icon: null },
+    { key: 'data.guilds.0.avatarUrl', value: '567890', icon: 'avatar-logo' },
   ]
 }
 
