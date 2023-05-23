@@ -34,9 +34,11 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
     }));
   };
 
-  const handleClick = (value) => {
+  const handleClick = (value, key) => {
     if (typeof value === 'object') {
-      setParentDataStack([...parentDataStack, data]);
+      const parentPath = parentDataStack.length > 0 ? parentDataStack[parentDataStack.length - 1].key : '';
+      const thisPath = parentPath ? `${parentPath}.${key}` : key;
+      setParentDataStack([...parentDataStack, { data, parentPath: parentPath, key: thisPath }]);
       setData(value);
       setAnimateDirection('slide-in-right');
       setSearchFilter('');
@@ -45,12 +47,23 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
 
   const handleGoBack = () => {
     if (parentDataStack.length > 0) {
-      const parentData = parentDataStack[parentDataStack.length - 1];
+      const { data: parentData, key: parentKey } = parentDataStack[parentDataStack.length - 1];
       const updatedStack = parentDataStack.slice(0, parentDataStack.length - 1);
       setParentDataStack(updatedStack);
       setData(parentData);
       setAnimateDirection('slide-in-left');
       setSearchFilter('');
+  
+      if (parentKey) {
+        const parentParentPath = updatedStack.length > 0 ? updatedStack[updatedStack.length - 1].path : '';
+        const path = parentParentPath ? `${parentParentPath}.${parentKey}` : parentKey;
+        setParentDataStack((prevStack) => {
+          const updatedParentDataStack = [...prevStack];
+          if(updatedParentDataStack[updatedParentDataStack.length - 1])
+            updatedParentDataStack[updatedParentDataStack.length - 1].path = path;
+          return updatedParentDataStack;
+        });
+      }
     }
   };
 
@@ -82,12 +95,13 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
     setShowSearchFilter(showFilter);
   }
 
-  const renderValue = (key, value, parentPath) =>
+  const renderValue = (key, value) =>
   {
     if (value === undefined || value === null) {
       return null;
     }
 
+    const parentPath = parentDataStack[parentDataStack.length - 1]?.key;
     const path = parentPath ? `${parentPath}.${key}` : key;
 
     // Find the matching path rule in the config
@@ -142,21 +156,9 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
               <strong>{key}</strong>
             </Col>
             <Col xs="auto" onClick={() => handleExpand(key)}>
-              {expanded[key] ? <BsChevronDown /> : <BsChevronRight />}
+              {expanded[key] ? null : <BsChevronRight />}
             </Col>
           </Row>
-          {expanded[key] && (
-            <Container>
-              {value.map((item, index) => {
-                const itemKey = `${key}.${index}`;
-                return (
-                  <Fragment key={itemKey}>
-                    {renderValue(itemKey, item, `${path}.${itemKey}`)}
-                  </Fragment>
-                );
-              })}
-            </Container>
-          )}
         </Container>
       );
     }
@@ -178,21 +180,9 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
               <strong>{key}</strong>
             </Col>
             <Col xs="auto" onClick={() => handleExpand(key)}>
-              {expanded[key] ? <BsChevronDown /> : <BsChevronRight />}
+              {expanded[key] ? null : <BsChevronRight />}
             </Col>
           </Row>
-          {expanded[key] && (
-            <Container>
-              {entries.map(([nestedKey, nestedValue]) => {
-                const nestedItemKey = `${key}.${nestedKey}`;
-                return (
-                  <Fragment key={nestedItemKey}>
-                    {renderValue(nestedItemKey, nestedValue, `${path}.${nestedItemKey}`)}
-                  </Fragment>
-                );
-              })}
-            </Container>
-          )}
         </Container>
       );
     }
@@ -257,11 +247,11 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
         }
         {filteredData &&
           Object.entries(filteredData).map(([key, value]) => {
-            const renderedValue = renderValue(key, value, '');
+            const renderedValue = renderValue(key, value);
             return renderedValue && (
               <ListGroup.Item
                 key={key}
-                onClick={() => handleClick(value)}
+                onClick={() => handleClick(value, key)}
                 style={{ cursor: typeof value === 'object' ? 'pointer' : 'default' }}
                 className={`animate ${animateDirection}`}
                 onAnimationEnd={handleAnimationEnd}

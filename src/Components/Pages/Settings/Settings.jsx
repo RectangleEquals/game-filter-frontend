@@ -2,18 +2,17 @@ import './Settings.css';
 import { Container, Button } from 'react-bootstrap';
 import useAuthContext from 'components/AuthContext/AuthContext';
 import DynamicTreeView from 'components/DynamicTreeView/DynamicTreeView';
-import data from '../../../testdata/userData_02.json'
+import data from '../../../testdata/userData_01.json'
 
 const treeConfig = {
   // Only show search field if there are at least this many elements shown
   visibleSearchThreshold: 10,
   paths: [
-    { key: 'provider', icon: 'discord-logo' },
-    { key: 'data.discordId', icon: 'steam-logo' },
-    { key: '*', value: 'Zekeonia', icon: 'microsoft-logo' },
-    { key: '*', icon: 'website-logo' },
-    { key: '*', value: 'VIP_REGIONS', icon: null },
-    { key: 'data.guilds.0.avatarUrl', value: '567890', icon: 'avatar-logo' },
+    { key: '*', icon: 'default' },
+    { key: 'provider', value: 'discord', icon: 'discord-logo' },
+    { key: 'provider', value: 'steam', icon: 'steam-logo' },
+    { key: 'provider', value: 'microsoft', icon: 'microsoft-logo' },
+    { key: 'provider', value: 'epic', icon: 'epic-logo' },
   ]
 }
 
