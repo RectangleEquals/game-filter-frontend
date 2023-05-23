@@ -106,23 +106,19 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
 
     // Find the matching path rule in the config
     const matchingRules = config.paths.filter((rule) => {
-      if (rule.key === '*') {
-        // Check if value matches the '*' rule
-        return rule.value === value;
-      } else {
-        // Check if path matches the rule key
-        const rulePathParts = rule.key.split('.');
-        const pathParts = path.split('.');
-        if (rulePathParts.length !== pathParts.length) {
+      const ruleKeys = rule.key ? rule.key.split('.') : [];
+      const pathKeys = path.split('.');
+      if (ruleKeys.length > pathKeys.length) {
+        return false;
+      }
+      for (let i = 0; i < ruleKeys.length; i++) {
+        if (ruleKeys[i] !== '*' && ruleKeys[i] !== pathKeys[i]) {
           return false;
         }
-        for (let i = 0; i < rulePathParts.length; i++) {
-          if (rulePathParts[i] !== '*' && rulePathParts[i] !== pathParts[i]) {
-            return false;
-          }
-        }
-        return true;
       }
+      return (!rule.value && key === rule.key && value === rule.key) ||
+             (rule.value && rule.value === value) ||
+             (rule.key === '*' && !rule.value);
     });
 
     // Sort the matching rules based on their position in the config.paths array
@@ -133,7 +129,7 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
     });
 
     // Get the icon from the highest priority matching rule (last rule in the sorted array)
-    const icon = matchingRules.length > 0 ? matchingRules[matchingRules.length - 1].icon : 'website-logo';
+    const icon = matchingRules.length > 0 ? matchingRules[matchingRules.length - 1].icon : null;
 
     // Use the ImageAsset component with the appropriate className for the icon
     const iconComponent = icon ? (

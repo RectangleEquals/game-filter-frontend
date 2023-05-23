@@ -6,13 +6,17 @@ import data from '../../../testdata/userData_01.json'
 
 const treeConfig = {
   // Only show search field if there are at least this many elements shown
-  visibleSearchThreshold: 10,
+  visibleSearchThreshold: 8,
   paths: [
     { key: '*', icon: 'default' },
-    { key: 'provider', value: 'discord', icon: 'discord-logo' },
-    { key: 'provider', value: 'steam', icon: 'steam-logo' },
-    { key: 'provider', value: 'microsoft', icon: 'microsoft-logo' },
-    { key: 'provider', value: 'epic', icon: 'epic-logo' },
+    { value: 'discord', icon: 'discord-logo' },
+    { value: 'steam', icon: 'steam-logo' },
+    { value: 'microsoft', icon: 'microsoft-logo' },
+    { value: 'epic', icon: 'epic-logo' },
+    { key: 'data.guilds', icon: 'user-avatar' },
+    { key: 'data.guilds.0.*', icon: 'steam-logo' },
+    { key: '*', value: 'Zekeonia', icon: 'microsoft-logo' },
+    { key: '*', value: 'VIP_REGIONS', icon: null },
   ]
 }
 
