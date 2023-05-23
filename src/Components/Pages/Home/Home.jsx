@@ -8,7 +8,8 @@ import Settings from "components/Pages/Settings/Settings";
 
 const debugModeKeySequence = 'humbug';
 
-export default function Home({page}) {
+export default function Home({page})
+{
   const authContext = useAuthContext();
   const [debugMode, setDebugMode] = useState(false);
   const [showButton, setShowButton] = useState(false);

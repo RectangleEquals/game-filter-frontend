@@ -1,9 +1,9 @@
 import './SocialCircle.css';
 import { useEffect, useState } from 'react';
-import { Form, ListGroup } from 'react-bootstrap';
+import { Accordion, Button, Card, Form, ListGroup } from 'react-bootstrap';
 import useSocialCircleContext from './SocialCircleContext';
 
-export default function SocialCircle()
+export default function SocialCircle(selectedAccount)
 {
   const socialCircleContext = useSocialCircleContext();
   const [searchText, setSearchText] = useState('');
@@ -54,18 +54,29 @@ export default function SocialCircle()
         )}
       </div>
       <div className="friend-list-container">
-        <ListGroup className="mt-3">
-          {socialCircleContext.filteredFriends.map(friend => (
-            <ListGroup.Item key={friend}>
-              {friend}
-              <span
-                className="remove-friend"
-                onClick={() => handleRemoveFriend(friend)} >
-                &#10006;
-              </span>
-            </ListGroup.Item>
+        <Accordion className="mt-3" defaultActiveKey="0">
+          {socialCircleContext.guilds.map((guild, index) => (
+            <Accordion.Item eventKey={index.toString()} key={index}>
+              <Accordion.Header>{guild}</Accordion.Header>
+              <Accordion.Collapse eventKey={index.toString()}>
+                <Accordion.Body>
+                  {/* Render the sublist of users for the selected guild */}
+                  {selectedAccount === 'Discord' ? (
+                    /* Render the sublist of users for the selected guild */
+                    socialCircleContext.filteredFriends.map(friend => (
+                      <ListGroup.Item key={friend}>{friend}</ListGroup.Item>
+                    ))
+                  ) : (
+                    /* Render the list of friends */
+                    socialCircleContext.friends.map(friend => (
+                      <ListGroup.Item key={friend}>{friend}</ListGroup.Item>
+                    ))
+                  )}
+                </Accordion.Body>
+              </Accordion.Collapse>
+            </Accordion.Item>
           ))}
-        </ListGroup>
+        </Accordion>
       </div>
     </>
   );

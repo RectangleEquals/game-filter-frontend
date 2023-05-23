@@ -115,7 +115,7 @@ export default function SocialCircles()
           </Button>
 
           {/* SocialCircle component */}
-          <SocialCircle />
+          <SocialCircle selectedAccount={selectedAccount} />
   
           {/* Save social circle */}
           <Form.Control

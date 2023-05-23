@@ -43,3 +43,19 @@
   animation: fade-in 0.2s ease-in-out;
   animation-fill-mode: both;
 }
+
+.tree-icon-column {
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+}
+
+.tree-icon-div {
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.6667), rgba(0, 0, 0, 0.3333));
+}
+
+.tree-icon-image {
+  width: 32px;
+  padding: 0px 0px 0px 0px;
+}
