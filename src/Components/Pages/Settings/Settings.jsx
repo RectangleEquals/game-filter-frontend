@@ -37,8 +37,6 @@ const config1 = {
   paths: [
     { key: '*', icon: 'website-logo' },
     { key: 'data.guilds', icon: 'user-avatar' },
-    { key: 'data.guilds.*', icon: 'epic-logo' },
-    { value: 'Zekeonia', icon: 'microsoft-logo' },
   ]
 }
 
@@ -47,13 +45,11 @@ const config2 = {
   maxHeight: 350,
   paths: [
     { key: '*', icon: 'website-logo' },
-    { key: 'data.guilds.*', icon: 'epic-logo' },
     { key: 'data.guilds', icon: 'user-avatar' },
-    { value: 'Zekeonia', icon: 'microsoft-logo' },
   ]
 }
 
-const currentConfig = config2;
+const currentConfig = config1;
 
 export default function Settings()
 {
