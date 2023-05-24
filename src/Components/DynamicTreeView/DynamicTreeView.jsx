@@ -6,7 +6,9 @@ import { AiOutlineClose } from 'react-icons/ai';
 import useAuthContext from "components/AuthContext/AuthContext";
 import ImageAsset from 'components/ImageAsset';
 
-export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColumn = true, config = null }) {
+const defaultMaxHeight = 500;
+
+export default function DynamicTreeView({ jsonData, showKeyColumn = true, config = null }) {
   const authContext = useAuthContext();
   const [data, setData] = useState(jsonData);
   const [parentDataStack, setParentDataStack] = useState([]);
@@ -74,6 +76,11 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
   const handleSearchFilterChange = (event) => {
     setSearchFilter(event.target.value);
   };
+  
+  const filterData = (data, searchFilter) => {
+    // TODO: Implement filtering logic here
+    return data;
+  };
 
   const clearSearchFilter = () => {
     setSearchFilter('');
@@ -104,32 +111,8 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
     const parentPath = parentDataStack[parentDataStack.length - 1]?.key;
     const path = parentPath ? `${parentPath}.${key}` : key;
 
-    // Find the matching path rule in the config
-    const matchingRules = config.paths.filter((rule) => {
-      const ruleKeys = rule.key ? rule.key.split('.') : [];
-      const pathKeys = path.split('.');
-      if (ruleKeys.length > pathKeys.length) {
-        return false;
-      }
-      for (let i = 0; i < ruleKeys.length; i++) {
-        if (ruleKeys[i] !== '*' && ruleKeys[i] !== pathKeys[i]) {
-          return false;
-        }
-      }
-      return (!rule.value && key === rule.key && value === rule.key) ||
-             (rule.value && rule.value === value) ||
-             (rule.key === '*' && !rule.value);
-    });
-
-    // Sort the matching rules based on their position in the config.paths array
-    matchingRules.sort((a, b) => {
-      const indexA = config.paths.indexOf(a);
-      const indexB = config.paths.indexOf(b);
-      return indexA - indexB;
-    });
-
-    // Get the icon from the highest priority matching rule (last rule in the sorted array)
-    const icon = matchingRules.length > 0 ? matchingRules[matchingRules.length - 1].icon : null;
+    // Apply matching path rules from the config
+    const icon = applyPathRules(path, value);
 
     // Use the ImageAsset component with the appropriate className for the icon
     const iconComponent = icon ? (
@@ -145,7 +128,7 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
           className={`animate fade-in ${hoveredElement === path && authContext.debugMode ? 'hovered' : ''}`}
           onMouseEnter={() => setHoveredElement(path)}
           onMouseLeave={() => setHoveredElement(null)}
-          title={authContext.debugMode ? path : ''}>
+          aria-label={authContext.debugMode ? path : ''}>
           <Row>
             {iconComponent && <Col xs="auto" className="tree-icon-column">{iconComponent}</Col>}
             <Col>
@@ -169,7 +152,7 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
           className={`animate fade-in ${hoveredElement === path && authContext.debugMode ? 'hovered' : ''}`}
           onMouseEnter={() => setHoveredElement(path)}
           onMouseLeave={() => setHoveredElement(null)}
-          title={authContext.debugMode ? path : ''}>
+          aria-label={authContext.debugMode ? path : ''}>
           <Row>
             {iconComponent && <Col xs="auto" className="tree-icon-column">{iconComponent}</Col>}
             <Col>
@@ -189,7 +172,7 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
         className={`animate fade-in ${hoveredElement === path && authContext.debugMode ? 'hovered' : ''}`}
         onMouseEnter={() => setHoveredElement(path)}
         onMouseLeave={() => setHoveredElement(null)}
-        title={authContext.debugMode ? path : ''}>
+        aria-label={authContext.debugMode ? path : ''}>
         <Row>
           {iconComponent && <Col xs="auto" className="tree-icon-column">{iconComponent}</Col>}
           <Col>
@@ -200,14 +183,52 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
     );
   };
 
-  const filterData = (data, searchFilter) => {
-    // TODO: Implement filtering logic here
-    return data;
+  const applyPathRules = (path, value) => {
+    let icon = null;
+  
+    if (config && config.paths) {
+      // Iterate over each rule in the config.paths array
+      for (const rule of config.paths) {
+        if (matchesPathRule(path, value, rule)) {
+          // If the rule matches the path and value, update the icon
+          icon = rule.icon;
+        }
+      }
+    }
+  
+    return icon;
+  };
+  
+  const matchesPathRule = (path, value, rule) => {
+    const pathKeys = path.split('.');
+  
+    // Check if the rule's key matches the path
+    const ruleKeys = rule.key ? rule.key.split('.') : [];
+    if (ruleKeys.length > pathKeys.length) {
+      return false;
+    }
+  
+    for (let i = 0; i < ruleKeys.length; i++) {
+      const ruleKey = ruleKeys[i];
+      const pathKey = pathKeys[i];
+  
+      // Handle wildcard (*) and wildcard with prefix (key.*)
+      if (ruleKey !== '*' && !ruleKey.endsWith('.*') && ruleKey !== pathKey) {
+        return false;
+      }
+    }
+  
+    // Check if the rule's value matches the value (if specified)
+    if (rule.value !== undefined && rule.value !== value) {
+      return false;
+    }
+  
+    return true;
   };
 
   return (
     <Container>
-      <ListGroup style={{ maxHeight: `${maxHeight}px`, overflowY: 'auto', overflowX: 'hidden' }}>
+      <ListGroup style={{ maxHeight: `${config.maxHeight || defaultMaxHeight}px`, overflowY: 'auto', overflowX: 'hidden' }}>
         {parentDataStack.length > 0 && (
           <ListGroup.Item
             variant='dark'
@@ -241,21 +262,20 @@ export default function DynamicTreeView({ jsonData, maxHeight = 500, showKeyColu
             </Row>
           </ListGroup.Item>
         }
-        {filteredData &&
-          Object.entries(filteredData).map(([key, value]) => {
-            const renderedValue = renderValue(key, value);
-            return renderedValue && (
-              <ListGroup.Item
-                key={key}
-                onClick={() => handleClick(value, key)}
-                style={{ cursor: typeof value === 'object' ? 'pointer' : 'default' }}
-                className={`animate ${animateDirection}`}
-                onAnimationEnd={handleAnimationEnd}
-              >
-                {renderedValue}
-              </ListGroup.Item>
-            );
-          })}
+        {filteredData && Object.entries(filteredData).map(([key, value]) => {
+          const renderedValue = renderValue(key, value);
+          return renderedValue && (
+            <ListGroup.Item
+              key={key}
+              onClick={() => handleClick(value, key)}
+              style={{ cursor: typeof value === 'object' ? 'pointer' : 'default' }}
+              className={`animate ${animateDirection}`}
+              onAnimationEnd={handleAnimationEnd}
+            >
+              {renderedValue}
+            </ListGroup.Item>
+          );
+        })}
       </ListGroup>
     </Container>
   );

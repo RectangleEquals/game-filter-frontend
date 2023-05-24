@@ -4,21 +4,56 @@ import useAuthContext from 'components/AuthContext/AuthContext';
 import DynamicTreeView from 'components/DynamicTreeView/DynamicTreeView';
 import data from '../../../testdata/userData_01.json'
 
+
 const treeConfig = {
   // Only show search field if there are at least this many elements shown
   visibleSearchThreshold: 8,
+  maxHeight: 350,
   paths: [
-    { key: '*', icon: 'default' },
-    { value: 'discord', icon: 'discord-logo' },
-    { value: 'steam', icon: 'steam-logo' },
-    { value: 'microsoft', icon: 'microsoft-logo' },
-    { value: 'epic', icon: 'epic-logo' },
-    { key: 'data.guilds', icon: 'user-avatar' },
-    { key: 'data.guilds.0.*', icon: 'steam-logo' },
-    { key: '*', value: 'Zekeonia', icon: 'microsoft-logo' },
-    { key: '*', value: 'VIP_REGIONS', icon: null },
+    { key: '*', icon: 'website-logo' },
+    { key: 'data.discordId', value: '163849518868201473', icon: 'steam-logo' },
+    { key: 'data.discordId', icon: 'discord-logo' },
+    { key: 'data.*', icon: 'epic-logo' },
+    { value: 'Zekeonia', icon: 'microsoft-logo' },
   ]
 }
+
+const config3 = {
+  visibleSearchThreshold: 8,
+  maxHeight: 350,
+  paths: [
+    { key: '*', icon: 'website-logo' },
+    { key: 'data.guilds', icon: 'user-avatar' },
+    { key: 'data.guilds.*', icon: 'epic-logo' },
+    { key: 'data.discordId', value: '163849518868201473', icon: 'steam-logo' },
+    { key: 'data.discordId', icon: 'discord-logo' },
+    { value: 'Zekeonia', icon: 'microsoft-logo' },
+  ]
+}
+
+const config1 = {
+  visibleSearchThreshold: 8,
+  maxHeight: 350,
+  paths: [
+    { key: '*', icon: 'website-logo' },
+    { key: 'data.guilds', icon: 'user-avatar' },
+    { key: 'data.guilds.*', icon: 'epic-logo' },
+    { value: 'Zekeonia', icon: 'microsoft-logo' },
+  ]
+}
+
+const config2 = {
+  visibleSearchThreshold: 8,
+  maxHeight: 350,
+  paths: [
+    { key: '*', icon: 'website-logo' },
+    { key: 'data.guilds.*', icon: 'epic-logo' },
+    { key: 'data.guilds', icon: 'user-avatar' },
+    { value: 'Zekeonia', icon: 'microsoft-logo' },
+  ]
+}
+
+const currentConfig = config2;
 
 export default function Settings()
 {
@@ -32,7 +67,7 @@ export default function Settings()
 
         <Container className="social-container">
           <div className="social-circles">
-            <DynamicTreeView jsonData={data} maxHeight={600} config={treeConfig}/>
+            <DynamicTreeView jsonData={data} config={currentConfig}/>
           </div>
         </Container>
 
