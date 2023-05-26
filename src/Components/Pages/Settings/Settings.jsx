@@ -2,8 +2,9 @@ import './Settings.css';
 import { Container, Button } from 'react-bootstrap';
 import useAuthContext from 'components/AuthContext/AuthContext';
 import DynamicTreeView from 'components/DynamicTreeView/DynamicTreeView';
+import SocialCircles from 'components/SocialCircles/SocialCircles';
+import {SocialCircleProvider} from '../../SocialCircles/SocialCircleContext';
 import data from '../../../testdata/userData_01.json'
-
 
 const treeConfig = {
   // Only show search field if there are at least this many elements shown
@@ -37,6 +38,7 @@ const config1 = {
   paths: [
     { key: '*', icon: 'website-logo' },
     { key: 'data.guilds', icon: 'user-avatar' },
+    { key: 'data.guilds.*', icon: 'epic-logo' },
   ]
 }
 
@@ -63,7 +65,9 @@ export default function Settings()
 
         <Container className="social-container">
           <div className="social-circles">
-            <DynamicTreeView jsonData={data} config={currentConfig}/>
+            <SocialCircleProvider>
+              <SocialCircles />
+            </SocialCircleProvider>
           </div>
         </Container>
 
