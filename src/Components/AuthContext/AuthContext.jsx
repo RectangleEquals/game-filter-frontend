@@ -1,11 +1,13 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import resolveUrl from "utils/resolveUrl";
 import formDataBody from 'form-data-body';
+import { isMobile as _isMobile, isTablet as _isTablet, isMobile, isTablet } from 'react-device-detect';
 
 const debugModeKeySequence = 'humbug';
 const isMaintenanceMode = process.env.NODE_ENV !== "production";
-const apiUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
-const apiUrlLogout = resolveUrl(apiUrlBase, 'logout');
+const apiAuthUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
+const apiDebugUrl = process.env.DEBUG_URL || "http://localhost/api/debug";
+const apiUrlLogout = resolveUrl(apiAuthUrlBase, 'logout');
 const sessionName = process.env.SESSION_COOKIE_NAME || "__gfsid";
 
 export const AuthContext = createContext();
@@ -13,12 +15,16 @@ export const AuthContext = createContext();
 export function AuthProvider({ message, children })
 {
   const didMountRef = useRef(false);
-  const [debugMode, setDebugMode] = useState(false);
+  const [isDebugMode, setIsDebugMode] = useState(false);
   const [maintenanceMode, setMaintenanceMode] = useState(isMaintenanceMode);
   const [keySequence, setKeySequence] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(sessionStorage.getItem(sessionName));
   const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
+  const [consoleText, setConsoleText] = useState('');
+  const [debugLogs, setDebugLogs] = useState({});
+  const [isMobile] = useState(_isMobile);
+  const [isTablet] = useState(_isTablet);
 
   useEffect(_ => {
     const handleKeyDown = (event) => {
@@ -47,7 +53,7 @@ export function AuthProvider({ message, children })
 
   useEffect(() => {
     if (keySequence === debugModeKeySequence)
-      setDebugMode(true);
+      setIsDebugMode(true);
   }, [keySequence]);
 
   const updateToken = () => {
@@ -55,11 +61,108 @@ export function AuthProvider({ message, children })
     const token = sessionStorage.getItem(sessionName);
   
     // Update the session
-    if (token !== accessToken) {
+    if (token && token !== accessToken) {
       setAccessToken(token);
     }
 
     return token;
+  }
+
+  function pushLog(category, message)
+  {
+    const boundary = formDataBody.generateBoundary();
+    const header = {
+      'Content-Type': `multipart/form-data; boundary=${boundary}`
+    }
+    const token = updateToken();
+    if(token === null) {
+      logWarning("Failed to update token", false);
+      return;
+    }
+    const body = formDataBody({
+      accessToken: token,
+      method: "PUSH",
+      category: category,
+      message: message
+    }, boundary);
+  
+    fetch(apiDebugUrl, {
+      method: 'POST',
+      body: body,
+      mode: 'cors',
+      headers: header
+    })
+    .then(async response => {
+      if (response.status !== 200) {
+        const result = await response.text();
+        logWarning(`Failed to push log - Reason: ${result}`, false);
+      }
+    })
+    .catch(error => logError(error, false));
+  }
+
+  function pullLogs(emails = [''], categories = ['ALL'])
+  {
+    const boundary = formDataBody.generateBoundary();
+    const header = {
+      'Content-Type': `multipart/form-data; boundary=${boundary}`
+    }
+    const token = updateToken();
+    if(token === null) {
+      logWarning("Failed to update token", false);
+      return;
+    }
+    const body = formDataBody({
+      accessToken: token,
+      method: "PULL",
+      email: emails,
+      category: categories
+    }, boundary);
+  
+    return fetch(apiDebugUrl, {
+      method: 'POST',
+      body: body,
+      mode: 'cors',
+      headers: header
+    })
+    .then(async response => {
+      if (response.status !== 200) {
+        const result = await response.text();
+        logWarning(`Failed to push log - Reason: ${result}`, false);
+        return null;
+      } else {
+        const result = await response.json();
+        return setDebugLogs(result);
+      }
+    })
+    .catch(error => {
+      logError(error, false);
+      return null;
+    });
+  }
+
+  function log(message, push = true) {
+    setConsoleText(`${consoleText}\n[INFO]: ${message}`);
+    if(push)
+      pushLog("INFO", message);
+    if(!(isMobile || isTablet))
+      console.log(message);
+  }
+  
+  function logWarning(message, push = true) {
+    setConsoleText(`${consoleText}\n[WARNING]: ${message}`);
+    if(push)
+      pushLog("WARNING", message);
+    if(!(isMobile || isTablet))
+      console.warn(message);
+  }
+  
+  function logError(message, push = true) {
+    setConsoleText(`${consoleText}\n[ERROR]: ${message}`);
+    if(push)
+      pushLog("ERROR", message);
+    if(!(isMobile || isTablet))
+      console.error(message);
   }
 
   const checkSession = () => {
@@ -68,13 +171,13 @@ export function AuthProvider({ message, children })
       if(!isLoggedIn)
         handleLoginChange(true);
 
-      console.log('User is logged in');
+      log('User is logged in', false);
     } else {
       // User is not logged in
       if(isLoggedIn)
         handleLoginChange(false);
 
-      console.log('User is not logged in');
+      log('User is not logged in', false);
     }
   }
 
@@ -84,7 +187,12 @@ export function AuthProvider({ message, children })
     const header = {
       'Content-Type': `multipart/form-data; boundary=${boundary}`
     }
-    const body = formDataBody({ accessToken: updateToken() }, boundary);
+    const token = updateToken();
+    if(token === null) {
+      logWarning("Failed to update token");
+      return;
+    }
+    const body = formDataBody({ accessToken: token }, boundary);
   
     fetch(apiUrlLogout, {
       method: 'POST',
@@ -98,16 +206,16 @@ export function AuthProvider({ message, children })
         setIsLoggedIn(false);
         sessionStorage.removeItem(sessionName);
         updateToken();
-        console.log('User logged out');
+        log('User logged out', false);
       }
     })
-    .catch(error => console.error(error));
+    .catch(error => logError(error));
   }   
 
   const handleLoginChange = (loginStatus) => {
     setIsLoggedIn(loginStatus);
     if(loginStatus != wasLoggedIn) {
-      console.log('handleLoginChange: ' + loginStatus);
+      log('handleLoginChange: ' + loginStatus, false);
     }
 
     // Tell the server to end the session, then refresh the page
@@ -119,13 +227,23 @@ export function AuthProvider({ message, children })
 
   const handleRegister = (token) => {
     if(token)
-      console.log(`[TOKEN]: ${token}`);
+      log(`[TOKEN]: ${token}`);
   }
 
   return (
     <AuthContext.Provider
       value={{
-        debugMode,
+        isMobile,
+        isTablet,
+        debugModeKeySequence,
+        isDebugMode,
+        setDebugMode: setIsDebugMode,
+        log,
+        logWarning,
+        logError,
+        pullLogs,
+        debugLogs,
+        consoleText,
         message,
         maintenanceMode,
         setMaintenanceMode,

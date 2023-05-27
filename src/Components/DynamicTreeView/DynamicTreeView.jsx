@@ -1,6 +1,6 @@
 import './DynamicTreeView.css';
 import { useState, useEffect, Fragment } from 'react';
-import { Container, ListGroup, Row, Col, Form } from 'react-bootstrap';
+import { Container, Image, ListGroup, Row, Col, Form } from 'react-bootstrap';
 import { BsChevronLeft, BsChevronRight } from 'react-icons/bs';
 import { AiOutlineClose } from 'react-icons/ai';
 import useAuthContext from "components/AuthContext/AuthContext";
@@ -114,9 +114,15 @@ export default function DynamicTreeView({ jsonData, showKeyColumn = true, config
     // Apply matching path rules from the config
     const icon = applyPathRules(path, value);
 
-    // Use the ImageAsset component with the appropriate className for the icon
+    // Use the Image or ImageAsset component with the appropriate className for the icon, if it exists
     const iconComponent = icon ? (
-      <ImageAsset className={`asset-${icon} div-tree-icon-div img-tree-icon-image div-show-border`} />
+      icon.startsWith('http') ? (
+        <div className="tree-icon-div border rounded-circle">
+          <Image src={icon} className="img-tree-icon-image" />
+        </div>
+      ) : (
+        <ImageAsset className={`asset-${icon} div-tree-icon-div img-tree-icon-image div-show-border`} />
+      )
     ) : null;
   
     if (Array.isArray(value)) {
@@ -125,10 +131,10 @@ export default function DynamicTreeView({ jsonData, showKeyColumn = true, config
       return (
         <Container
           key={path}
-          className={`animate fade-in ${hoveredElement === path && authContext.debugMode ? 'hovered' : ''}`}
+          className={`animate fade-in ${hoveredElement === path && authContext.isDebugMode ? 'hovered' : ''}`}
           onMouseEnter={() => setHoveredElement(path)}
           onMouseLeave={() => setHoveredElement(null)}
-          aria-label={authContext.debugMode ? path : ''}>
+          aria-label={authContext.isDebugMode ? path : ''}>
           <Row>
             {iconComponent && <Col xs="auto" className="tree-icon-column">{iconComponent}</Col>}
             <Col>
@@ -149,10 +155,10 @@ export default function DynamicTreeView({ jsonData, showKeyColumn = true, config
       return (
         <Container
           key={path}
-          className={`animate fade-in ${hoveredElement === path && authContext.debugMode ? 'hovered' : ''}`}
+          className={`animate fade-in ${hoveredElement === path && authContext.isDebugMode ? 'hovered' : ''}`}
           onMouseEnter={() => setHoveredElement(path)}
           onMouseLeave={() => setHoveredElement(null)}
-          aria-label={authContext.debugMode ? path : ''}>
+          aria-label={authContext.isDebugMode ? path : ''}>
           <Row>
             {iconComponent && <Col xs="auto" className="tree-icon-column">{iconComponent}</Col>}
             <Col>
@@ -169,10 +175,10 @@ export default function DynamicTreeView({ jsonData, showKeyColumn = true, config
     return (
       <Container
         key={path}
-        className={`animate fade-in ${hoveredElement === path && authContext.debugMode ? 'hovered' : ''}`}
+        className={`animate fade-in ${hoveredElement === path && authContext.isDebugMode ? 'hovered' : ''}`}
         onMouseEnter={() => setHoveredElement(path)}
         onMouseLeave={() => setHoveredElement(null)}
-        aria-label={authContext.debugMode ? path : ''}>
+        aria-label={authContext.isDebugMode ? path : ''}>
         <Row>
           {iconComponent && <Col xs="auto" className="tree-icon-column">{iconComponent}</Col>}
           <Col>

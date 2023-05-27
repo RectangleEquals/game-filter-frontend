@@ -26,14 +26,14 @@ export default function Navbar({verification})
   };
   
   const handleLogoutRequest = () => {
-    console.log('handleLogout');
+    authContext.log('handleLogout', false);
     if(authContext.isLoggedIn)
       authContext.handleLoginChange(false);
     setShowModal(false);
   };
 
   const handleVerification = () => {
-    console.log("SUCCESS!");
+    authContext.log("SUCCESS!", false);
     location.href = clientUrlBase;
   }
 

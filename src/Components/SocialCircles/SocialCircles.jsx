@@ -3,33 +3,68 @@ import { useEffect, useState } from 'react';
 import { Button, Container, Form, ListGroup } from 'react-bootstrap';
 import ImageAsset from 'components/ImageAsset';
 import SocialCircle from './SocialCircle';
+import DynamicTreeView from 'components/DynamicTreeView/DynamicTreeView';
+import useAuthContext from 'components/AuthContext/AuthContext';
 import useSocialCircleContext from './SocialCircleContext';
 
 const providers = ["Discord", "Steam", "Microsoft", "Epic Games"];
+const initialTreeConfig = {
+  visibleSearchThreshold: 8,
+  maxHeight: 350,
+  paths: [
+    { key: '*', icon: 'default' },
+  ]
+}
 
 export default function SocialCircles()
 {
+  const authContext = useAuthContext();
   const socialCircleContext = useSocialCircleContext();
   const [selectedAccount, setSelectedAccount] = useState('');
   const [socialCircles, setSocialCircles] = useState([]);
   const [circleName, setCircleName] = useState('');
+  const [socialData, setSocialData] = useState(null);
+  const [treeConfig, setTreeConfig] = useState(initialTreeConfig);
 
   useEffect(_ => {
-    console.log('[SocialCircles] > useEffect(socialCircleContext.linkedAccounts)');
+    authContext.log('[SocialCircles] > useEffect(socialCircleContext.linkedAccounts)');
     if(socialCircleContext.linkedAccounts.length > 0) {
-      console.log('[SocialCircles]: useEffect(socialCircleContext.linkedAccounts) (updating linked accounts)');
+      authContext.log('[SocialCircles]: useEffect(socialCircleContext.linkedAccounts) (updating linked accounts)');
       // Update UI to reflect changes
       if(selectedAccount === '') {
-        console.log('[SocialCircles]: useEffect(socialCircleContext.linkedAccounts) (updating UI)');
+        authContext.log('[SocialCircles]: useEffect(socialCircleContext.linkedAccounts) (updating UI)');
         setSelectedAccount(socialCircleContext.linkedAccounts[0]);
       }
     }
-    console.log('[SocialCircles] < useEffect(socialCircleContext.linkedAccounts)');
+    authContext.log('[SocialCircles] < useEffect(socialCircleContext.linkedAccounts)');
   }, [socialCircleContext && socialCircleContext.linkedAccounts]);
   
+  useEffect(_ => {
+    if(
+      socialCircleContext.socialData &&
+      socialCircleContext.socialData.length > 0 &&
+      socialCircleContext.socialData[0].data &&
+      socialCircleContext.socialData[0].data.relationships
+    ) {
+      const data = socialCircleContext.socialData[0].data.relationships[0];
+
+      // Remove id and icon from the user field
+      const { id, avatar, ...userWithoutIdAndIcon } = data.user;
+
+      // Remove id and icon from each element in guilds field
+      const guildsWithoutIdAndIcon = data.guilds.map(({ id, icon, ...guild }) => guild);
+
+      // Create the new JSON object
+      const result = { user: userWithoutIdAndIcon, guilds: guildsWithoutIdAndIcon };
+
+      setTreeConfig(getTreeConfigForSocialData(result));
+      setSocialData(result);
+    }
+  }, [socialCircleContext && socialCircleContext.socialData])
+
   // Handler function for selecting an account from the dropdown
   const handleSelectAccount = (account) => {
-    console.log('[SocialCircles] > handleSelectAccount');
+    authContext.log('[SocialCircles] > handleSelectAccount');
     setSelectedAccount(account || '');
     socialCircleContext.updateSocials(account || 0); 
   };
@@ -42,7 +77,7 @@ export default function SocialCircles()
 
   // Handler function for saving a social circle
   const handleSaveSocialCircle = (name) => {
-    console.log('[SocialCircles] > handleSaveSocialCircle');
+    authContext.log('[SocialCircles] > handleSaveSocialCircle');
     const newSocialCircle = { name, friends: [...socialCircleContext.friends] };
     setSocialCircles(prevSocialCircles => [...prevSocialCircles, newSocialCircle]);
     setCircleName(''); // Clear the circleName after saving
@@ -50,17 +85,35 @@ export default function SocialCircles()
 
   // Handler function for selecting a saved social circle
   const handleSelectSocialCircle = (socialCircle) => {
-    console.log('[SocialCircles] > handleSelectSocialCircle');
+    authContext.log('[SocialCircles] > handleSelectSocialCircle');
     setSelectedAccount(socialCircle.name || '');
     socialCircleContext.setFriends(socialCircle.friends);
   };
 
+  // Handler function for removing a saved social circle
   const handleRemoveSocialCircle = (socialCircle) => {
-    console.log('[SocialCircles] > handleRemoveSocialCircle');
+    authContext.log('[SocialCircles] > handleRemoveSocialCircle');
     setSocialCircles(prevSocialCircles =>
       prevSocialCircles.filter(circle => circle !== socialCircle)
     );
-  };  
+  };
+
+  const getTreeConfigForSocialData = (data) => {
+    let config = initialTreeConfig;
+
+    if(data && data.user && data.guilds) {
+      config = {
+        visibleSearchThreshold: 8,
+        maxHeight: 350,
+        paths: [
+          { key: 'name', value: data.user.name, icon: data.user.avatar },
+          ...data.guilds.map(guild => ({ key: 'name', value: guild.name, icon: guild.icon }))
+        ]
+      };
+    }
+
+    return config;
+  }
 
   return (
     <Container className="social-circle-container">
@@ -115,7 +168,8 @@ export default function SocialCircles()
           </Button>
 
           {/* SocialCircle component */}
-          <SocialCircle selectedAccount={selectedAccount} />
+          {/* <SocialCircle selectedAccount={selectedAccount} /> */}
+          { socialData && <DynamicTreeView jsonData={socialData} config={treeConfig} /> }
   
           {/* Save social circle */}
           <Form.Control

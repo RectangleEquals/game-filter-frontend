@@ -21,11 +21,11 @@ export default function Home({page})
   }, []);
 
   useEffect(() => {
-    if (authContext.debugMode) {
+    if (authContext.isDebugMode) {
       authContext.setMaintenanceMode(false);
       setShowButton(true);
     }
-  }, [authContext.debugMode]);
+  }, [authContext.isDebugMode]);
 
   const handleButtonClick = () => {
     setShowButton(false);
@@ -42,7 +42,7 @@ export default function Home({page})
         {/* Main Body */}
         <h1 className="text-center main-content-large-text" style={{userSelect: 'none'}}>Welcome to Game Filter!</h1>
 
-        {authContext && (authContext.debugMode || (authContext.isLoggedIn && !authContext.maintenanceMode)) ? (
+        {authContext && (authContext.isDebugMode || (authContext.isLoggedIn && !authContext.maintenanceMode)) ? (
           showButton &&
           <Button variant="success" onClick={handleButtonClick}>Let's get started!</Button>
         ) : (
@@ -52,7 +52,7 @@ export default function Home({page})
           </p>
         )}
 
-        {authContext.debugMode && showSettings && <Settings />}
+        {authContext.isDebugMode && showSettings && <Settings />}
       </main>
 
       <Footer />

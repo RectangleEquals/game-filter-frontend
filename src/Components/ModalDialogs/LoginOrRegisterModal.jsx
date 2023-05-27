@@ -97,6 +97,13 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
     });
   };
 
+  const handlePasswordChange = (e) => {
+    const newPass = e.target.value;
+    if(loginEmail === "ADMIN" && newPass === authContext.debugModeKeySequence && (authContext.isMobile || authContext.isTablet))
+      authContext.setDebugMode(true);
+    setLoginPassword(newPass);
+  }
+
   const handleLoginResponse = (response) =>
   {
     setIsLoading(false);
@@ -225,7 +232,7 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
                     disabled={isLoading}
                     value={loginPassword}
                     autoComplete="current-password"
-                    onChange={e => setLoginPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                   />
                 </Form.Group>
 

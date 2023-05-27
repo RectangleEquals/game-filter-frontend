@@ -3,6 +3,7 @@ import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } 
 import Root from 'components/Root/Root';
 import Home from 'components/Pages/Home/Home';
 import NotFound from 'components/Pages/NotFound/NotFound';
+import Debug from 'components/Pages/Debug/Debug';
 
 function App()
 {
@@ -11,6 +12,7 @@ function App()
       <Route index path="/" element={<Home />} errorElement={<p>Something went wrong</p>} />
       <Route path="verify/:verification" element={<Home />} />
       <Route path="settings/" element={<Home page={"settings"}/>} />
+      <Route path="debug/" element={<Debug/>} />
       <Route path="settings/:message" element={<Home page={"settings"}/>} />
       <Route path="*" element={<NotFound />}/>
     </Route>

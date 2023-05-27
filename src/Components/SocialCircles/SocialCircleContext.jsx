@@ -31,7 +31,7 @@ export function SocialCircleProvider({ children })
 
   const requestAccountLink = async(provider) =>
   {
-    console.log('[SocialCircleProvider] > requestAccountLink');
+    authContext.log('[SocialCircleProvider] > requestAccountLink');
     if(!authContext.isLoggedIn)
       return false;
     
@@ -58,19 +58,24 @@ export function SocialCircleProvider({ children })
       }
     })
     .then(response => handleAccountLinkResponse(provider, response))
-    .catch(err => console.error(err));
+    .catch(err => authContext.logError(err));
   }
 
   const requestSocialData = async() =>
   {
     if(requestingSocialData) {
-      console.log('[SocialCircleProvider]: requestSocialData (Already in progress)');
+      authContext.log('[SocialCircleProvider]: requestSocialData (Already in progress)');
       return;
     }
     setRequestingSocialData(true);
 
-    console.log('[SocialCircleProvider] > requestSocialData');
+    authContext.log('[SocialCircleProvider] > requestSocialData');
     const boundary = formDataBody.generateBoundary();
+    const token = authContext.updateToken();
+    if(token === null) {
+      authContext.logWarning("Failed to update token");
+      return;
+    }
     const body = formDataBody({ accessToken: authContext.accessToken }, boundary);
 
     fetch(socialDataUrl, {
@@ -82,11 +87,11 @@ export function SocialCircleProvider({ children })
       }
     })
     .then(response => handleSocialDataResponse(response))
-    .catch(err => console.error(err));
+    .catch(err => authContext.logError(err));
   }
 
   const handleAccountLinkResponse = async(provider, response) => {
-    console.log('[SocialCircleProvider] > handleAccountLinkResponse');
+    authContext.log('[SocialCircleProvider] > handleAccountLinkResponse');
     try {
       if(response.ok) {
         const apiUrl = await response.text();
@@ -94,26 +99,26 @@ export function SocialCircleProvider({ children })
         addAccountLink(provider);
       }
     } catch (err) {
-      console.error(err);  
+      authContext.logError(err);  
     }
   }
 
   const handleSocialDataResponse = async(response) => {
-    console.log('[SocialCircleProvider] > handleSocialDataResponse');
+    authContext.log('[SocialCircleProvider] > handleSocialDataResponse');
 
     try {
       if (response.ok) {
         const userData = await response.json();
         if (!isSocialDataEqual(userData)) {
           setSocialData(userData);
-          console.log('[SocialCircleProvider]: handleSocialDataResponse: Social data updated');
+          authContext.log('[SocialCircleProvider]: handleSocialDataResponse: Social data updated');
         } else {
-          console.log('[SocialCircleProvider]: handleSocialDataResponse: Social data already up to date');
+          authContext.log('[SocialCircleProvider]: handleSocialDataResponse: Social data already up to date');
           updateSocials();
         }
       }
     } catch (err) {
-      console.error(err.message);
+      authContext.logError(err.message);
     }
 
     // Simulate a long server request or latency
@@ -128,13 +133,13 @@ export function SocialCircleProvider({ children })
   };
 
   const addAccountLink = (account) => {
-    console.log(`[SocialCircleProvider] > addAccountLink (${account})`);
+    authContext.log(`[SocialCircleProvider] > addAccountLink (${account})`);
     setLinkedAccounts(prevLinkedAccounts => [...new Set([...prevLinkedAccounts, account])]);
   };
 
   const updateSocials = (provider) =>
   {
-    console.log('[SocialCircleProvider] > updateSocials');
+    authContext.log('[SocialCircleProvider] > updateSocials');
   
     // If data is invalid, set default empty values
     if (!socialData || socialData.length === 0) {
@@ -164,7 +169,7 @@ export function SocialCircleProvider({ children })
   };
 
   const updateLinkedAccounts = () => {
-    console.log('[SocialCircleProvider] > updateLinkedAccounts');
+    authContext.log('[SocialCircleProvider] > updateLinkedAccounts');
 
     // Update linked accounts
     for (const account of socialData) {

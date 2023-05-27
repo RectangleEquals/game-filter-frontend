@@ -1,57 +1,8 @@
 import './Settings.css';
 import { Container, Button } from 'react-bootstrap';
 import useAuthContext from 'components/AuthContext/AuthContext';
-import DynamicTreeView from 'components/DynamicTreeView/DynamicTreeView';
 import SocialCircles from 'components/SocialCircles/SocialCircles';
-import {SocialCircleProvider} from '../../SocialCircles/SocialCircleContext';
 import data from '../../../testdata/userData_01.json'
-
-const treeConfig = {
-  // Only show search field if there are at least this many elements shown
-  visibleSearchThreshold: 8,
-  maxHeight: 350,
-  paths: [
-    { key: '*', icon: 'website-logo' },
-    { key: 'data.discordId', value: '163849518868201473', icon: 'steam-logo' },
-    { key: 'data.discordId', icon: 'discord-logo' },
-    { key: 'data.*', icon: 'epic-logo' },
-    { value: 'Zekeonia', icon: 'microsoft-logo' },
-  ]
-}
-
-const config3 = {
-  visibleSearchThreshold: 8,
-  maxHeight: 350,
-  paths: [
-    { key: '*', icon: 'website-logo' },
-    { key: 'data.guilds', icon: 'user-avatar' },
-    { key: 'data.guilds.*', icon: 'epic-logo' },
-    { key: 'data.discordId', value: '163849518868201473', icon: 'steam-logo' },
-    { key: 'data.discordId', icon: 'discord-logo' },
-    { value: 'Zekeonia', icon: 'microsoft-logo' },
-  ]
-}
-
-const config1 = {
-  visibleSearchThreshold: 8,
-  maxHeight: 350,
-  paths: [
-    { key: '*', icon: 'website-logo' },
-    { key: 'data.guilds', icon: 'user-avatar' },
-    { key: 'data.guilds.*', icon: 'epic-logo' },
-  ]
-}
-
-const config2 = {
-  visibleSearchThreshold: 8,
-  maxHeight: 350,
-  paths: [
-    { key: '*', icon: 'website-logo' },
-    { key: 'data.guilds', icon: 'user-avatar' },
-  ]
-}
-
-const currentConfig = config1;
 
 export default function Settings()
 {
@@ -65,9 +16,7 @@ export default function Settings()
 
         <Container className="social-container">
           <div className="social-circles">
-            <SocialCircleProvider>
-              <SocialCircles />
-            </SocialCircleProvider>
+            <SocialCircles />
           </div>
         </Container>
 
