@@ -34,26 +34,23 @@ export default function Home({page})
 
   return (
     <>
-      {/* Main Content */}
-      <main id="main-content" name="main-content" className="main-content min-vw-100 flex-grow-1 d-flex flex-column justify-content-center align-items-center">
-        {/* Background Logo */}
-        <ImageAsset className="asset-main-logo img-main-logo img-vh-100 img-vw-100"/>
+      {/* Background Logo */}
+      <ImageAsset className="asset-main-logo img-main-logo img-vh-100 img-vw-100"/>
 
-        {/* Main Body */}
-        <h1 className="text-center main-content-large-text" style={{userSelect: 'none'}}>Welcome to Game Filter!</h1>
+      {/* Main Body */}
+      <h1 className="text-center main-content-large-text" style={{userSelect: 'none'}}>Welcome to Game Filter!</h1>
 
-        {authContext && (authContext.isDebugMode || (authContext.isLoggedIn && !authContext.maintenanceMode)) ? (
-          showButton &&
-          <Button variant="success" onClick={handleButtonClick}>Let's get started!</Button>
-        ) : (
-          !showSettings &&
-          <p className="text-center main-content-small-text" style={{userSelect: 'none'}}>
-            Currently under maintenance. We are working hard to get things up and running, so stay tuned!
-          </p>
-        )}
+      {authContext && (authContext.isDebugMode || (authContext.isLoggedIn && !authContext.maintenanceMode)) ? (
+        showButton &&
+        <Button variant="success" onClick={handleButtonClick}>Let's get started!</Button>
+      ) : (
+        !showSettings &&
+        <p className="text-center main-content-small-text" style={{userSelect: 'none'}}>
+          Currently under maintenance. We are working hard to get things up and running, so stay tuned!
+        </p>
+      )}
 
-        {authContext.isDebugMode && showSettings && <Settings />}
-      </main>
+      {authContext.isDebugMode && showSettings && <Settings />}
 
       <Footer />
     </>

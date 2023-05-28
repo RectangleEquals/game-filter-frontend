@@ -21,7 +21,6 @@ export function AuthProvider({ message, children })
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(sessionStorage.getItem(sessionName));
   const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
-  const [consoleText, setConsoleText] = useState('');
   const [debugLogs, setDebugLogs] = useState({});
   const [isMobile] = useState(_isMobile);
   const [isTablet] = useState(_isTablet);
@@ -142,7 +141,6 @@ export function AuthProvider({ message, children })
   }
 
   function log(message, push = true) {
-    setConsoleText(`${consoleText}\n[INFO]: ${message}`);
     if(push)
       pushLog("INFO", message);
     if(!(isMobile || isTablet))
@@ -150,7 +148,6 @@ export function AuthProvider({ message, children })
   }
   
   function logWarning(message, push = true) {
-    setConsoleText(`${consoleText}\n[WARNING]: ${message}`);
     if(push)
       pushLog("WARNING", message);
     if(!(isMobile || isTablet))
@@ -158,7 +155,6 @@ export function AuthProvider({ message, children })
   }
   
   function logError(message, push = true) {
-    setConsoleText(`${consoleText}\n[ERROR]: ${message}`);
     if(push)
       pushLog("ERROR", message);
     if(!(isMobile || isTablet))
@@ -243,7 +239,6 @@ export function AuthProvider({ message, children })
         logError,
         pullLogs,
         debugLogs,
-        consoleText,
         message,
         maintenanceMode,
         setMaintenanceMode,

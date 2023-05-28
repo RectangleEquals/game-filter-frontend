@@ -1,21 +1,9 @@
-/*
-// Main logo and content
-*/
-.main-logo {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  z-index: -1 !important;
-  stroke: aqua;
-  pointer-events: none;
-  opacity: .2;
-}
-
 .main-content {
   margin-top: var(--navbar-height); /* Use the CSS variable for margin */
   padding: 16px; /* Add padding to provide spacing */
   background-color: rgba(0, 0, 0, 0.535);
   z-index: 0 !important;
+  overflow-y: none;
 }
 
 .main-content-large-text {

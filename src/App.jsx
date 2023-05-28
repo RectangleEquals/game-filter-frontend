@@ -1,3 +1,4 @@
+import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, Route } from "react-router-dom";
 import Root from 'components/Root/Root';
