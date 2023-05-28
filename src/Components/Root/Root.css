@@ -1,6 +1,13 @@
+.main-content-head {
+  padding: 0px 0px 0px 0px;
+  background-color: rgba(0, 0, 0, 0.535);
+  z-index: 0 !important;
+  overflow-y: none;
+  width: 100%;
+}
+
 .main-content {
-  margin-top: var(--navbar-height); /* Use the CSS variable for margin */
-  padding: 16px; /* Add padding to provide spacing */
+  padding: 16px 16px 16px 16px;
   background-color: rgba(0, 0, 0, 0.535);
   z-index: 0 !important;
   overflow-y: none;
