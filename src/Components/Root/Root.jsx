@@ -1,5 +1,6 @@
 import "./Root.css";
 import { useParams, Outlet } from "react-router-dom";
+import { Container } from "react-bootstrap";
 import { AuthProvider } from 'components/AuthContext/AuthContext';
 import { NavbarProvider } from 'components/NavbarContext/NavbarContext';
 import { SocialCircleProvider } from "components/SocialCircles/SocialCircleContext";
@@ -12,7 +13,7 @@ export default function Root()
 
   return (
       <>
-        <div className="root d-flex flex-column min-vh-100 min-vw-100 border-bottom border-primary">
+        <Container fluid className="root">
           <AuthProvider message={message} >
             <NavbarProvider>
               <SocialCircleProvider>
@@ -23,7 +24,7 @@ export default function Root()
               </SocialCircleProvider>
             </NavbarProvider>
           </AuthProvider>
-        </div>
+        </Container>
       </>
     )
 }

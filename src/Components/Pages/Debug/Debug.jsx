@@ -161,7 +161,7 @@ export default function SocialLinkBypass() {
         {authContext && authContext.isDebugMode && <ListGroup.Item>Debug mode</ListGroup.Item>}
         {authContext && authContext.isMobile && <ListGroup.Item>Mobile</ListGroup.Item>}
         {authContext && authContext.isTablet && <ListGroup.Item>Tablet</ListGroup.Item>}
-        {navbarContext && navbarContext.navbarHeight !== undefined && <ListGroup.Item>{`Navbar Height: ${navbarContext.navbarHeight}`}</ListGroup.Item>}
+        {navbarContext && <ListGroup.Item>{`Navbar Height: ${navbarContext.navbarHeight}`}</ListGroup.Item>}
       </>
     )
   }

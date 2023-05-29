@@ -1,14 +1,27 @@
+.body {
+  background-color: #888888;
+}
+
 .main-content-head {
-  padding: 0px 0px 0px 0px;
-  background-color: rgba(0, 0, 0, 0.535);
+  position: absolute;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  margin: 0px 0px 0px 0px !important;
+  padding: 0px 0px 0px 0px !important;
+  background-color: #888888;
   z-index: 0 !important;
   overflow-y: none;
-  width: 100%;
+  pointer-events: none;
 }
 
 .main-content {
-  padding: 16px 16px 16px 16px;
-  background-color: rgba(0, 0, 0, 0.535);
+  position: absolute;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100%;
+  margin: 0px 0px 0px 0px !important;
+  padding: 0px 0px 0px 0px !important;
   z-index: 0 !important;
   overflow-y: none;
 }

@@ -9,10 +9,10 @@ export function NavbarProvider({ children })
   const [navbarOffsetHeight, setNavbarOffsetHeight] = useState(0);
   const [collapsibleContentOffsetHeight, setCollapsibleContentOffsetHeight] = useState(0);
 
-  const updateOffsetHeight = (navbarHeight, collapsibleContentHeight) => {
-    const offsetHeight = isCollapsed ? navbarHeight : navbarOffsetHeight + collapsibleContentHeight;
-    setNavbarOffsetHeight(navbarHeight);
-    setCollapsibleContentOffsetHeight(collapsibleContentHeight);
+  const updateOffsetHeight = (newNavbarHeight, newCollapsibleContentHeight) => {
+    const offsetHeight = isCollapsed ? (newNavbarHeight || navbarHeight) : navbarOffsetHeight + (newCollapsibleContentHeight || collapsibleContentOffsetHeight);
+    setNavbarOffsetHeight(newNavbarHeight);
+    setCollapsibleContentOffsetHeight(newCollapsibleContentHeight);
     setNavbarHeight(offsetHeight);
   }
 

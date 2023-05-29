@@ -25,7 +25,7 @@ export default function Navbar({verification})
 
   useEffect(_ => {
     updateOffsetHeight();
-  }, [navbarContext.isCollapsed]);
+  }, [navbarContext.isCollapsed, navbarRef, collapseContentRef]);
 
   const updateOffsetHeight = () => {
     const navbarHeight = navbarRef.current ? navbarRef.current.offsetHeight : 0;
@@ -33,8 +33,9 @@ export default function Navbar({verification})
     navbarContext.updateOffsetHeight(navbarHeight, collapsibleContentHeight);
     setTimeout(() => {
       const updatedNavbarHeight = navbarRef.current ? navbarRef.current.offsetHeight : 0;
-      if (updatedNavbarHeight !== navbarHeight) {
-        navbarContext.updateOffsetHeight(updatedNavbarHeight, collapsibleContentHeight);
+      const updatedCollapsibleContentHeight = collapseContentRef.current ? collapseContentRef.current.offsetHeight : 0;
+      if (updatedNavbarHeight !== navbarHeight || updatedCollapsibleContentHeight !== collapsibleContentHeight) {
+        navbarContext.updateOffsetHeight(updatedNavbarHeight, updatedCollapsibleContentHeight);
       }
     }, 0);
   };
@@ -62,8 +63,8 @@ export default function Navbar({verification})
   return(
     <header>
       {/* Navigation Bar */}
-      <BootstrapNavbar onResize={updateOffsetHeight} className="navbar-header" expand="lg" variant="dark">
-        <Container ref={navbarRef} fluid style={{userSelect: 'none'}}>
+      <BootstrapNavbar ref={navbarRef} onResize={updateOffsetHeight} className="navbar-header" expand="lg" variant="dark">
+        <Container fluid style={{userSelect: 'none'}}>
 
           {/* Website Logo and Title */}
           <BootstrapNavbar.Brand className="d-flex align-items-center" href={clientUrlBase}>
