@@ -3,6 +3,7 @@ import { useParams, Outlet } from "react-router-dom";
 import { Container } from "react-bootstrap";
 import { UtilityProvider } from 'components/UtilityContext/UtilityContext';
 import { AuthProvider } from 'components/AuthContext/AuthContext';
+import { UserProvider } from 'components/UserContext/UserContext';
 import { NavbarProvider } from 'components/NavbarContext/NavbarContext';
 import { SocialCircleProvider } from "components/SocialCircles/SocialCircleContext";
 import { Navbar } from 'components/Navbar/Navbar';
@@ -17,15 +18,17 @@ export default function Root()
       <Container fluid className="content-root">
         <UtilityProvider>
           <AuthProvider message={message} >
-            <NavbarProvider>
-              <SocialCircleProvider>
-                <Navbar verification={verification} />
-                <NavbarUnderlay />
-                <MainContent>
-                  <Outlet />
-                </MainContent>
-              </SocialCircleProvider>
-            </NavbarProvider>
+            <UserProvider>
+              <NavbarProvider>
+                <SocialCircleProvider>
+                  <Navbar verification={verification} />
+                  <NavbarUnderlay />
+                  <MainContent>
+                    <Outlet />
+                  </MainContent>
+                </SocialCircleProvider>
+              </NavbarProvider>
+            </UserProvider>
           </AuthProvider>
         </UtilityProvider>
       </Container>

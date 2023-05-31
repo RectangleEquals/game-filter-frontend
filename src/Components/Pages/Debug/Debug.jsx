@@ -4,7 +4,7 @@ import useAuthContext from 'components/AuthContext/AuthContext';
 import useNavbarContext from 'components/NavbarContext/NavbarContext';
 import useSocialCircleContext from 'components/SocialCircles/SocialCircleContext';
 
-export default function SocialLinkBypass() {
+export default function Debug() {
   const authContext = useAuthContext();
   const navbarContext = useNavbarContext();
   const socialCircleContext = useSocialCircleContext();
@@ -135,8 +135,6 @@ export default function SocialLinkBypass() {
     if(authContext.isDebugMode && command === 'linkdiscord') {
       authContext.log('Requesting Discord account link...')
       socialCircleContext.requestAccountLink('Discord');
-    } else if (command === authContext.debugModeKeySequence) {
-      authContext.setDebugMode(true);
     } else if (command.startsWith('logError ')) {
       const message = command.substring(command.indexOf(" ") + 1);
       authContext.logError(message);

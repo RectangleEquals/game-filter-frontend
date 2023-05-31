@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import useAuthContext from 'components/AuthContext/AuthContext';
+import { useAuthContext } from 'components/AuthContext/AuthContext';
+import { useUserContext } from 'components/UserContext/UserContext';
 import generateNames from 'utils/generateNames';
 import formDataBody from 'form-data-body';
 
 const discordAuthUrl = process.env.DISCORD_AUTHURL;
-const userDataUrl = process.env.SOCIAL_DATA_URL;
 const sessionName = process.env.SESSION_COOKIE_NAME || "__gfsid";
 const initialFriends = generateNames(5);
 
@@ -14,21 +14,18 @@ export function SocialCircleProvider({ children })
 {
   const ref = useRef(null);
   const authContext = useAuthContext();
+  const userContext = useUserContext();
   const [linkedAccounts, setLinkedAccounts] = useState([]);
   const [friends, setFriends] = useState(initialFriends);
   const [filteredFriends, setFilteredFriends] = useState(initialFriends);
   const [guilds, setGuilds] = useState([]);
-  const [userData, setUserData] = useState({});
-  const [requestingUserData, setRequestingUserData] = useState(false);
 
   useEffect(_ => {
-    if(!userData || !userData.socials || userData.socials.length < 1)
-      requestUserData();
-  }, []);
-
-  useEffect(_ => {
-    updateUserData('discord');
-  }, [userData])
+    if(!userContext.data || !userContext.data.socials || userContext.data.socials.length < 1)
+      userContext.requestData();
+    else
+      updateData('discord');
+  }, [userContext.data]);
 
   const requestAccountLink = async(provider) =>
   {
@@ -62,35 +59,6 @@ export function SocialCircleProvider({ children })
     .catch(err => authContext.logError(err));
   }
 
-  const requestUserData = async() =>
-  {
-    if(requestingUserData) {
-      authContext.log('[SocialCircleProvider]: requestUserData (Already in progress)');
-      return;
-    }
-    setRequestingUserData(true);
-
-    authContext.log('[SocialCircleProvider] > requestUserData');
-    const boundary = formDataBody.generateBoundary();
-    const token = authContext.updateToken();
-    if(token === null) {
-      authContext.logWarning("Failed to update token");
-      return;
-    }
-    const body = formDataBody({ accessToken: authContext.accessToken }, boundary);
-
-    fetch(userDataUrl, {
-      method: 'POST',
-      body: body,
-      mode: 'cors',
-      headers: {
-        'Content-Type': `multipart/form-data; boundary=${boundary}`
-      }
-    })
-    .then(response => handleUserDataResponse(response))
-    .catch(err => authContext.logError(err));
-  }
-
   const handleAccountLinkResponse = async(provider, response) => {
     authContext.log('[SocialCircleProvider] > handleAccountLinkResponse');
     try {
@@ -104,49 +72,17 @@ export function SocialCircleProvider({ children })
     }
   }
 
-  const handleUserDataResponse = async(response) => {
-    authContext.log('[SocialCircleProvider] > handleUserDataResponse');
-
-    try {
-      if (response.ok) {
-        const data = await response.json();
-        if (!isUserDataEqual(data)) {
-          setUserData(data);
-          authContext.log('[SocialCircleProvider]: handleUserDataResponse: User data updated');
-          setRequestingUserData(false);
-        } else {
-          authContext.log('[SocialCircleProvider]: handleUserDataResponse: User data already up to date');
-          updateUserData('discord');
-          setRequestingUserData(false);
-        }
-      }
-    } catch (err) {
-      authContext.logError(err.message);
-      setRequestingUserData(false);
-    }
-
-    // Simulate a long server request or latency
-    // setTimeout(_ => {
-    //   setRequestingUserData(false);
-    // }, 3000);
-  }
-
-  const isUserDataEqual = (data) => {
-    // Compare the new userData with the current userData
-    return JSON.stringify(data) === JSON.stringify(userData);
-  };
-
   const addAccountLink = (account) => {
     authContext.log(`[SocialCircleProvider] > addAccountLink (${account})`);
     setLinkedAccounts(prevLinkedAccounts => [...new Set([...prevLinkedAccounts, account])]);
   };
 
-  const updateUserData = (provider) =>
+  const updateData = (provider) =>
   {
-    authContext.log(`[SocialCircleProvider] > updateUserData (${provider})`);
+    authContext.log(`[SocialCircleProvider] > updateData (${provider})`);
   
     // If data is invalid, set default empty values
-    if (!userData || !userData.socials || userData.socials.length === 0) {
+    if (!userContext.data || !userContext.data.socials || userContext.data.socials.length === 0) {
       setGuilds([]);
       setFriends([]);
       setFilteredFriends([]);
@@ -154,16 +90,16 @@ export function SocialCircleProvider({ children })
     }
   
     if(!provider) {
-      authContext.logWarning(`[SocialCircleProvider]: updateUserData - Invalid provider`);
+      authContext.logWarning(`[SocialCircleProvider]: updateData - Invalid provider`);
       return;
     }
 
-    // Find the index of the provider in userData.socials
+    // Find the index of the provider in userContext.data.socials
     const lowercaseProvider = provider.toLowerCase();
-    const indexOfProvider = userData.socials.findIndex(account => {
+    const indexOfProvider = userContext.data.socials.findIndex(account => {
       return Object.keys(account).some(key => key === lowercaseProvider);
     });
-    const socialData = userData.socials[indexOfProvider][provider];
+    const socialData = userContext.data.socials[indexOfProvider][provider];
   
     // Update guilds & friends
     let _guilds = [];
@@ -173,7 +109,7 @@ export function SocialCircleProvider({ children })
     _guilds.sort((a, b) => a.localeCompare(b));
     setGuilds(_guilds);
 
-    const names = socialData.relationships.map(({ user }) => user.name);;
+    const names = socialData.relationships.map(({ user }) => user.name);
     setFriends(names);
     setFilteredFriends(names);
     updateLinkedAccounts();
@@ -183,7 +119,7 @@ export function SocialCircleProvider({ children })
     authContext.log('[SocialCircleProvider] > updateLinkedAccounts');
 
     // Update linked accounts
-    for (const account of userData.socials) {
+    for (const account of userContext.data.socials) {
       for (const provider of Object.keys(account)) {
         switch (provider.toLowerCase()) {
           case 'epic':
@@ -209,15 +145,13 @@ export function SocialCircleProvider({ children })
         ref,
         addAccountLink,
         requestAccountLink,
-        requestUserData,
         setFriends,
         setFilteredFriends,
         updateLinkedAccounts,
         friends,
         filteredFriends,
         guilds,
-        linkedAccounts,
-        userData
+        linkedAccounts
       }} >
       {children}
     </SocialCircleContext.Provider>

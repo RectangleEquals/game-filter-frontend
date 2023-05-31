@@ -1,7 +1,6 @@
 import './Home.css';
 import { useEffect, useState } from "react";
 import { Button, Container } from "react-bootstrap";
-import Footer from "components/Footer/Footer";
 import ImageAsset from "components/ImageAsset";
 import useAuthContext from "components/AuthContext/AuthContext";
 import Settings from "components/Pages/Settings/Settings";
@@ -54,7 +53,6 @@ export default function Home({page})
         {authContext.isDebugMode && showSettings && <Settings />}
       </Container>
 
-      <Footer />
     </Container>
   );
 }

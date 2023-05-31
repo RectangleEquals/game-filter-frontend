@@ -99,8 +99,6 @@ export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin
 
   const handlePasswordChange = (e) => {
     const newPass = e.target.value;
-    if(loginEmail === "ADMIN" && newPass === authContext.debugModeKeySequence && (authContext.isMobile || authContext.isTablet))
-      authContext.setDebugMode(true);
     setLoginPassword(newPass);
   }
 

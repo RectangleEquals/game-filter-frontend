@@ -4,6 +4,7 @@ import { Button, Container, Form, ListGroup } from 'react-bootstrap';
 import ImageAsset from 'components/ImageAsset';
 import SocialCircle from './SocialCircle';
 import useAuthContext from 'components/AuthContext/AuthContext';
+import useUserContext from 'components/UserContext/UserContext';
 import useSocialCircleContext from './SocialCircleContext';
 
 const providers = ["Discord", "Steam", "Microsoft", "Epic Games"];
@@ -18,6 +19,7 @@ const initialTreeConfig = {
 export default function SocialCircles()
 {
   const authContext = useAuthContext();
+  const userContext = useUserContext();
   const socialCircleContext = useSocialCircleContext();
   const [selectedAccount, setSelectedAccount] = useState('discord');
   const [socialCircles, setSocialCircles] = useState([]);
@@ -40,17 +42,17 @@ export default function SocialCircles()
   
   useEffect(_ => {
     if(
-      socialCircleContext.userData &&
-      socialCircleContext.userData.socials &&
-      socialCircleContext.userData.socials.length > 0 &&
+      userContext.data &&
+      userContext.data.socials &&
+      userContext.data.socials.length > 0 &&
       selectedAccount.length > 0
     ) {
       const provider = selectedAccount.toLowerCase();
-      const indexOfProvider = socialCircleContext.userData.socials.findIndex(account => {
+      const indexOfProvider = userContext.data.socials.findIndex(account => {
         return Object.keys(account).some(key => key === provider);
       });
 
-      const socialData = socialCircleContext.userData.socials[indexOfProvider][provider];      
+      const socialData = userContext.data.socials[indexOfProvider][provider];      
       const data = socialData.relationships[0];
 
       // Remove id and icon from the user field
@@ -65,7 +67,7 @@ export default function SocialCircles()
       setTreeConfig(getTreeConfigForSocialData(result));
       setUserData(result);
     }
-  }, [socialCircleContext && socialCircleContext.userData])
+  }, [userContext && userContext.data])
 
   // Handler function for selecting an account from the dropdown
   const handleSelectAccount = (account) => {

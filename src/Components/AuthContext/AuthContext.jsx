@@ -3,7 +3,6 @@ import resolveUrl from "utils/resolveUrl";
 import formDataBody from 'form-data-body';
 import { isMobile as _isMobile, isTablet as _isTablet, isMobile, isTablet } from 'react-device-detect';
 
-const debugModeKeySequence = 'humbug';
 const isMaintenanceMode = process.env.NODE_ENV !== "production";
 const apiAuthUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiDebugUrl = process.env.DEBUG_URL || "http://localhost/api/debug";
@@ -17,7 +16,6 @@ export function AuthProvider({ message, children })
   const didMountRef = useRef(false);
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [maintenanceMode, setMaintenanceMode] = useState(isMaintenanceMode);
-  const [keySequence, setKeySequence] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(sessionStorage.getItem(sessionName));
   const [wasLoggedIn, setWasLoggedIn] = useState(isLoggedIn);
@@ -26,14 +24,6 @@ export function AuthProvider({ message, children })
   const [isTablet] = useState(_isTablet);
 
   useEffect(_ => {
-    const handleKeyDown = (event) => {
-      try {
-        const keyPressed = event.key.toLowerCase();
-        setKeySequence(prevSequence => prevSequence + keyPressed);        
-      } catch { /* Do nothing */ }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-
     // TODO: Fix the ability to receive and decode base64 `message`
     if(message)
       message = atob(message);
@@ -44,16 +34,7 @@ export function AuthProvider({ message, children })
       checkSession();
       didMountRef.current = true;
     }
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
   }, []);
-
-  useEffect(() => {
-    if (keySequence === debugModeKeySequence)
-      setIsDebugMode(true);
-  }, [keySequence]);
 
   const updateToken = () => {
     // Check for the existence of a previous session
@@ -231,9 +212,8 @@ export function AuthProvider({ message, children })
       value={{
         isMobile,
         isTablet,
-        debugModeKeySequence,
         isDebugMode,
-        setDebugMode: setIsDebugMode,
+        setIsDebugMode,
         log,
         logWarning,
         logError,

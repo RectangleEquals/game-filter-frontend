@@ -3,11 +3,13 @@ import { useEffect, useState } from 'react';
 import { Accordion, Button, Card, Form, ListGroup } from 'react-bootstrap';
 import { MdSubdirectoryArrowRight } from 'react-icons/md';
 import useAuthContext from 'components/AuthContext/AuthContext';
+import useUserContext from 'components/UserContext/UserContext';
 import useSocialCircleContext from './SocialCircleContext';
 
 export default function SocialCircle({selectedAccount})
 {
   const authContext = useAuthContext();
+  const userContext = useUserContext();
   const socialCircleContext = useSocialCircleContext();
   const [searchText, setSearchText] = useState('');
 
@@ -43,10 +45,10 @@ export default function SocialCircle({selectedAccount})
   const getBodyComponent = () => {
     const body = [];
 
-    const indexOfProvider = socialCircleContext.userData.socials.findIndex(account => {
+    const indexOfProvider = userContext.data.socials.findIndex(account => {
       return Object.keys(account).some(key => key === selectedAccount);
     });
-    const socialData = socialCircleContext.userData.socials[indexOfProvider][selectedAccount];
+    const socialData = userContext.data.socials[indexOfProvider][selectedAccount];
 
     function addBody(index) {
       const innerBody = [];

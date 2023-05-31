@@ -2,17 +2,35 @@ import './Footer.css';
 import { useState } from "react";
 import { Button, Navbar, Nav, Container } from "react-bootstrap";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import useAuthContext from "components/AuthContext/AuthContext";
+import useUserContext from 'components/UserContext/UserContext';
 
 const buildId = process.env.VERCEL_GIT_COMMIT_SHA || "1.0.0";
 const commitId = process.env.VERCEL_GIT_COMMIT_REF || "alpha";
 
 export default function Footer()
 {
+  const authContext = useAuthContext();
+  const userContext = useUserContext();
   const [visible, setVisible] = useState(false);
+  const [debugModeClickCount, setDebugModeClickCount] = useState(0);
 
   const toggleVisible = () => {
     setVisible(!visible);
   };
+
+  const handleVersionClick = (e) => {
+    e.preventDefault();
+    if(authContext && authContext.isLoggedIn && !authContext.isDebugMode &&
+      userContext && userContext.data && userContext.data.roles && userContext.data.roles.includes("Developer")) {
+      if(debugModeClickCount < 4) {
+        setDebugModeClickCount(debugModeClickCount + 1);
+      } else {
+        authContext.setIsDebugMode(true);
+        alert('Debug mode enabled');
+      }
+    }
+  }
 
   return (
     <footer>
@@ -60,6 +78,7 @@ export default function Footer()
                 fontFamily: "'Bruno Ace SC', cursive",
                 textShadow: "1px 3px 4px #0e92c2, 0 0 1em #5865F2, 0 0 0.2em rgba(88, 101, 242, 0.588)",
               }}
+              onClick={handleVersionClick}
             >
               {`Version: ${buildId} ${commitId}`}
             </Nav.Link>
