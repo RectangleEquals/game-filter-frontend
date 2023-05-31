@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Button, Col, Form, ListGroup, Row } from 'react-bootstrap';
+import { Button, Col, Container, Form, ListGroup, Row } from 'react-bootstrap';
 import useAuthContext from 'components/AuthContext/AuthContext';
+import useUserContext from 'components/UserContext/UserContext';
 import useNavbarContext from 'components/NavbarContext/NavbarContext';
 import useSocialCircleContext from 'components/SocialCircles/SocialCircleContext';
 
 export default function Debug() {
   const authContext = useAuthContext();
+  const userContext = useUserContext();
   const navbarContext = useNavbarContext();
   const socialCircleContext = useSocialCircleContext();
   const [command, setCommand] = useState('');
@@ -153,20 +155,24 @@ export default function Debug() {
     return (
       <>
         {authContext && <ListGroup.Item>Auth Context</ListGroup.Item>}
+        {userContext && <ListGroup.Item>User Context</ListGroup.Item>}
         {navbarContext && <ListGroup.Item>Navbar Context</ListGroup.Item>}
         {socialCircleContext && <ListGroup.Item>Social Context</ListGroup.Item>}
         {authContext && authContext.isLoggedIn && <ListGroup.Item>Logged in</ListGroup.Item>}
         {authContext && authContext.isDebugMode && <ListGroup.Item>Debug mode</ListGroup.Item>}
         {authContext && authContext.isMobile && <ListGroup.Item>Mobile</ListGroup.Item>}
         {authContext && authContext.isTablet && <ListGroup.Item>Tablet</ListGroup.Item>}
-        {navbarContext && <ListGroup.Item>{`Navbar Height: ${navbarContext.height}`}</ListGroup.Item>}
+        {userContext && userContext.data &&
+          userContext.data.roles && userContext.data.roles.length > 0 &&
+          <ListGroup.Item>{`User Roles: ${userContext.data.roles}`}</ListGroup.Item>
+        }
       </>
     )
   }
 
   return (
     <>
-      <div className="d-flex flex-column" style={{ width: '86%', marginTop: '32px' }}>
+      <Container fluid className="d-flex flex-column" style={{ width: '86%', marginTop: '32px' }}>
         {authContext.isLoggedIn && (
           <>
             <Form.Control
@@ -182,12 +188,12 @@ export default function Debug() {
           </>
         )}
         {consoleComponent}
-      </div>
-      <div className="mt-3 mb-3 d-flex flex-column justify-content-end align-items-center" style={{ margin: '0px 0px 0px 0px', padding: '0px 0px 0px 0px' }}>
+      </Container>
+      <Container fluid className="mt-3 mb-3 d-flex flex-column justify-content-end align-items-center" style={{ margin: '0px 0px 0px 0px', padding: '0px 0px 0px 0px' }}>
         <ListGroup className="vw-100 text-center" style={{ maxWidth: '86%', maxHeight: '200px', overflowY: 'auto' }}>
           {renderVariableStateComponent()}
         </ListGroup>
-      </div>
+      </Container>
     </>
   );
 }
