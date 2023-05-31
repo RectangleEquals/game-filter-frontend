@@ -73,13 +73,14 @@ export default function SocialCircles()
   const handleSelectAccount = (account) => {
     authContext.log('[SocialCircles] > handleSelectAccount');
     setSelectedAccount(account || '');
-    socialCircleContext.updateUserData(account || 0); 
+    socialCircleContext.updateData(account || 0); 
   };
 
-  // Handler function for resetting the SocialCircle list
-  const handleResetList = (e) => {
+  // Handler function for refreshing the SocialCircle list
+  const handleRefreshList = (e) => {
     e.preventDefault();
-    socialCircleContext.requestUserData();
+
+    userContext.requestData();
   }
 
   // Handler function for saving a social circle
@@ -128,7 +129,7 @@ export default function SocialCircles()
         {/* Social account buttons */}
         {providers.map(account => {
 
-          const accountIncluded = socialCircleContext && socialCircleContext.linkedAccounts.includes(account);
+          const accountLinked = socialCircleContext && socialCircleContext.linkedAccounts.includes(account);
           let accountImage = account;
           if(accountImage.startsWith("Epic"))
             accountImage = 'epic';
@@ -136,16 +137,16 @@ export default function SocialCircles()
           return (
             <Button
               className="social-account-links"
-              variant={`${accountIncluded ? 'info' : 'primary'}`}
+              variant={`${accountLinked ? 'info' : 'primary'}`}
               key={account}
               onClick={_ => socialCircleContext && socialCircleContext.requestAccountLink(account)}
-              disabled={accountIncluded}
+              disabled={accountLinked}
             >
               {/* Logo image */}
               <ImageAsset className={`asset-${accountImage.toLowerCase()}-logo img-social-account-logo`} />
               {/* Button text */}
-              <div>{accountIncluded ? `${account} linked` : `Link with ${account}`}</div>
-              {accountIncluded ?
+              <div>{accountLinked ? `${account} linked` : `Link with ${account}`}</div>
+              {accountLinked ?
                 <div className="social-account-checkmark">✅</div> :
                 <div className="social-account-checkmark">🔲</div>
               }
@@ -168,14 +169,14 @@ export default function SocialCircles()
 
           <Button
             className="mt-3"
-            variant="success"
-            disabled={socialCircleContext && socialCircleContext.requestingUserData}
-            onClick={handleResetList}>
-              Reset List
+            variant={userContext.requestingData ? "secondary" : "success"}
+            disabled={userContext.requestingData}
+            onClick={handleRefreshList}>
+              Refresh List
           </Button>
 
           {/* SocialCircle component */}
-          <SocialCircle selectedAccount={selectedAccount} />
+          {userContext.data && !userContext.requestingData && <SocialCircle selectedAccount={selectedAccount} />}
           {/* userData && <DynamicTreeView jsonData={userData} config={treeConfig} /> */}
   
           {/* Save social circle */}

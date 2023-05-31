@@ -1,22 +1,32 @@
 import './Footer.css';
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Navbar, Nav, Container } from "react-bootstrap";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import { RxDividerVertical } from "react-icons/rx";
 import useAuthContext from "components/AuthContext/AuthContext";
 import useUserContext from 'components/UserContext/UserContext';
 
-const buildId = process.env.VERCEL_GIT_COMMIT_SHA || "1.0.0";
+const buildId = process.env.VERCEL_GIT_COMMIT_SHA || "0.6.0";
 const commitId = process.env.VERCEL_GIT_COMMIT_REF || "alpha";
 
 export default function Footer()
 {
+  const navbarRef = useRef(null);
   const authContext = useAuthContext();
   const userContext = useUserContext();
-  const [visible, setVisible] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [toggleButtonBottom, setToggleButtonBottom] = useState(0);
+  const [isToggleHovered, setIsToggleHovered] = useState(false);
   const [debugModeClickCount, setDebugModeClickCount] = useState(0);
 
+  useEffect(_ => {
+    if(navbarRef.current) {
+      setToggleButtonBottom(navbarRef.current.offsetHeight);
+    }
+  }, [isExpanded, navbarRef.current])
+
   const toggleVisible = () => {
-    setVisible(!visible);
+    setIsExpanded(!isExpanded);
   };
 
   const handleVersionClick = (e) => {
@@ -37,49 +47,50 @@ export default function Footer()
       <Button
         className="navbar-toggle-button"
         type="button"
-        aria-expanded={visible}
+        aria-expanded={isExpanded}
         onClick={toggleVisible}
+        onMouseEnter={_ => setIsToggleHovered(true)}
+        onMouseLeave={_ => setIsToggleHovered(false)}
         style={{
-          bottom: visible ? "2vw" : "0",
-          opacity: visible ? 0.3333 : 0.85
+          bottom: isExpanded ? toggleButtonBottom : "0",
+          opacity: isToggleHovered ? 0.85 : 0.3333
         }}
       >
-        {visible ? <IoIosArrowDown size="2em" /> : <IoIosArrowUp size="2em" />}
+        {isExpanded ? <IoIosArrowDown size="2em" /> : <IoIosArrowUp size="2em" />}
       </Button>
       <Navbar
+        ref={navbarRef}
         className="navbar-footer"
         bg="light"
         expand="lg"
         variant="dark"
         fixed="bottom"
         style={{
-          height: visible ? "2vw" : "0px",
-          overflow: "hidden",
-          transition: "opacity 0.2s ease-in-out, height 0.2s ease-in-out",
-          opacity: !visible ? 0.1 : 0.85
+          height: isExpanded ? "auto" : "0px",
+          opacity: !isExpanded ? 0.1 : 0.80
         }}
       >
-        <Container fluid className="w-100 d-flex justify-content-between">
+        <Container fluid className="">
           <Nav>
-            <Nav.Link
-              style={{
-                color: "#ffffff",
-                fontFamily: "'Bruno Ace SC', cursive",
-                textShadow: "1px 3px 4px #0e92c2, 0 0 1em #5865F2, 0 0 0.2em rgba(88, 101, 242, 0.588)",
-              }}
-            >
+            <Nav.Link className="navbar-text" href='https://discord.gg/9Xdpd7w2' style={{opacity: !isExpanded ? 0.1 : 1}}>
               ©2023 Electric Ocean Games
             </Nav.Link>
           </Nav>
+          <Nav style={{zIndex: 1000}}>
+            <Nav.Link style={{pointerEvents: 'none'}}>
+              <RxDividerVertical
+                style={{
+                  color: "#ffffff",
+                  fontSize: "1.5em",
+                  fontWeight: "bolder",
+                  margin: "0px 0px 0px 0px",
+                  alignSelf: "center",
+                }}
+              />
+            </Nav.Link>
+          </Nav>
           <Nav>
-            <Nav.Link
-              style={{
-                color: "#ffffff",
-                fontFamily: "'Bruno Ace SC', cursive",
-                textShadow: "1px 3px 4px #0e92c2, 0 0 1em #5865F2, 0 0 0.2em rgba(88, 101, 242, 0.588)",
-              }}
-              onClick={handleVersionClick}
-            >
+            <Nav.Link className="navbar-text"  style={{opacity: !isExpanded ? 0.1 : 1}} onClick={handleVersionClick}>
               {`Version: ${buildId} ${commitId}`}
             </Nav.Link>
           </Nav>

@@ -3,10 +3,12 @@ import { useState } from 'react';
 import { Container, Navbar as BootstrapNavbar, Nav } from 'react-bootstrap';
 import { useUtilityContext } from 'components/UtilityContext/UtilityContext';
 import { useAuthContext } from 'components/AuthContext/AuthContext';
+import { useUserContext } from 'components/UserContext/UserContext';
 import { useNavbarContext } from 'components/NavbarContext/NavbarContext';
 import LoginOrRegisterModal from "modals/LoginOrRegisterModal";
 import VerifyAccountModal from "modals/VerifyAccountModal";
 import ImageAsset from 'components/ImageAsset';
+import { useEffect } from 'react';
 
 const clientUrlBase = process.env.VITE_CLIENT_BASEPATH || "http://localhost";
 
@@ -14,8 +16,27 @@ export function Navbar({verification})
 {
   const { simulateResizeEvent } = useUtilityContext();
   const authContext = useAuthContext();
+  const userContext = useUserContext();
   const { ref, expanded, setExpanded } = useNavbarContext();
   const [showModal, setShowModal] = useState(false);
+  const [userAvatar, setUserAvatar] = useState('user-avatar');
+
+  useEffect(_ => {
+    if(userContext.data && userContext.data.socials && userContext.data.socials.length > 0) {
+      let socialAccount;
+
+      // TODO: Don't force discord as the provider.
+      //  Instead, let the user choose in settings,
+      //  and pull their avatar from that context
+      const indexOfProvider = userContext.data.socials.findIndex(account => {
+        return Object.keys(account).some(key => key === 'discord');
+      });
+      if(indexOfProvider > -1)
+        socialAccount = userContext.data.socials[indexOfProvider]['discord'];
+
+      setUserAvatar(authContext.isLoggedIn && socialAccount ? `{${socialAccount.avatarUrl}}` : 'user-avatar');
+    }
+  }, [userContext.data && userContext.data.socials]);
 
   const handleToggle = () => {
     setExpanded(!expanded);
@@ -74,7 +95,7 @@ export function Navbar({verification})
               {authContext.isLoggedIn ? (
                 <Nav.Link href="#" className='d-flex flex-row justify-content-center align-items-center' onClick={handleLogoutRequest}>
                   <span className="user-name">Logout</span>
-                  <ImageAsset className="asset-user-avatar img-user-avatar img-show-border" />
+                  <ImageAsset className={`asset-${userAvatar} img-user-avatar img-show-border`} />
                 </Nav.Link>
               ) : (
                 <Nav.Link href="#" className='d-flex flex-row justify-content-center align-items-center' onClick={handleLoginRequest}>

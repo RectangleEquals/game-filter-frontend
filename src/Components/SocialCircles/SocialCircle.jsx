@@ -54,7 +54,7 @@ export default function SocialCircle({selectedAccount})
       const innerBody = [];
       for (const guild of socialData.relationships[index].guilds) {
         innerBody.push(
-          <ListGroup.Item key={guild.name}>
+          <ListGroup.Item key={guild.name} className='mb-1 mt-1'>
             <MdSubdirectoryArrowRight/>
             <img style={{marginRight: '10px'}} src={guild.icon}/>
             {guild.name}
@@ -98,7 +98,7 @@ export default function SocialCircle({selectedAccount})
         )}
       </div>
       <div className="friend-list-container">
-        <Accordion className="mt-3" defaultActiveKey="0">
+        <Accordion className="mt-3" defaultActiveKey={null}>
           { /* Render the sublist of users for the selected guild */
             getBodyComponent()
           }

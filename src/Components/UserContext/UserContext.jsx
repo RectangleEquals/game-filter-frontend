@@ -50,16 +50,15 @@ export function UserProvider({ children })
         if (!isDataEqual(userData)) {
           setData(userData);
           authContext.log('[UserProvider]: handleDataResponse: User data updated');
-          setRequestingData(false);
         } else {
           authContext.log('[UserProvider]: handleDataResponse: User data already up to date');
-          setRequestingData(false);
         }
       }
     } catch (err) {
       authContext.logError(err.message);
-      setRequestingData(false);
     }
+
+    setRequestingData(false);
   }
   
   const isDataEqual = (userData) => {
@@ -71,6 +70,7 @@ export function UserProvider({ children })
     <UserContext.Provider
       value={{
         requestData,
+        requestingData,
         data
       }} >
       {children}

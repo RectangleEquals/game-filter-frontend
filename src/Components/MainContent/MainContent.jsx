@@ -6,7 +6,9 @@ export function MainContent({ children }) {
   return (
     <Container fluid
       className="main-content align-items-center justify-content-center">
-        {children}
+        <main>
+          {children}
+        </main>
         <Footer />
     </Container>
   );

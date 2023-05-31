@@ -30,7 +30,16 @@ export default function ImageAsset(props) {
         return Tumbleweed;
       else if(props.className.startsWith('asset-ufo'))
         return UFO;
-      else
+      else if(props.className.startsWith('asset-{')) {
+        const iStart = props.className.indexOf('{');
+        const iEnd = props.className.indexOf('}');
+        if(iEnd > iStart + 1) {
+          const asset = props.className.substring(iStart + 1, iEnd);
+          if(asset.length > 0)
+            return asset;
+        }
+        return MainLogo;
+      } else
         return MainLogo;
     }
     return ''; // Unsupported attribute

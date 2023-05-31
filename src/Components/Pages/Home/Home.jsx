@@ -38,10 +38,10 @@ export default function Home({page})
 
       {/* Main Body */}
       <Container fluid className='d-flex flex-column align-items-center justify-content-center' style={{zIndex: "0 !important"}}>
-        <h1 className="text-center main-content-large-text" style={{userSelect: 'none'}}>Welcome to Game Filter!</h1>
+        {!showSettings && <h1 className="text-center main-content-large-text" style={{userSelect: 'none'}}>Welcome to Game Filter!</h1>}
 
         {authContext && (authContext.isDebugMode || (authContext.isLoggedIn && !authContext.maintenanceMode)) ? (
-          showButton &&
+          !showSettings && showButton &&
           <Button variant="success" onClick={handleButtonClick}>Let's get started!</Button>
         ) : (
           !showSettings &&
