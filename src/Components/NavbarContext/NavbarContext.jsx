@@ -1,35 +1,42 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 export const NavbarContext = createContext();
 
 export function NavbarProvider({ children })
 {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const [navbarHeight, setNavbarHeight] = useState(0);
-  const [navbarOffsetHeight, setNavbarOffsetHeight] = useState(0);
-  const [collapsibleContentOffsetHeight, setCollapsibleContentOffsetHeight] = useState(0);
+  const ref = useRef(null);
+  const [height, setHeight] = useState(66);
+  const [expanded, setExpanded] = useState(false);
 
-  const updateOffsetHeight = (newNavbarHeight, newCollapsibleContentHeight) => {
-    const offsetHeight = isCollapsed ? (newNavbarHeight || navbarHeight) : navbarOffsetHeight + (newCollapsibleContentHeight || collapsibleContentOffsetHeight);
-    setNavbarOffsetHeight(newNavbarHeight);
-    setCollapsibleContentOffsetHeight(newCollapsibleContentHeight);
-    setNavbarHeight(offsetHeight);
-  }
+  useEffect(() => {
+    const handleResize = () => {
+      if (ref.current) {
+        setHeight(ref.current.offsetHeight);
+        setTimeout(() => setHeight(ref.current.offsetHeight), 0);
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   return (
     <NavbarContext.Provider
       value={{
-        isCollapsed,
-        setIsCollapsed,
-        navbarHeight,
-        navbarOffsetHeight,
-        collapsibleContentOffsetHeight,
-        updateOffsetHeight
+        ref,
+        height,
+        expanded,
+        setExpanded
       }} >
       {children}
     </NavbarContext.Provider>
   );
 };
 
-const useNavbarContext = () => useContext(NavbarContext);
+export const useNavbarContext = () => useContext(NavbarContext);
 export default useNavbarContext;

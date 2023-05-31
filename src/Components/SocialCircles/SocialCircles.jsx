@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { Button, Container, Form, ListGroup } from 'react-bootstrap';
 import ImageAsset from 'components/ImageAsset';
 import SocialCircle from './SocialCircle';
-import DynamicTreeView from 'components/DynamicTreeView/DynamicTreeView';
 import useAuthContext from 'components/AuthContext/AuthContext';
 import useSocialCircleContext from './SocialCircleContext';
 
@@ -20,10 +19,10 @@ export default function SocialCircles()
 {
   const authContext = useAuthContext();
   const socialCircleContext = useSocialCircleContext();
-  const [selectedAccount, setSelectedAccount] = useState('');
+  const [selectedAccount, setSelectedAccount] = useState('discord');
   const [socialCircles, setSocialCircles] = useState([]);
   const [circleName, setCircleName] = useState('');
-  const [socialData, setSocialData] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [treeConfig, setTreeConfig] = useState(initialTreeConfig);
 
   useEffect(_ => {
@@ -41,12 +40,18 @@ export default function SocialCircles()
   
   useEffect(_ => {
     if(
-      socialCircleContext.socialData &&
-      socialCircleContext.socialData.length > 0 &&
-      socialCircleContext.socialData[0].data &&
-      socialCircleContext.socialData[0].data.relationships
+      socialCircleContext.userData &&
+      socialCircleContext.userData.socials &&
+      socialCircleContext.userData.socials.length > 0 &&
+      selectedAccount.length > 0
     ) {
-      const data = socialCircleContext.socialData[0].data.relationships[0];
+      const provider = selectedAccount.toLowerCase();
+      const indexOfProvider = socialCircleContext.userData.socials.findIndex(account => {
+        return Object.keys(account).some(key => key === provider);
+      });
+
+      const socialData = socialCircleContext.userData.socials[indexOfProvider][provider];      
+      const data = socialData.relationships[0];
 
       // Remove id and icon from the user field
       const { id, avatar, ...userWithoutIdAndIcon } = data.user;
@@ -58,21 +63,21 @@ export default function SocialCircles()
       const result = { user: userWithoutIdAndIcon, guilds: guildsWithoutIdAndIcon };
 
       setTreeConfig(getTreeConfigForSocialData(result));
-      setSocialData(result);
+      setUserData(result);
     }
-  }, [socialCircleContext && socialCircleContext.socialData])
+  }, [socialCircleContext && socialCircleContext.userData])
 
   // Handler function for selecting an account from the dropdown
   const handleSelectAccount = (account) => {
     authContext.log('[SocialCircles] > handleSelectAccount');
     setSelectedAccount(account || '');
-    socialCircleContext.updateSocials(account || 0); 
+    socialCircleContext.updateUserData(account || 0); 
   };
 
   // Handler function for resetting the SocialCircle list
   const handleResetList = (e) => {
     e.preventDefault();
-    socialCircleContext.requestSocialData();
+    socialCircleContext.requestUserData();
   }
 
   // Handler function for saving a social circle
@@ -116,8 +121,8 @@ export default function SocialCircles()
   }
 
   return (
-    <Container className="social-circle-container">
-      <div className="social-accounts-container d-flex flex-wrap justify-content-center align-items-center">
+    <Container fluid ref={socialCircleContext.ref} className="social-circle-container" style={{overflowY: 'auto'}}>
+      <div className="social-accounts-container">
         {/* Social account buttons */}
         {providers.map(account => {
 
@@ -128,7 +133,7 @@ export default function SocialCircles()
 
           return (
             <Button
-              className="social-account-links d-flex flex-wrap justify-content-center align-items-center"
+              className="social-account-links"
               variant={`${accountIncluded ? 'info' : 'primary'}`}
               key={account}
               onClick={_ => socialCircleContext && socialCircleContext.requestAccountLink(account)}
@@ -148,7 +153,7 @@ export default function SocialCircles()
       </div>
   
       {socialCircleContext && socialCircleContext.linkedAccounts.length > 0 && (
-        <Container>
+        <Container fluid>
           {/* Dropdown of linked social accounts */}
           <Form.Select
             className="mt-3"
@@ -162,14 +167,14 @@ export default function SocialCircles()
           <Button
             className="mt-3"
             variant="success"
-            disabled={socialCircleContext && socialCircleContext.requestingSocialData}
+            disabled={socialCircleContext && socialCircleContext.requestingUserData}
             onClick={handleResetList}>
               Reset List
           </Button>
 
           {/* SocialCircle component */}
-          {/* <SocialCircle selectedAccount={selectedAccount} /> */}
-          { socialData && <DynamicTreeView jsonData={socialData} config={treeConfig} /> }
+          <SocialCircle selectedAccount={selectedAccount} />
+          {/* userData && <DynamicTreeView jsonData={userData} config={treeConfig} /> */}
   
           {/* Save social circle */}
           <Form.Control

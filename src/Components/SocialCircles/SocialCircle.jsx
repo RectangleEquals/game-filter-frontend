@@ -1,10 +1,11 @@
 import './SocialCircle.css';
 import { useEffect, useState } from 'react';
 import { Accordion, Button, Card, Form, ListGroup } from 'react-bootstrap';
+import { MdSubdirectoryArrowRight } from 'react-icons/md';
 import useAuthContext from 'components/AuthContext/AuthContext';
 import useSocialCircleContext from './SocialCircleContext';
 
-export default function SocialCircle(selectedAccount)
+export default function SocialCircle({selectedAccount})
 {
   const authContext = useAuthContext();
   const socialCircleContext = useSocialCircleContext();
@@ -39,6 +40,45 @@ export default function SocialCircle(selectedAccount)
     setSearchText('');
   };
 
+  const getBodyComponent = () => {
+    const body = [];
+
+    const indexOfProvider = socialCircleContext.userData.socials.findIndex(account => {
+      return Object.keys(account).some(key => key === selectedAccount);
+    });
+    const socialData = socialCircleContext.userData.socials[indexOfProvider][selectedAccount];
+
+    function addBody(index) {
+      const innerBody = [];
+      for (const guild of socialData.relationships[index].guilds) {
+        innerBody.push(
+          <ListGroup.Item key={guild.name}>
+            <MdSubdirectoryArrowRight/>
+            <img style={{marginRight: '10px'}} src={guild.icon}/>
+            {guild.name}
+          </ListGroup.Item>
+        );
+      }
+      return innerBody;
+    }
+
+    body.push(socialCircleContext.filteredFriends.map((friend, index) => (
+      <Accordion.Item eventKey={index.toString()} key={index}>
+        <Accordion.Header>
+          <img style={{marginRight: '10px'}} src={socialData.relationships[index].user.avatar}/>
+          {friend}
+        </Accordion.Header>
+        <Accordion.Collapse eventKey={index.toString()}>
+          <Accordion.Body>
+            {addBody(index)}
+          </Accordion.Body>
+        </Accordion.Collapse>
+      </Accordion.Item>
+    )));
+
+    return body.length > 0 ? body : null;
+  };
+
   return (
     <>
       <div className="search-container">
@@ -57,27 +97,9 @@ export default function SocialCircle(selectedAccount)
       </div>
       <div className="friend-list-container">
         <Accordion className="mt-3" defaultActiveKey="0">
-          {socialCircleContext.guilds.map((guild, index) => (
-            <Accordion.Item eventKey={index.toString()} key={index}>
-              <Accordion.Header>{guild}</Accordion.Header>
-              <Accordion.Collapse eventKey={index.toString()}>
-                <Accordion.Body>
-                  {/* Render the sublist of users for the selected guild */}
-                  {selectedAccount === 'Discord' ? (
-                    /* Render the sublist of users for the selected guild */
-                    socialCircleContext.filteredFriends.map(friend => (
-                      <ListGroup.Item key={friend}>{friend}</ListGroup.Item>
-                    ))
-                  ) : (
-                    /* Render the list of friends */
-                    socialCircleContext.friends.map(friend => (
-                      <ListGroup.Item key={friend}>{friend}</ListGroup.Item>
-                    ))
-                  )}
-                </Accordion.Body>
-              </Accordion.Collapse>
-            </Accordion.Item>
-          ))}
+          { /* Render the sublist of users for the selected guild */
+            getBodyComponent()
+          }
         </Accordion>
       </div>
     </>

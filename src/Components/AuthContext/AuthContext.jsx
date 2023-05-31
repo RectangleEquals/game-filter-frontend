@@ -127,7 +127,7 @@ export function AuthProvider({ message, children })
     .then(async response => {
       if (response.status !== 200) {
         const result = await response.text();
-        logWarning(`Failed to push log - Reason: ${result}`, false);
+        logWarning(`Failed to pull log - Reason: ${result}`, false);
         return null;
       } else {
         const result = await response.json();
@@ -257,7 +257,7 @@ export function AuthProvider({ message, children })
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-const useAuthContext = () => useContext(AuthContext);
+export const useAuthContext = () => useContext(AuthContext);
 export default useAuthContext;

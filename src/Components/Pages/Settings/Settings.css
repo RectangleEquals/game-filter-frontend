@@ -1,11 +1,7 @@
 .settings-overlay {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
+  z-index: 999;
   background: linear-gradient(to right, #DAF5F8 0%, #B1E8F0 33%, #DAEFF8 100%);
-  margin: 0px 0px 0px 0px;
+  margin: 0px 0px 58px 0px;
   padding: 0px 0px 16px 0px;
   border-radius: 22px;
   overflow-y: auto;
@@ -24,16 +20,8 @@
 }
 
 .social-container {
-  display: flex;
-  flex-direction: column;
   margin: 0px 0px 0px 0px;
   padding: 20px 20px 0px 20px;
-}
-
-.social-account-links {
-  display: flex;
-  flex-direction: row;
-  width: 320px;
 }
 
 .social-account-button {
@@ -51,7 +39,7 @@
 
 .social-circles {
   margin: 0px 0px 0px 0px;
-  padding: 8px 0 8px 0;
+  padding: 8px 0px 8px 0px;
 }
 
 .action-buttons {

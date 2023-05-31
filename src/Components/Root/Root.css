@@ -1,40 +1,9 @@
-.body {
+.content-root {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
   background-color: #888888;
-}
-
-.main-content-head {
-  position: absolute;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  margin: 0px 0px 0px 0px !important;
-  padding: 0px 0px 0px 0px !important;
-  background-color: #888888;
-  z-index: 0 !important;
-  overflow-y: none;
-  pointer-events: none;
-}
-
-.main-content {
-  position: absolute;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100%;
-  margin: 0px 0px 0px 0px !important;
-  padding: 0px 0px 0px 0px !important;
-  z-index: 0 !important;
-  overflow-y: none;
-}
-
-.main-content-large-text {
-  font-family: 'Bruno Ace SC', cursive;
-  font-size: 48px;
-  color: white;
-  text-shadow: 1px 3px 4px #0e92c2, 0 0 1em #5865F2, 0 0 0.2em rgba(88, 101, 242, 0.588)
-}
-
-.main-content-small-text {
-  color: white;
-  font-size: 16px;
-  text-shadow: 0px 1px 10px #c20e0e, 0 0 1em #5865F2, 0 0 0.2em rgba(88, 101, 242, 0.588)
 }

@@ -1,13 +1,18 @@
 .social-circle-container {
   background: linear-gradient(to right, #5865F2 0%, #5865F2 33%, #0ebad1 100%);
-  margin: 0px 0px 0px 0px;
   padding: 16px 6px 16px 6px;
+  overflow-y: auto;
+  border-radius: 8px;
 }
 
 .social-accounts-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
   background: linear-gradient(to right, #DAF5F8 0%, #B1E8F0 33%, #DAEFF8 100%);
   border-radius: 8px;
-  overflow-x: auto;
+  overflow-y: auto;
   white-space: nowrap;
   margin-left: 12px;
   margin-right: 12px;
@@ -23,16 +28,50 @@
 }
 
 .social-account-links {
+  justify-content: center;
+  align-items: center;
   padding: 8px;
-  min-width: 240px;
-  max-width: 240px;
+  min-width: 226px;
+  max-width: 300px;
   margin: 4px;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  overflow-x: none;
+  overflow-y: auto;
+}
+
+@media screen and (max-width: 1399px) {
+  .social-account-links {
+    min-width: 380px;
+    max-width: 380px;
+  }
 }
 
 @media screen and (max-width: 767px) {
   .social-account-links {
     min-width: 380px;
     max-width: 380px;
+  }
+}
+
+@media screen and (max-width: 510px) {
+  .social-account-links {
+    min-width: 236px;
+    max-width: 300px;
+  }
+}
+
+@media screen and (max-width: 510px) {
+  .social-account-links {
+    max-width: 600px;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .social-account-links {
+    min-width: 200px;
+    max-width: 400px;
   }
 }
 

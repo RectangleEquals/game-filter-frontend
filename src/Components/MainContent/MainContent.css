@@ -1,11 +1,9 @@
-.main-logo {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  z-index: 0;
-  stroke: aqua;
-  pointer-events: none;
-  opacity: .2;
+.main-content {
+  display: flex;
+  flex-direction: column;
+  padding: 0px 0px 0px 0px;
+  flex: 1;
+  background-color: #888888;
 }
 
 .main-content-large-text {

@@ -10,11 +10,11 @@ export default function Settings()
 
   return (authContext.isLoggedIn && (
     <Container className="settings-overlay">
-        <Container className="settings-header" style={{fontFamily: "'Bruno Ace SC', cursive"}}>
+        <Container className="settings-header">
           <h2>Settings</h2>
         </Container>
 
-        <Container className="social-container">
+        <Container fluid className="social-container">
           <div className="social-circles">
             <SocialCircles />
           </div>

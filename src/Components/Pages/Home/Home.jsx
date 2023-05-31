@@ -1,6 +1,6 @@
 import './Home.css';
 import { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import Footer from "components/Footer/Footer";
 import ImageAsset from "components/ImageAsset";
 import useAuthContext from "components/AuthContext/AuthContext";
@@ -33,26 +33,28 @@ export default function Home({page})
   };
 
   return (
-    <>
+    <Container fluid>
       {/* Background Logo */}
       <ImageAsset className="asset-main-logo img-main-logo img-vh-100 img-vw-100"/>
 
       {/* Main Body */}
-      <h1 className="text-center main-content-large-text" style={{userSelect: 'none'}}>Welcome to Game Filter!</h1>
+      <Container fluid className='d-flex flex-column align-items-center justify-content-center' style={{zIndex: "0 !important"}}>
+        <h1 className="text-center main-content-large-text" style={{userSelect: 'none'}}>Welcome to Game Filter!</h1>
 
-      {authContext && (authContext.isDebugMode || (authContext.isLoggedIn && !authContext.maintenanceMode)) ? (
-        showButton &&
-        <Button variant="success" onClick={handleButtonClick}>Let's get started!</Button>
-      ) : (
-        !showSettings &&
-        <p className="text-center main-content-small-text" style={{userSelect: 'none'}}>
-          Currently under maintenance. We are working hard to get things up and running, so stay tuned!
-        </p>
-      )}
+        {authContext && (authContext.isDebugMode || (authContext.isLoggedIn && !authContext.maintenanceMode)) ? (
+          showButton &&
+          <Button variant="success" onClick={handleButtonClick}>Let's get started!</Button>
+        ) : (
+          !showSettings &&
+          <p className="text-center main-content-small-text" style={{userSelect: 'none'}}>
+            Currently under maintenance. We are working hard to get things up and running, so stay tuned!
+          </p>
+        )}
 
-      {authContext.isDebugMode && showSettings && <Settings />}
+        {authContext.isDebugMode && showSettings && <Settings />}
+      </Container>
 
       <Footer />
-    </>
+    </Container>
   );
 }
