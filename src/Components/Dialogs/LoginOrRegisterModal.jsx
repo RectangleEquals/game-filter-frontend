@@ -1,10 +1,10 @@
+import './LoginOrRegisterModal.css';
 import { useState, useRef } from 'react';
 import { Modal, Form, Button, Tab, Tabs, Alert } from 'react-bootstrap';
 import { useAuthContext } from 'contexts/AuthContext';
 import resolveUrl from 'utils/resolveUrl';
 import DOMPurify from 'dompurify';
 import formDataBody from 'form-data-body';
-import './LoginOrRegisterModal.css';
 
 const apiUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlLogin = resolveUrl(apiUrlBase, 'login');

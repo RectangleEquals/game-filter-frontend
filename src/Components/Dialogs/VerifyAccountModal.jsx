@@ -1,8 +1,8 @@
+import './VerifyAccountModal.css';
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Alert } from "react-bootstrap";
 import resolveUrl from "utils/resolveUrl";
 import DOMPurify from 'dompurify';
-import './VerifyAccountModal.css';
 
 const apiUrlBase = process.env.VITE_API_AUTHPATH || "http://localhost/api/auth";
 const apiUrlVerify = resolveUrl(apiUrlBase, 'verify');

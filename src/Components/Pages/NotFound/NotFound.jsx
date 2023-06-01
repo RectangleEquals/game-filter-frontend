@@ -1,9 +1,9 @@
+import './NotFound.css'
 import React, { useState, useEffect } from 'react';
 import { Button, Container } from 'react-bootstrap';
 import backgroundImage from '../../../assets/404.png';
 import ImageAsset from 'components/ImageAsset';
 import { useSpring, animated } from 'react-spring';
-import './NotFound.css'
 
 const calculateBrightness = () => {
   const date = new Date((new Date()).getTime() + hoursToAddOrSubtract * 60 * 60 * 1000);
