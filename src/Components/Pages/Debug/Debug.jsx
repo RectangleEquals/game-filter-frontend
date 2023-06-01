@@ -189,7 +189,7 @@ export default function Debug() {
         )}
         {consoleComponent}
       </Container>
-      <Container fluid className="mt-3 mb-3 d-flex flex-column justify-content-end align-items-center" style={{ margin: '0px 0px 0px 0px', padding: '0px 0px 0px 0px' }}>
+      <Container fluid className="mt-3 mb-3 d-flex flex-column justify-content-end align-items-center" style={{ padding: '0px 0px 0px 0px' }}>
         <ListGroup className="vw-100 text-center" style={{ maxWidth: '86%', maxHeight: '200px', overflowY: 'auto' }}>
           {renderVariableStateComponent()}
         </ListGroup>
