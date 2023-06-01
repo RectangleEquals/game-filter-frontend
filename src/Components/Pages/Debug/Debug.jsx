@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Button, Col, Container, Form, ListGroup, Row } from 'react-bootstrap';
-import useAuthContext from 'components/AuthContext/AuthContext';
-import useUserContext from 'components/UserContext/UserContext';
-import useNavbarContext from 'components/NavbarContext/NavbarContext';
-import useSocialCircleContext from 'components/SocialCircles/SocialCircleContext';
+import { useAuthContext } from 'contexts/AuthContext';
+import { useUserContext } from 'contexts/UserContext';
+import { useNavbarContext } from 'contexts/NavbarContext';
+import { useSocialCircleContext } from 'contexts/SocialCircleContext';
 
 export default function Debug() {
   const authContext = useAuthContext();

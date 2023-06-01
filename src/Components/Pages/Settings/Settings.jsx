@@ -1,6 +1,6 @@
 import './Settings.css';
 import { Container, Button } from 'react-bootstrap';
-import useAuthContext from 'components/AuthContext/AuthContext';
+import { useAuthContext } from 'contexts/AuthContext';
 import SocialCircles from 'components/SocialCircles/SocialCircles';
 import data from '../../../testdata/userData_01.json'
 

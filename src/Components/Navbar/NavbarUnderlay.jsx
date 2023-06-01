@@ -1,4 +1,4 @@
-import { useNavbarContext } from "components/NavbarContext/NavbarContext";
+import { useNavbarContext } from "contexts/NavbarContext";
 
 export function NavbarUnderlay() {
   const { height } = useNavbarContext();

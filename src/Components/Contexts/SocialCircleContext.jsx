@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { useAuthContext } from 'components/AuthContext/AuthContext';
-import { useUserContext } from 'components/UserContext/UserContext';
+import { useAuthContext } from 'contexts/AuthContext';
+import { useUserContext } from 'contexts/UserContext';
 import generateNames from 'utils/generateNames';
 import formDataBody from 'form-data-body';
 
@@ -158,5 +158,5 @@ export function SocialCircleProvider({ children })
   );
 };
 
-const useSocialCircleContext = () => useContext(SocialCircleContext);
+export const useSocialCircleContext = () => useContext(SocialCircleContext);
 export default useSocialCircleContext;

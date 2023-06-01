@@ -1,10 +1,10 @@
 import './Navbar.css'
 import { useState } from 'react';
 import { Container, Navbar as BootstrapNavbar, Nav } from 'react-bootstrap';
-import { useUtilityContext } from 'components/UtilityContext/UtilityContext';
-import { useAuthContext } from 'components/AuthContext/AuthContext';
-import { useUserContext } from 'components/UserContext/UserContext';
-import { useNavbarContext } from 'components/NavbarContext/NavbarContext';
+import { useUtilityContext } from 'contexts/UtilityContext';
+import { useAuthContext } from 'contexts/AuthContext';
+import { useUserContext } from 'contexts/UserContext';
+import { useNavbarContext } from 'contexts/NavbarContext';
 import LoginOrRegisterModal from "modals/LoginOrRegisterModal";
 import VerifyAccountModal from "modals/VerifyAccountModal";
 import ImageAsset from 'components/ImageAsset';

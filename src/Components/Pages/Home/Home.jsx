@@ -1,8 +1,8 @@
 import './Home.css';
 import { useEffect, useState } from "react";
 import { Button, Container } from "react-bootstrap";
+import { useAuthContext } from "contexts/AuthContext";
 import ImageAsset from "components/ImageAsset";
-import useAuthContext from "components/AuthContext/AuthContext";
 import Settings from "components/Pages/Settings/Settings";
 
 export default function Home({page})

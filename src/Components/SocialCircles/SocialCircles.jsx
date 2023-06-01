@@ -1,11 +1,11 @@
 import './SocialCircles.css';
 import { useEffect, useState } from 'react';
 import { Button, Container, Form, ListGroup } from 'react-bootstrap';
+import { useAuthContext } from 'contexts/AuthContext';
+import { useUserContext } from 'contexts/UserContext';
+import { useSocialCircleContext } from 'contexts/SocialCircleContext';
 import ImageAsset from 'components/ImageAsset';
 import SocialCircle from './SocialCircle';
-import useAuthContext from 'components/AuthContext/AuthContext';
-import useUserContext from 'components/UserContext/UserContext';
-import useSocialCircleContext from './SocialCircleContext';
 
 const providers = ["Discord", "Steam", "Microsoft", "Epic Games"];
 const initialTreeConfig = {

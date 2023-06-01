@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useAuthContext } from 'components/AuthContext/AuthContext';
+import { useAuthContext } from 'contexts/AuthContext';
 import formDataBody from 'form-data-body';
 
 const userDataUrl = process.env.USER_DATA_URL;

@@ -16,7 +16,8 @@ export default defineConfig({
       '@': path.resolve(process.cwd(), './src'),
       'assets': path.resolve(process.cwd(), './src/assets'),
       'components': path.resolve(process.cwd(), './src/Components'),
-      'modals': path.resolve(process.cwd(), './src/Components/ModalDialogs'),
+      'contexts': path.resolve(process.cwd(), './src/Components/Contexts'),
+      'modals': path.resolve(process.cwd(), './src/Components/Dialogs'),
       'utils': path.resolve(process.cwd(), './src/utility'),
       'react-router-dom': path.resolve(process.cwd(), 'node_modules/react-router-dom'),
       '~bootstrap': path.resolve(process.cwd(), 'node_modules/react-bootstrap')

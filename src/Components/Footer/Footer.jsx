@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Button, Navbar, Nav, Container } from "react-bootstrap";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { RxDividerVertical } from "react-icons/rx";
-import useAuthContext from "components/AuthContext/AuthContext";
-import useUserContext from 'components/UserContext/UserContext';
+import { useAuthContext } from "contexts/AuthContext";
+import { useUserContext } from 'contexts/UserContext';
 
 const buildId = process.env.VERCEL_GIT_COMMIT_SHA || "0.6.0";
 const commitId = process.env.VERCEL_GIT_COMMIT_REF || "alpha";

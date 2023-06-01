@@ -3,7 +3,7 @@ import { useState, useEffect, Fragment } from 'react';
 import { Container, Image, ListGroup, Row, Col, Form } from 'react-bootstrap';
 import { BsChevronLeft, BsChevronRight } from 'react-icons/bs';
 import { AiOutlineClose } from 'react-icons/ai';
-import useAuthContext from "components/AuthContext/AuthContext";
+import { useAuthContext } from "contexts/AuthContext";
 import ImageAsset from 'components/ImageAsset';
 
 const defaultMaxHeight = 500;

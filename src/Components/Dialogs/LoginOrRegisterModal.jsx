@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Modal, Form, Button, Tab, Tabs, Alert } from 'react-bootstrap';
-import useAuthContext from 'components/AuthContext/AuthContext';
+import { useAuthContext } from 'contexts/AuthContext';
 import resolveUrl from 'utils/resolveUrl';
 import DOMPurify from 'dompurify';
 import formDataBody from 'form-data-body';

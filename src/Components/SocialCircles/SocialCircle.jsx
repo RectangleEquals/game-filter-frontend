@@ -2,9 +2,9 @@ import './SocialCircle.css';
 import { useEffect, useState } from 'react';
 import { Accordion, Button, Card, Form, ListGroup } from 'react-bootstrap';
 import { MdSubdirectoryArrowRight } from 'react-icons/md';
-import useAuthContext from 'components/AuthContext/AuthContext';
-import useUserContext from 'components/UserContext/UserContext';
-import useSocialCircleContext from './SocialCircleContext';
+import { useAuthContext } from 'contexts/AuthContext';
+import { useUserContext } from 'contexts/UserContext';
+import { useSocialCircleContext } from 'contexts/SocialCircleContext';
 
 export default function SocialCircle({selectedAccount})
 {
