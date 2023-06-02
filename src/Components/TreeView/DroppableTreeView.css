@@ -1,0 +1,19 @@
+.tree-container {
+  transition: transform 0.3s ease, animation 0.3s ease; /* Add a transition for the transform property */
+}
+
+.tree-container.animating {
+  animation: slide-animation 0.3s ease; /* Add a CSS animation for the slide animation */
+}
+
+@keyframes slide-animation {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(calc(-100% / 2));
+  }
+  100% {
+    transform: translateX(calc(-100%));
+  }
+}
