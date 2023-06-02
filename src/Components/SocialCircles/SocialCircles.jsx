@@ -22,7 +22,6 @@ export default function SocialCircles()
   const authContext = useAuthContext();
   const userContext = useUserContext();
   const socialCircleContext = useSocialCircleContext();
-  const [selectedAccount, setSelectedAccount] = useState('discord');
   const [socialCircles, setSocialCircles] = useState([]);
   const [circleName, setCircleName] = useState('');
   const [userData, setUserData] = useState(null);
@@ -32,11 +31,7 @@ export default function SocialCircles()
     authContext.log('[SocialCircles] > useEffect(socialCircleContext.linkedAccounts)');
     if(socialCircleContext.linkedAccounts.length > 0) {
       authContext.log('[SocialCircles]: useEffect(socialCircleContext.linkedAccounts) (updating linked accounts)');
-      // Update UI to reflect changes
-      if(selectedAccount === '') {
-        authContext.log('[SocialCircles]: useEffect(socialCircleContext.linkedAccounts) (updating UI)');
-        setSelectedAccount(socialCircleContext.linkedAccounts[0]);
-      }
+      // TODO: Update tree data to reflect changes
     }
     authContext.log('[SocialCircles] < useEffect(socialCircleContext.linkedAccounts)');
   }, [socialCircleContext && socialCircleContext.linkedAccounts]);
@@ -46,9 +41,9 @@ export default function SocialCircles()
       userContext.data &&
       userContext.data.socials &&
       userContext.data.socials.length > 0 &&
-      selectedAccount.length > 0
+      socialCircleContext.linkedAccounts.length > 0
     ) {
-      const provider = selectedAccount.toLowerCase();
+      const provider = socialCircleContext.linkedAccounts[0].toLowerCase();
       const indexOfProvider = userContext.data.socials.findIndex(account => {
         return Object.keys(account).some(key => key === provider);
       });
@@ -73,7 +68,6 @@ export default function SocialCircles()
   // Handler function for selecting an account from the dropdown
   const handleSelectAccount = (account) => {
     authContext.log('[SocialCircles] > handleSelectAccount');
-    setSelectedAccount(account || '');
     socialCircleContext.updateData(account || 0); 
   };
 
@@ -95,7 +89,6 @@ export default function SocialCircles()
   // Handler function for selecting a saved social circle
   const handleSelectSocialCircle = (socialCircle) => {
     authContext.log('[SocialCircles] > handleSelectSocialCircle');
-    setSelectedAccount(socialCircle.name || '');
     socialCircleContext.setFriends(socialCircle.friends);
   };
 
@@ -221,19 +214,9 @@ export default function SocialCircles()
           )
         })}
       </div>
-  
+
       {socialCircleContext && socialCircleContext.linkedAccounts.length > 0 && (
         <Container fluid>
-          {/* Dropdown of linked social accounts */}
-          <Form.Select
-            className="mt-3"
-            value={selectedAccount || ''}
-            onChange={event => handleSelectAccount(event.target.value)}>
-            {socialCircleContext && socialCircleContext.linkedAccounts.map(account => (
-              <option key={account} value={account}>{account}</option>
-            ))}
-          </Form.Select>
-
           {/* SocialCircle component */}
           {/* userContext.data && !userContext.requestingData && <SocialCircle selectedAccount={selectedAccount} /> */}
           {userContext.data && !userContext.requestingData &&
