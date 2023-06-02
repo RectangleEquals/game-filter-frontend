@@ -106,11 +106,7 @@ export default function SocialCircles()
       {
         id: '2',
         header: true,
-        title: (
-          <Container fluid className='d-flex flex-column m-0 p-0'>
-            <h4>Drag your connections below</h4>
-          </Container>
-        ),
+        title: <h4>Drag your connections below</h4>,
         children: []
       },
       {
