@@ -1,19 +1,29 @@
 .tree-container {
-  transition: transform 0.3s ease, animation 0.3s ease; /* Add a transition for the transform property */
+  transition: opacity 0.3s ease;
 }
 
-.tree-container.animating {
-  animation: slide-animation 0.3s ease; /* Add a CSS animation for the slide animation */
+.tree-container.animate-fade-in {
+  animation: fade-in-animation 0.3s ease;
 }
 
-@keyframes slide-animation {
+.tree-container.animate-fade-out {
+  animation: fade-out-animation 0.3s ease;
+}
+
+@keyframes fade-out-animation {
   0% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(calc(-100% / 2));
+    opacity: 1;
   }
   100% {
-    transform: translateX(calc(-100%));
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out-animation {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }

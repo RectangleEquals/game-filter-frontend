@@ -1,7 +1,7 @@
 import './DroppableTreeView.css';
 import { useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { Container, ListGroup } from 'react-bootstrap';
+import { ListGroup } from 'react-bootstrap';
 import { StrictModeDroppable } from 'components/StrictModeDroppable';
 import DraggableTreeNode from './DraggableTreeNode';
 
@@ -13,7 +13,10 @@ export function DroppableTreeView({ treeData, id, children }) {
   const [animationDirection, setAnimationDirection] = useState(null); // Animation direction state
 
   const handleNodeClick = (node) => {
-    setHistory((prevHistory) => [      ...prevHistory,      { tree: currentTree, parentIndex: currentTree.findIndex((element) => element.id === node.id) },    ]);
+    setHistory((prevHistory) => [
+      ...prevHistory,
+      { tree: currentTree, parentIndex: currentTree.findIndex((element) => element.id === node.id) },
+    ]);
     setAnimationDirection('forward'); // Set the animation direction to forward
     setCurrentTree(node.children);
   };
@@ -68,11 +71,11 @@ export function DroppableTreeView({ treeData, id, children }) {
 
             {currentTree.map((node, index) => (
               <DraggableTreeNode
-                className={`tree-container ${animationDirection ? 'animating' : ''}`}
                 key={node.id}
                 node={node}
                 index={index}
-                isDraggable={Boolean(!node.children)}
+                isHeader={node.header}
+                isDraggable={!node.header && Boolean(!node.children)}
                 handleNodeClick={handleNodeClick}
               />
             ))}

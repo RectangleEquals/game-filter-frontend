@@ -11,6 +11,8 @@ const sessionName = process.env.SESSION_COOKIE_NAME || "__gfsid";
 
 export const AuthContext = createContext();
 
+// TODO: Handle the case where the session has expired and we are still logged in
+
 export function AuthProvider({ message, children })
 {
   const didMountRef = useRef(false);
@@ -185,8 +187,15 @@ export function AuthProvider({ message, children })
         updateToken();
         log('User logged out', false);
       }
+      else if(response.status === 401) {
+        sessionStorage.removeItem(sessionName);
+        setIsLoggedIn(false);
+        log('User logged out (forcefully)', false);
+      }
     })
-    .catch(error => logError(error));
+    .catch(error => {
+      logError(error);
+    });
   }   
 
   const handleLoginChange = (loginStatus) => {

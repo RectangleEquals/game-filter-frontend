@@ -2,7 +2,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import { ListGroup } from 'react-bootstrap';
 import { MdArrowBackIos, MdArrowForwardIos } from 'react-icons/md';
 
-export function DraggableTreeNode({ node, index, isDraggable, isBack, handleNodeClick }) {
+export function DraggableTreeNode({ node, index, isDraggable, isBack, isHeader, handleNodeClick }) {
   const handleClick = () => {
     if (node.children) {
       handleNodeClick(node);
@@ -19,6 +19,12 @@ export function DraggableTreeNode({ node, index, isDraggable, isBack, handleNode
           {node.icon && <span>{node.icon}</span>}
           <span><strong>{node.title}</strong></span>
       </ListGroup.Item>
+    ) : isHeader ? (
+      <ListGroup.Item
+        variant='dark'
+        style={{textAlign: 'center'}}>
+          <span>{node.title}</span>
+      </ListGroup.Item>
     ) : (
       <Draggable key={node.id} draggableId={node.id} index={index} isDragDisabled={!isDraggable}>
         {(provided, snapshot) => (
@@ -34,7 +40,7 @@ export function DraggableTreeNode({ node, index, isDraggable, isBack, handleNode
             onClick={!isDraggable ? handleClick : () => {}}>
             {node.icon}
             <span>{node.title}</span>
-            {node.children && <MdArrowForwardIos className="float-right" />}
+            {node.children && <MdArrowForwardIos />}
           </ListGroup.Item>
         )}
       </Draggable>

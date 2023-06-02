@@ -5,76 +5,7 @@ import { useAuthContext } from 'contexts/AuthContext';
 import { useUserContext } from 'contexts/UserContext';
 import { useSocialCircleContext } from 'contexts/SocialCircleContext';
 import ImageAsset from 'components/ImageAsset';
-import SocialCircle from './SocialCircle';
 import DroppableTreeView from 'components/TreeView/DroppableTreeView';
-import { DragDropContext } from 'react-beautiful-dnd';
-
-const treeData2 = [
-  {
-    id: '1',
-    icon: <span>🌳</span>,
-    title: 'Parent 1',
-    children: [
-      {
-        id: '2',
-        title: 'Child 1.1',
-      },
-      {
-        id: '3',
-        title: 'Child 1.2',
-      },
-    ],
-  },
-  {
-    id: '4',
-    icon: <span>🌴</span>,
-    title: 'Parent 2',
-    children: [
-      {
-        id: '5',
-        title: 'Child 2.1',
-      },
-      {
-        id: '6',
-        title: 'Child 2.2',
-      },
-    ],
-  },
-];
-
-const discordData = [
-  {
-    id: '2',
-    icon: <span>🌴</span>,
-    title: 'Rabenclam'
-  },
-  {
-    id: '3',
-    icon: <span>🌳</span>,
-    title: 'Insomniaddict'
-  }
-];
-
-const treeData = [
-  {
-    id: '1',
-    icon: <ImageAsset className='asset-discord-logo img-social-account-logo' style={{pointerEvents: 'none', userSelect: 'none'}}/>,
-    title: 'Discord',
-    children: discordData
-  },
-  {
-    id: '4',
-    icon: <ImageAsset className='asset-steam-logo img-social-account-logo' style={{pointerEvents: 'none', userSelect: 'none'}}/>,
-    title: 'Steam',
-    children: []
-  },
-  {
-    id: '5',
-    icon: <ImageAsset className='asset-microsoft-logo img-social-account-logo' style={{pointerEvents: 'none', userSelect: 'none'}}/>,
-    title: 'Microsoft',
-    children: []
-  }
-];
 
 const providers = ["Discord", "Steam", "Microsoft", "Epic Games"];
 const initialTreeConfig = {
@@ -175,8 +106,70 @@ export default function SocialCircles()
     );
   };
 
-  const handleDragEnd = (result) => {
-    console.log(JSON.stringify(result));
+  const getTreeData = () =>
+  {
+    const discordData = [
+      {
+        id: '2',
+        header: true,
+        title: (
+          <Container fluid className='d-flex flex-column m-0 p-0'>
+            <h4>Drag your connections below</h4>
+          </Container>
+        ),
+        children: []
+      },
+      {
+        id: '3',
+        icon: <span>🌴</span>,
+        title: 'Rabenclam'
+      },
+      {
+        id: '4',
+        icon: <span>🌳</span>,
+        title: 'Insomniaddict'
+      }
+    ];
+    
+    const treeData = [
+      {
+        id: '0',
+        header: true,
+        title: (
+          <Container fluid className='d-flex flex-column m-0 p-0'>
+            <h4>Choose a provider:</h4>
+            <Button
+              className="mt-3"
+              variant={userContext.requestingData ? "secondary" : "dark"}
+              disabled={userContext.requestingData}
+              onClick={handleRefreshList}>
+                Refresh List
+            </Button>
+          </Container>
+        ),
+        children: []
+      },
+      {
+        id: '1',
+        icon: <ImageAsset className='asset-discord-logo img-social-account-logo' style={{pointerEvents: 'none', userSelect: 'none'}}/>,
+        title: 'Discord',
+        children: discordData
+      },
+      {
+        id: '5',
+        icon: <ImageAsset className='asset-steam-logo img-social-account-logo' style={{pointerEvents: 'none', userSelect: 'none'}}/>,
+        title: 'Steam',
+        children: []
+      },
+      {
+        id: '6',
+        icon: <ImageAsset className='asset-microsoft-logo img-social-account-logo' style={{pointerEvents: 'none', userSelect: 'none'}}/>,
+        title: 'Microsoft',
+        children: []
+      }
+    ];
+
+    return treeData;
   }
 
   const getTreeConfigForSocialData = (data) => {
@@ -243,17 +236,7 @@ export default function SocialCircles()
           {/* SocialCircle component */}
           {/* userContext.data && !userContext.requestingData && <SocialCircle selectedAccount={selectedAccount} /> */}
           {userContext.data && !userContext.requestingData &&
-            <DroppableTreeView id="treeview" treeData={treeData}>
-              <Container fluid className='d-flex flex-column m-0 p-0'>
-                <Button
-                  className="mt-3"
-                  variant={userContext.requestingData ? "secondary" : "dark"}
-                  disabled={userContext.requestingData}
-                  onClick={handleRefreshList}>
-                    Refresh List
-                </Button>
-              </Container>
-            </DroppableTreeView>
+            <DroppableTreeView id="treeview" treeData={getTreeData()} />
           }
           
           {/* Save social circle */}
