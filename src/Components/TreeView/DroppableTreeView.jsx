@@ -1,43 +1,20 @@
 import './DroppableTreeView.css';
-import { useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { ListGroup } from 'react-bootstrap';
+import { useTreeViewContext } from 'contexts/TreeViewContext';
 import { StrictModeDroppable } from 'components/StrictModeDroppable';
 import DraggableTreeNode from './DraggableTreeNode';
 
 // TODO: Replace StrictModeDroppable with Droppable for production
 
-export function DroppableTreeView({ treeData, id, children }) {
-  const [currentTree, setCurrentTree] = useState(treeData);
-  const [history, setHistory] = useState([]);
-  const [animationDirection, setAnimationDirection] = useState(null); // Animation direction state
-
-  const handleNodeClick = (node) => {
-    setHistory((prevHistory) => [
-      ...prevHistory,
-      { tree: currentTree, parentIndex: currentTree.findIndex((element) => element.id === node.id) },
-    ]);
-    setAnimationDirection('forward'); // Set the animation direction to forward
-    setCurrentTree(node.children);
-  };
-
-  const handleGoBack = () => {
-    if (history.length > 0) {
-      const { tree, parentIndex } = history.pop();
-      setAnimationDirection('backward'); // Set the animation direction to backward
-      setCurrentTree(tree);
-    }
-  };
-
-  const handleDragEnd = (result) => {
-    console.log(JSON.stringify(result));
-  };
+export function DroppableTreeView({ id, children }) {
+  const treeViewContext = useTreeViewContext();
 
   const createBackNode = () => {
-    if (history.length > 0) {
+    if (treeViewContext.history.length > 0) {
       /* Creates a new node specifically for this "back"
         element, which should be tied to the parent node */
-      const previousTree = history[history.length - 1];
+      const previousTree = treeViewContext.history[treeViewContext.history.length - 1];
       const parentNode = previousTree.tree[previousTree.parentIndex];
       return {
         id: `${parentNode.id}.back`,
@@ -50,7 +27,7 @@ export function DroppableTreeView({ treeData, id, children }) {
   };
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
+    <DragDropContext onDragEnd={treeViewContext.handleDragEnd}>
       <StrictModeDroppable droppableId={id}>
         {(provided) => (
           <ListGroup
@@ -60,23 +37,23 @@ export function DroppableTreeView({ treeData, id, children }) {
             
             {children}
 
-            {history.length > 0 && (
+            {treeViewContext.history.length > 0 && (
               <DraggableTreeNode
-                key={`${history[history.length - 1].id}.back`}
+                key={`${treeViewContext.history[treeViewContext.history.length - 1].id}.back`}
                 node={createBackNode()}
                 isBack={true}
-                handleNodeClick={handleGoBack}
+                handleNodeClick={treeViewContext.handleGoBack}
               />
             )}
 
-            {currentTree.map((node, index) => (
+            {treeViewContext.currentTree.map((node, index) => (
               <DraggableTreeNode
                 key={node.id}
                 node={node}
                 index={index}
                 isHeader={node.header}
                 isDraggable={!node.header && Boolean(!node.children)}
-                handleNodeClick={handleNodeClick}
+                handleNodeClick={treeViewContext.handleNodeClick}
               />
             ))}
             {provided.placeholder}

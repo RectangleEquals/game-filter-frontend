@@ -4,6 +4,7 @@ import { Button, Container, Form, ListGroup } from 'react-bootstrap';
 import { useAuthContext } from 'contexts/AuthContext';
 import { useUserContext } from 'contexts/UserContext';
 import { useSocialCircleContext } from 'contexts/SocialCircleContext';
+import { TreeViewProvider } from 'contexts/TreeViewContext';
 import ImageAsset from 'components/ImageAsset';
 import DroppableTreeView from 'components/TreeView/DroppableTreeView';
 
@@ -236,7 +237,9 @@ export default function SocialCircles()
           {/* SocialCircle component */}
           {/* userContext.data && !userContext.requestingData && <SocialCircle selectedAccount={selectedAccount} /> */}
           {userContext.data && !userContext.requestingData &&
-            <DroppableTreeView id="treeview" treeData={getTreeData()} />
+            <TreeViewProvider treeData={getTreeData()}>
+              <DroppableTreeView id="treeview" />
+            </TreeViewProvider>
           }
           
           {/* Save social circle */}
