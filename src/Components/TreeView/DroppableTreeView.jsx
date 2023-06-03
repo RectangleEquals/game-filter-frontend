@@ -1,61 +1,46 @@
 import './DroppableTreeView.css';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { useEffect, useState } from 'react';
 import { ListGroup } from 'react-bootstrap';
+import { DragDropContext } from 'react-beautiful-dnd';
 import { useTreeViewContext } from 'contexts/TreeViewContext';
 import { StrictModeDroppable } from 'components/StrictModeDroppable';
 import DraggableTreeNode from './DraggableTreeNode';
 
 // TODO: Replace StrictModeDroppable with Droppable for production
 
-export function DroppableTreeView({ id, children }) {
+export function DroppableTreeView({ id }) {
   const treeViewContext = useTreeViewContext();
+  const [nodes, setNodes] = useState([]);
 
-  const createBackNode = () => {
-    if (treeViewContext.history.length > 0) {
-      /* Creates a new node specifically for this "back"
-        element, which should be tied to the parent node */
-      const previousTree = treeViewContext.history[treeViewContext.history.length - 1];
-      const parentNode = previousTree.tree[previousTree.parentIndex];
-      return {
-        id: `${parentNode.id}.back`,
-        icon: parentNode.icon,
-        title: parentNode.title, // Use the parent node's title for the back button
-        children: [], // A back button shouldn't have any children
-      };
-    }
-    return {};
-  };
+  useEffect(_ => {
+    if(treeViewContext.generated)
+      setNodes(getNodes());
+  }, [treeViewContext.currentTree, treeViewContext.generated]);
+
+  const getNodes = () => {
+    let body = [];
+
+    treeViewContext.currentTree.map((node, index) => {
+      body.push((
+        <DraggableTreeNode
+          key={node.id}
+          node={node}
+          index={index}
+          isDraggable={node.draggable}
+          handleNodeClick={treeViewContext.handleNodeClick}
+        />
+      ))
+    });
+
+    return body;
+  }
 
   return (
     <DragDropContext onDragEnd={treeViewContext.handleDragEnd}>
       <StrictModeDroppable droppableId={id}>
         {(provided) => (
-          <ListGroup
-            className={id}
-            ref={provided.innerRef}
-            {...provided.droppableProps}>
-            
-            {children}
-
-            {treeViewContext.history.length > 0 && (
-              <DraggableTreeNode
-                key={`${treeViewContext.history[treeViewContext.history.length - 1].id}.back`}
-                node={createBackNode()}
-                isBack={true}
-                handleNodeClick={treeViewContext.handleGoBack}
-              />
-            )}
-
-            {treeViewContext.currentTree.map((node, index) => (
-              <DraggableTreeNode
-                key={node.id}
-                node={node}
-                index={index}
-                isHeader={node.header}
-                isDraggable={!node.header && Boolean(!node.children)}
-                handleNodeClick={treeViewContext.handleNodeClick}
-              />
-            ))}
+          <ListGroup className={id} ref={provided.innerRef} {...provided.droppableProps}>
+            {nodes}
             {provided.placeholder}
           </ListGroup>
         )}

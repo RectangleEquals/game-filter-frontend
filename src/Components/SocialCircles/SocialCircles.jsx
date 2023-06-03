@@ -102,29 +102,8 @@ export default function SocialCircles()
 
   const getTreeData = () =>
   {
-    const discordData = [
-      {
-        id: '2',
-        header: true,
-        title: <h4>Drag your connections below</h4>,
-        children: []
-      },
-      {
-        id: '3',
-        icon: <span>🌴</span>,
-        title: 'Rabenclam'
-      },
-      {
-        id: '4',
-        icon: <span>🌳</span>,
-        title: 'Insomniaddict'
-      }
-    ];
-    
     const treeData = [
       {
-        id: '0',
-        header: true,
         title: (
           <Container fluid className='d-flex flex-column m-0 p-0'>
             <h4>Choose a provider:</h4>
@@ -138,26 +117,39 @@ export default function SocialCircles()
           </Container>
         ),
         children: []
-      },
-      {
-        id: '1',
-        icon: <ImageAsset className='asset-discord-logo img-social-account-logo' style={{pointerEvents: 'none', userSelect: 'none'}}/>,
-        title: 'Discord',
-        children: discordData
-      },
-      {
-        id: '5',
-        icon: <ImageAsset className='asset-steam-logo img-social-account-logo' style={{pointerEvents: 'none', userSelect: 'none'}}/>,
-        title: 'Steam',
-        children: []
-      },
-      {
-        id: '6',
-        icon: <ImageAsset className='asset-microsoft-logo img-social-account-logo' style={{pointerEvents: 'none', userSelect: 'none'}}/>,
-        title: 'Microsoft',
-        children: []
       }
     ];
+
+    for(const linkedAccount of socialCircleContext.linkedAccounts)
+    {
+      // TODO: Create top-level tree data based on which providers are available
+      let accountData = [
+        {
+          title: <h4>Drag your connections below</h4>,
+          children: []
+        }
+      ];
+      const account = linkedAccount.toLowerCase();
+      
+      const indexOfAccount = userContext.data.socials.findIndex(acc => {
+        return Object.keys(acc).some(key => key === account);
+      });
+      
+      const socialData = userContext.data.socials[indexOfAccount][account];
+      for(const relationship of socialData.relationships) {
+        accountData.push({
+          icon: <ImageAsset className={`asset-{${relationship.user.avatar}} img-social-account-logo`} style={{pointerEvents: 'none', userSelect: 'none'}}/>,
+          title: relationship.user.name
+        });
+      }
+
+      treeData.push({
+        icon: <ImageAsset className={`asset-${account}-logo img-social-account-logo`} style={{pointerEvents: 'none', userSelect: 'none'}}/>,
+        title: linkedAccount,
+        isDraggable: false,
+        children: accountData
+      });
+    }
 
     return treeData;
   }
