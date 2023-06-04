@@ -1,20 +1,26 @@
-import { useEffect } from 'react';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { DragDropContext } from 'react-beautiful-dnd';
 
 export const TreeViewContext = createContext();
 
-export function TreeViewProvider({ treeData, children })
+export function TreeViewProvider({ treeData, targetData, children })
 {
-  const [generated, setGenerated] = useState(false);
+  const [generated, setGenerated] = useState([false, false]);
   const [currentTree, setCurrentTree] = useState(treeData);
+  const [targetTree, setTargetTree] = useState(targetData);
   const [history, setHistory] = useState([]);
 
   useEffect(_ => {
     setCurrentTree(generateIds(treeData));
-    setGenerated(true);
+    setGenerated(previousGenerated => [true, previousGenerated[1]]);
   }, [treeData]);
 
-  function generateIds(treeData) {
+  useEffect(_ => {
+    setTargetTree(generateIds(targetData));
+    setGenerated(previousGenerated => [previousGenerated[0], true]);
+  }, [targetData]);
+
+  function generateIds(data) {
     let idCounter = 0;
   
     const traverse = (node, depth, topNode) => {
@@ -44,7 +50,7 @@ export function TreeViewProvider({ treeData, children })
       return updatedNode;
     };
   
-    return treeData.map((node, index) => traverse(node, 0, index === 0));
+    return data.map((node, index) => traverse(node, 0, index === 0));
   }
 
   const handleNodeClick = (node) => {
@@ -71,20 +77,23 @@ export function TreeViewProvider({ treeData, children })
   };
 
   return (
-    <TreeViewContext.Provider
-      value={{
-        generated,
-        currentTree,
-        history,
-        setCurrentTree,
-        setHistory,
-        handleNodeClick,
-        handleGoBack,
-        handleDragEnd
-      }}
-    >
-      {children}
-    </TreeViewContext.Provider>
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <TreeViewContext.Provider
+        value={{
+          generated,
+          currentTree,
+          targetTree,
+          history,
+          setCurrentTree,
+          setHistory,
+          handleNodeClick,
+          handleGoBack,
+          handleDragEnd
+        }}
+      >
+        {children}
+      </TreeViewContext.Provider>
+    </DragDropContext>
   );
 }
 

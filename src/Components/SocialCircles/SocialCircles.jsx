@@ -70,7 +70,7 @@ export default function SocialCircles()
     {
       let accountData = [
         {
-          title: <h4>Drag your connections below</h4>,
+          title: <h4>Drag your connections from below</h4>,
           children: []
         }
       ];
@@ -100,7 +100,7 @@ export default function SocialCircles()
   }
 
   return (
-    <Container fluid ref={socialCircleContext.ref} className="social-circle-container" style={{overflowY: 'auto'}}>
+    <Container fluid className="social-circle-container" style={{overflowY: 'auto'}}>
       <div className="social-accounts-container">
         {/* Social account buttons */}
         {providers.map(account => {
@@ -133,15 +133,29 @@ export default function SocialCircles()
 
       {socialCircleContext && socialCircleContext.linkedAccounts.length > 0 && (
         <Container fluid>
-          {/* SocialCircle component */}
-          {/* userContext.data && !userContext.requestingData && <SocialCircle selectedAccount={selectedAccount} /> */}
-          {
+          { /* TODO: Allow for setting the max height of the tree view via tree data */
             userContext.data &&
             userContext.data.socials &&
             userContext.data.socials.length > 0 &&
             !userContext.requestingData &&
-            <TreeViewProvider treeData={generateTreeData()}>
-              <DroppableTreeView id="tvwRelationships"/>
+            <TreeViewProvider treeData={generateTreeData()} targetData={[
+              {
+                title: <h4>Drop your connections here</h4>,
+                children: []
+              }
+            ]}>
+              <DroppableTreeView id="connections.source" />
+              <Container fluid
+                style={{
+                  height: '206px',
+                  overflowY: 'auto',
+                  margin: '12px 0px 0px 0px',
+                  padding: '0px 0px 0px 0px',
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                }}>
+                <DroppableTreeView id="connections.target" target/>
+              </Container>
             </TreeViewProvider>
           }
           

@@ -12,7 +12,6 @@ export const SocialCircleContext = createContext();
 
 export function SocialCircleProvider({ children })
 {
-  const ref = useRef(null);
   const authContext = useAuthContext();
   const userContext = useUserContext();
   const [linkedAccounts, setLinkedAccounts] = useState([]);
@@ -142,7 +141,6 @@ export function SocialCircleProvider({ children })
   return (
     <SocialCircleContext.Provider
       value={{
-        ref,
         addAccountLink,
         requestAccountLink,
         setFriends,
