@@ -10,23 +10,6 @@ export function DraggableTreeNode({ node, index, handleNodeClick })
     }
   };
 
-  // const createBackNode = () => {
-  //   if (treeViewContext.history.length > 0) {
-  //     /* Creates a new node specifically for this "back"
-  //       element, which should be tied to the parent node */
-  //     const previousTree = treeViewContext.history[treeViewContext.history.length - 1];
-  //     const parentNode = previousTree.tree[previousTree.parentIndex];
-
-  //     return {
-  //       id: node.id,
-  //       icon: parentNode.icon,
-  //       title: parentNode.title, // Use the parent node's title for the back button
-  //       children: [], // A back button shouldn't have any children
-  //     };
-  //   }
-  //   return {};
-  // };
-
   return (
     node.isBack || node.isHeader ? (
       <ListGroup.Item
@@ -44,6 +27,7 @@ export function DraggableTreeNode({ node, index, handleNodeClick })
       <Draggable key={node.id} draggableId={node.id} index={index} isDragDisabled={!node.isDraggable}>
         {(provided, snapshot) => (
           <ListGroup.Item
+            className="d-flex flex-grow-1 flex-row justify-content-start align-items-center"
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
@@ -55,7 +39,11 @@ export function DraggableTreeNode({ node, index, handleNodeClick })
             onClick={!node.isDraggable ? handleClick : _ => {}}>
             {node.icon}
             <span>{node.title}</span>
-            {node.children && <MdArrowForwardIos />}
+            {node.children && 
+              <div className="ms-auto">
+                <MdArrowForwardIos className='float-end'/>
+              </div>
+            }
           </ListGroup.Item>
         )}
       </Draggable>

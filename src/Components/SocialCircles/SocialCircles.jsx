@@ -1,5 +1,5 @@
 import './SocialCircles.css';
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import { Button, Container, Form, ListGroup } from 'react-bootstrap';
 import { useAuthContext } from 'contexts/AuthContext';
 import { useUserContext } from 'contexts/UserContext';
@@ -9,13 +9,6 @@ import ImageAsset from 'components/ImageAsset';
 import DroppableTreeView from 'components/TreeView/DroppableTreeView';
 
 const providers = ["Discord", "Steam", "Microsoft", "Epic Games"];
-const initialTreeConfig = {
-  visibleSearchThreshold: 8,
-  maxHeight: 350,
-  paths: [
-    { key: '*', icon: 'default' },
-  ]
-}
 
 export default function SocialCircles()
 {
@@ -24,57 +17,10 @@ export default function SocialCircles()
   const socialCircleContext = useSocialCircleContext();
   const [socialCircles, setSocialCircles] = useState([]);
   const [circleName, setCircleName] = useState('');
-  const [userData, setUserData] = useState(null);
-  const [treeConfig, setTreeConfig] = useState(initialTreeConfig);
-
-  useEffect(_ => {
-    authContext.log('[SocialCircles] > useEffect(socialCircleContext.linkedAccounts)');
-    if(socialCircleContext.linkedAccounts.length > 0) {
-      authContext.log('[SocialCircles]: useEffect(socialCircleContext.linkedAccounts) (updating linked accounts)');
-      // TODO: Update tree data to reflect changes
-    }
-    authContext.log('[SocialCircles] < useEffect(socialCircleContext.linkedAccounts)');
-  }, [socialCircleContext && socialCircleContext.linkedAccounts]);
-  
-  useEffect(_ => {
-    if(
-      userContext.data &&
-      userContext.data.socials &&
-      userContext.data.socials.length > 0 &&
-      socialCircleContext.linkedAccounts.length > 0
-    ) {
-      const provider = socialCircleContext.linkedAccounts[0].toLowerCase();
-      const indexOfProvider = userContext.data.socials.findIndex(account => {
-        return Object.keys(account).some(key => key === provider);
-      });
-
-      const socialData = userContext.data.socials[indexOfProvider][provider];      
-      const data = socialData.relationships[0];
-
-      // Remove id and icon from the user field
-      const { id, avatar, ...userWithoutIdAndIcon } = data.user;
-
-      // Remove id and icon from each element in guilds field
-      const guildsWithoutIdAndIcon = data.guilds.map(({ id, icon, ...guild }) => guild);
-
-      // Create the new JSON object
-      const result = { user: userWithoutIdAndIcon, guilds: guildsWithoutIdAndIcon };
-
-      setTreeConfig(getTreeConfigForSocialData(result));
-      setUserData(result);
-    }
-  }, [userContext && userContext.data])
-
-  // Handler function for selecting an account from the dropdown
-  const handleSelectAccount = (account) => {
-    authContext.log('[SocialCircles] > handleSelectAccount');
-    socialCircleContext.updateData(account || 0); 
-  };
 
   // Handler function for refreshing the SocialCircle list
   const handleRefreshList = (e) => {
     e.preventDefault();
-
     userContext.requestData();
   }
 
@@ -100,16 +46,16 @@ export default function SocialCircles()
     );
   };
 
-  const getTreeData = () =>
+  const generateTreeData = () =>
   {
     const treeData = [
       {
         title: (
           <Container fluid className='d-flex flex-column m-0 p-0'>
-            <h4>Choose a provider:</h4>
+            <h4>{socialCircleContext.linkedAccounts.length > 0 ? "Choose a provider:" : "Link a social account above"}</h4>
             <Button
               className="mt-3"
-              variant={userContext.requestingData ? "secondary" : "dark"}
+              variant={"dark"}
               disabled={userContext.requestingData}
               onClick={handleRefreshList}>
                 Refresh List
@@ -122,7 +68,6 @@ export default function SocialCircles()
 
     for(const linkedAccount of socialCircleContext.linkedAccounts)
     {
-      // TODO: Create top-level tree data based on which providers are available
       let accountData = [
         {
           title: <h4>Drag your connections below</h4>,
@@ -152,23 +97,6 @@ export default function SocialCircles()
     }
 
     return treeData;
-  }
-
-  const getTreeConfigForSocialData = (data) => {
-    let config = initialTreeConfig;
-
-    if(data && data.user && data.guilds) {
-      config = {
-        visibleSearchThreshold: 8,
-        maxHeight: 350,
-        paths: [
-          { key: 'name', value: data.user.name, icon: data.user.avatar },
-          ...data.guilds.map(guild => ({ key: 'name', value: guild.name, icon: guild.icon }))
-        ]
-      };
-    }
-
-    return config;
   }
 
   return (
@@ -207,9 +135,13 @@ export default function SocialCircles()
         <Container fluid>
           {/* SocialCircle component */}
           {/* userContext.data && !userContext.requestingData && <SocialCircle selectedAccount={selectedAccount} /> */}
-          {userContext.data && !userContext.requestingData &&
-            <TreeViewProvider treeData={getTreeData()}>
-              <DroppableTreeView id="treeview" />
+          {
+            userContext.data &&
+            userContext.data.socials &&
+            userContext.data.socials.length > 0 &&
+            !userContext.requestingData &&
+            <TreeViewProvider treeData={generateTreeData()}>
+              <DroppableTreeView id="tvwRelationships"/>
             </TreeViewProvider>
           }
           
