@@ -73,6 +73,7 @@ export function TreeViewProvider({ treeData, targetData, children })
   };
 
   const handleDragEnd = (result) => {
+    const { destination, source } = result;
     console.log(JSON.stringify(result));
   };
 

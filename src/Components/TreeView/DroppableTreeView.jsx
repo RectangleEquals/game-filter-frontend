@@ -7,7 +7,7 @@ import DraggableTreeNode from './DraggableTreeNode';
 
 // TODO: Replace StrictModeDroppable with Droppable for production
 
-export function DroppableTreeView({ id, target }) {
+export function DroppableTreeView({ id, target, style }) {
   const treeViewContext = useTreeViewContext();
   const [nodes, setNodes] = useState([]);
 
@@ -38,7 +38,7 @@ export function DroppableTreeView({ id, target }) {
   return (
     <StrictModeDroppable droppableId={id}>
       {(provided) => (
-        <ListGroup className={id} ref={provided.innerRef} {...provided.droppableProps}>
+        <ListGroup className={id} ref={provided.innerRef} {...provided.droppableProps} style={style}>
           {nodes}
           {provided.placeholder}
         </ListGroup>

@@ -145,7 +145,7 @@ export default function SocialCircles()
               }
             ]}>
               <DroppableTreeView id="connections.source" />
-              <Container fluid
+              <DroppableTreeView id="connections.target" target
                 style={{
                   height: '206px',
                   overflowY: 'auto',
@@ -153,9 +153,7 @@ export default function SocialCircles()
                   padding: '0px 0px 0px 0px',
                   backgroundColor: 'white',
                   borderRadius: '8px',
-                }}>
-                <DroppableTreeView id="connections.target" target/>
-              </Container>
+                }}/>
             </TreeViewProvider>
           }
           
