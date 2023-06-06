@@ -13,7 +13,7 @@ export function DroppableTreeView({ id, target, style }) {
 
   useEffect(_ => {
     treeViewContext.setContext(treeViewContext);
-  }, []);
+  }, [nodes]);
 
   useEffect(_ => {
     if(treeViewContext.generated[0] && !target || treeViewContext.generated[1] && target)

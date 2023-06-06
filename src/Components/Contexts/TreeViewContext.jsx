@@ -58,10 +58,10 @@ export function TreeViewProvider({ treeData, targetData, onDragEnd, children })
   const updateData = (newTargetTree, newSourceTree) => {
     setGenerated([false, false]);
     setCurrentTree(previousCurrentTree => {
-      return newSourceTree || currentTree
+      return newSourceTree || previousCurrentTree || currentTree
     });
     setTargetTree(previousTargetTree => {
-      return newTargetTree || targetTree
+      return newTargetTree || previousTargetTree || targetTree
     });
   }
 

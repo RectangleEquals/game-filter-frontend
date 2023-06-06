@@ -1,5 +1,5 @@
 import './SocialCircles.css';
-import {  useState } from 'react';
+import { useState } from 'react';
 import { Button, Container, Form, ListGroup } from 'react-bootstrap';
 import { useAuthContext } from 'contexts/AuthContext';
 import { useUserContext } from 'contexts/UserContext';
@@ -47,13 +47,36 @@ export default function SocialCircles()
   };
 
   const handleDragEnd = (result, context) => {
-    // TODO: Handle edge cases where we aren't dragging from source tree to dest tree
-    const sourceNode = context.currentTree[result.source.index];
-    const newTargetTree = context.targetTree;
-    newTargetTree.splice(result.destination.index + 1, 0, sourceNode);
-    context.updateData(newTargetTree);
-    console.log(JSON.stringify(context));
-  }
+    const { source, destination } = result;
+    
+    // Return if the item is dropped outside a droppable area
+    if (!destination) {
+      return;
+    }
+  
+    // Retrieve the relevant tree data based on the source and destination droppable IDs
+    const sourceTree = context.currentTree;
+    const targetTree = context.targetTree;
+  
+    // Retrieve the dragged node from the source tree
+    const draggedNode = sourceTree[source.index];
+  
+    // Create a copy of the target tree and insert the dragged node at the destination index
+    const newTargetTree = [...targetTree, draggedNode];
+    //newTargetTree.splice(destination.index, 0, draggedNode);
+  
+    // Create a copy of the source tree and remove the dragged node from its original position
+    const newSourceTree = [...sourceTree];
+    newSourceTree.splice(source.index, 1);
+  
+    // Update the tree data in the context
+    context.currentTree = newSourceTree;
+    context.targetTree = newTargetTree;
+  
+    // Call the updateData function from the context to update the states
+    context.updateData(newTargetTree, newSourceTree);
+    context.setContext(context);
+  };
 
   const generateTreeData = () =>
   {
