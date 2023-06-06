@@ -1,10 +1,12 @@
-import { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 
 export const TreeViewContext = createContext();
+export const useTreeViewContext = () => useContext(TreeViewContext);
 
-export function TreeViewProvider({ treeData, targetData, children })
+export function TreeViewProvider({ treeData, targetData, onDragEnd, children })
 {
+  const [context, setContext] = useState(useTreeViewContext());
   const [generated, setGenerated] = useState([false, false]);
   const [currentTree, setCurrentTree] = useState(treeData);
   const [targetTree, setTargetTree] = useState(targetData);
@@ -53,6 +55,16 @@ export function TreeViewProvider({ treeData, targetData, children })
     return data.map((node, index) => traverse(node, 0, index === 0));
   }
 
+  const updateData = (newTargetTree, newSourceTree) => {
+    setGenerated([false, false]);
+    setCurrentTree(previousCurrentTree => {
+      return newSourceTree || currentTree
+    });
+    setTargetTree(previousTargetTree => {
+      return newTargetTree || targetTree
+    });
+  }
+
   const handleNodeClick = (node) => {
     if(node.isBack) {
       handleGoBack();
@@ -73,19 +85,21 @@ export function TreeViewProvider({ treeData, targetData, children })
   };
 
   const handleDragEnd = (result) => {
-    const { destination, source } = result;
-    console.log(JSON.stringify(result));
+    if(onDragEnd)
+      onDragEnd(result, context);
   };
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <TreeViewContext.Provider
         value={{
+          context,
+          setContext,
           generated,
           currentTree,
           targetTree,
           history,
-          setCurrentTree,
+          updateData,
           setHistory,
           handleNodeClick,
           handleGoBack,
@@ -98,5 +112,4 @@ export function TreeViewProvider({ treeData, targetData, children })
   );
 }
 
-export const useTreeViewContext = () => useContext(TreeViewContext);
 export default useTreeViewContext;

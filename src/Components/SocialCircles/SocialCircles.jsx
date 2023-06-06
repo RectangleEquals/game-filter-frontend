@@ -46,6 +46,15 @@ export default function SocialCircles()
     );
   };
 
+  const handleDragEnd = (result, context) => {
+    // TODO: Handle edge cases where we aren't dragging from source tree to dest tree
+    const sourceNode = context.currentTree[result.source.index];
+    const newTargetTree = context.targetTree;
+    newTargetTree.splice(result.destination.index + 1, 0, sourceNode);
+    context.updateData(newTargetTree);
+    console.log(JSON.stringify(context));
+  }
+
   const generateTreeData = () =>
   {
     const treeData = [
@@ -143,7 +152,7 @@ export default function SocialCircles()
                 title: <h4>Drop your connections here</h4>,
                 children: []
               }
-            ]}>
+            ]} onDragEnd={handleDragEnd}>
               <DroppableTreeView id="connections.source" />
               <DroppableTreeView id="connections.target" target
                 style={{

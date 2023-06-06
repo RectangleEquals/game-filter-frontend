@@ -196,7 +196,7 @@ export function AuthProvider({ message, children })
     .catch(error => {
       logError(error);
     });
-  }   
+  }
 
   const handleLoginChange = (loginStatus) => {
     setIsLoggedIn(loginStatus);

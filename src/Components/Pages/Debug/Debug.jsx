@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Button, Col, Container, Form, ListGroup, Row } from 'react-bootstrap';
 import { useAuthContext } from 'contexts/AuthContext';
+import { useAriaContext } from 'contexts/AriaContext';
 import { useUserContext } from 'contexts/UserContext';
 import { useNavbarContext } from 'contexts/NavbarContext';
 import { useSocialCircleContext } from 'contexts/SocialCircleContext';
 
-export default function Debug() {
+export default function Debug()
+{
   const authContext = useAuthContext();
+  const ariaContext = useAriaContext();
   const userContext = useUserContext();
   const navbarContext = useNavbarContext();
   const socialCircleContext = useSocialCircleContext();
@@ -137,6 +140,8 @@ export default function Debug() {
     if(authContext.isDebugMode && command === 'linkdiscord') {
       authContext.log('Requesting Discord account link...')
       socialCircleContext.requestAccountLink('Discord');
+    } else if (userContext.data && userContext.data.roles && userContext.data.roles.includes("Owner") && command === 'hunt') {
+      ariaContext.setShown(true);
     } else if (command.startsWith('logError ')) {
       const message = command.substring(command.indexOf(" ") + 1);
       authContext.logError(message);

@@ -12,9 +12,13 @@ export function DroppableTreeView({ id, target, style }) {
   const [nodes, setNodes] = useState([]);
 
   useEffect(_ => {
+    treeViewContext.setContext(treeViewContext);
+  }, []);
+
+  useEffect(_ => {
     if(treeViewContext.generated[0] && !target || treeViewContext.generated[1] && target)
       setNodes(getNodes());
-  }, [treeViewContext.currentTree, treeViewContext.generated]);
+  }, [treeViewContext.currentTree, treeViewContext.targetTree, treeViewContext.generated]);
 
   const getNodes = () => {
     let body = [];

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { useAuthContext } from 'contexts/AuthContext';
 import formDataBody from 'form-data-body';
 

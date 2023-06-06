@@ -1,7 +1,6 @@
 import './LoginOrRegisterModal.css';
 import { useState, useRef } from 'react';
 import { Modal, Form, Button, Tab, Tabs, Alert } from 'react-bootstrap';
-import { useAuthContext } from 'contexts/AuthContext';
 import resolveUrl from 'utils/resolveUrl';
 import DOMPurify from 'dompurify';
 import formDataBody from 'form-data-body';
@@ -11,9 +10,10 @@ const apiUrlLogin = resolveUrl(apiUrlBase, 'login');
 const apiUrlRegister = resolveUrl(apiUrlBase, 'register');
 const sessionName = process.env.SESSION_COOKIE_NAME || "__gfsid";
 
+// TODO: Fix the login bug where after logging in, you still need to refresh the page
+
 export default function LoginOrRegisterModal({ shown, onShowModal, onHandleLogin, onHandleRegistration })
 {
-  const authContext = useAuthContext();
   const [title, setTitle] = useState('Login');
   const [activeTab, setActiveTab] = useState('login');
   const [loginEmail, setLoginEmail] = useState('');

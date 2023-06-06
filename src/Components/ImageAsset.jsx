@@ -7,6 +7,7 @@ import MicrosoftLogo from 'assets/xbox.svg';
 import EpicLogo from 'assets/epic.svg';
 import Tumbleweed from 'assets/tumbleweed.png';
 import UFO from 'assets/ufo.gif';
+import Aria from 'assets/aria.png';
 
 export default function ImageAsset(props) {
   const { className } = props;
@@ -30,6 +31,8 @@ export default function ImageAsset(props) {
         return Tumbleweed;
       else if(props.className.startsWith('asset-ufo'))
         return UFO;
+      else if(props.className.startsWith('asset-aria'))
+        return Aria;
       else if(props.className.startsWith('asset-{')) {
         const iStart = props.className.indexOf('{');
         const iEnd = props.className.indexOf('}');
