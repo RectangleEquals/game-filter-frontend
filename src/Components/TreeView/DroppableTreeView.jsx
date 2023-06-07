@@ -1,12 +1,14 @@
 import './DroppableTreeView.css';
-import { StrictModeDroppable } from 'components/StrictModeDroppable';
 import { ListGroup } from 'react-bootstrap';
+import { StrictModeDroppable } from 'components/StrictModeDroppable';
 import DraggableTreeNode from './DraggableTreeNode';
 
 // TODO: Replace StrictModeDroppable with Droppable for production
 
-export default function DroppableTreeView({ id, style, context }) {
-  const tree = id.endsWith(".target") ? context.targetTree : context.currentTree;
+export default function DroppableTreeView({ id, tree, onClick, style })
+{
+  if(!id || !tree)
+    return null;
 
   const getNodes = () => {
     return tree.map((node, index) => (
@@ -15,7 +17,7 @@ export default function DroppableTreeView({ id, style, context }) {
         node={node}
         index={index}
         isDraggable={node.draggable}
-        handleNodeClick={context.handleNodeClick}
+        handleNodeClick={onClick}
       />
     ));
   };

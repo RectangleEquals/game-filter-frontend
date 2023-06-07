@@ -142,11 +142,11 @@ export default function SocialCircles()
             userContext.data.socials &&
             userContext.data.socials.length > 0 &&
             !userContext.requestingData &&
-            <TreeViewProvider treeData={generateTreeData()} targetData={targetTreeHeader}>
-              {context => (
+            <TreeViewProvider sourceData={generateTreeData()} targetData={targetTreeHeader}>
+              {(sourceTree, targetTree, onClick) => {return (
                 <>
-                  <DroppableTreeView id="connections.0.source" context={context} />
-                  <DroppableTreeView id="connections.0.target" context={context}
+                  <DroppableTreeView id="connections.0.source" tree={sourceTree} onClick={onClick} />
+                  <DroppableTreeView id="connections.0.target" tree={targetTree} onClick={onClick}
                     style={{
                       height: '206px',
                       overflowY: 'auto',
@@ -157,7 +157,7 @@ export default function SocialCircles()
                     }}
                   />
                 </>
-              )}
+              )}}
             </TreeViewProvider>
           }
           

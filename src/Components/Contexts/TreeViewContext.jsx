@@ -1,24 +1,22 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 
 export const TreeViewContext = createContext();
 export const useTreeViewContext = () => useContext(TreeViewContext);
 
-export function TreeViewProvider({ treeData, targetData, children })
+export function TreeViewProvider({ sourceData, targetData, children })
 {
-  const context = useTreeViewContext();
-  const providerRef = useRef(null);
   const [generated, setGenerated] = useState([false, false]);
-  const [currentTree, setCurrentTree] = useState(treeData);
+  const [sourceTree, setSourceTree] = useState(sourceData);
   const [targetTree, setTargetTree] = useState(targetData);
   const [history, setHistory] = useState([]);
 
   useEffect(_ => {
-    setCurrentTree(generateIds(treeData));
+    setSourceTree(generateIds(sourceData));
     setGenerated(previousGenerated => {
       return [true, previousGenerated[1]]
     });
-  }, [treeData]);
+  }, [sourceData]);
 
   useEffect(_ => {
     setTargetTree(generateIds(targetData));
@@ -61,9 +59,9 @@ export function TreeViewProvider({ treeData, targetData, children })
   }
 
   const updateData = (newTargetTree, newSourceTree) => {
-    setGenerated([false, false]);
-    setCurrentTree(previousCurrentTree => {
-      return newSourceTree || previousCurrentTree || currentTree
+    //setGenerated([false, false]);
+    setSourceTree(previousSourceTree => {
+      return newSourceTree || previousSourceTree || sourceTree
     });
     setTargetTree(previousTargetTree => {
       return newTargetTree || previousTargetTree || targetTree
@@ -77,31 +75,50 @@ export function TreeViewProvider({ treeData, targetData, children })
     }
     setHistory((prevHistory) => [
       ...prevHistory,
-      { tree: currentTree, parentIndex: currentTree.findIndex((element) => element.id === node.id) },
+      { tree: sourceTree, parentIndex: sourceTree.findIndex((element) => element.id === node.id) },
     ]);
-    setCurrentTree(node.children);
+    setSourceTree(node.children);
   };
 
   const handleGoBack = () => {
     if (history.length > 0) {
       const { tree, parentIndex } = history.pop();
-      setCurrentTree(tree);
+      setSourceTree(tree);
     }
   };
 
-  const handleRegenerate = (id) => {
-    console.log(`[REGEN]: ${id}`);
-  }
-
   const handleDragEnd = (result) => {
-    console.log("[DROPPED]");
+    const { source, destination } = result;
+    
+    // Return if the item is dropped outside a droppable area
+    if (!destination) {
+      // TODO: Delete the item instead if it was dragged from the target tree
+      return;
+    }
+  
+    // Retrieve the dragged node from the source tree
+    const draggedNode = sourceTree[source.index];
+  
+    // Create a copy of the target tree and insert the dragged node at the destination index
+    const newTargetTree = [...targetTree, draggedNode];
+  
+    // Create a copy of the source tree and remove the dragged node from its original position
+    const newSourceTree = [...sourceTree];
+    newSourceTree.splice(source.index, 1);
+  
+    // Update the tree data in the context
+    setSourceTree(newSourceTree);
+    setTargetTree(newTargetTree);
+  
+    // Call the updateData function from the context to update the states
+    updateData(newTargetTree, newSourceTree);
   };
 
   const ChildrenWithContext = () => {
     if(!generated[0] || !generated[1])
       return null;
-      
-    const childElements = children({currentTree, targetTree, handleNodeClick, handleRegenerate});
+
+    const childElements = children(sourceTree, targetTree, handleNodeClick);
     return childElements;
   };
 
@@ -111,11 +128,9 @@ export function TreeViewProvider({ treeData, targetData, children })
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <TreeViewContext.Provider
-        ref={providerRef}
         value={{
-          providerRef,
           generated,
-          currentTree,
+          sourceTree,
           targetTree,
           history,
           updateData,
