@@ -9,6 +9,10 @@ import ImageAsset from 'components/ImageAsset';
 import DroppableTreeView from 'components/TreeView/DroppableTreeView';
 
 const providers = ["Discord", "Steam", "Microsoft", "Epic Games"];
+const targetTreeHeader = [{
+  title: <h4>Drop your connections here</h4>,
+  children: []
+}];
 
 export default function SocialCircles()
 {
@@ -44,38 +48,6 @@ export default function SocialCircles()
     setSocialCircles(prevSocialCircles =>
       prevSocialCircles.filter(circle => circle !== socialCircle)
     );
-  };
-
-  const handleDragEnd = (result, context) => {
-    const { source, destination } = result;
-    
-    // Return if the item is dropped outside a droppable area
-    if (!destination) {
-      return;
-    }
-  
-    // Retrieve the relevant tree data based on the source and destination droppable IDs
-    const sourceTree = context.currentTree;
-    const targetTree = context.targetTree;
-  
-    // Retrieve the dragged node from the source tree
-    const draggedNode = sourceTree[source.index];
-  
-    // Create a copy of the target tree and insert the dragged node at the destination index
-    const newTargetTree = [...targetTree, draggedNode];
-    //newTargetTree.splice(destination.index, 0, draggedNode);
-  
-    // Create a copy of the source tree and remove the dragged node from its original position
-    const newSourceTree = [...sourceTree];
-    newSourceTree.splice(source.index, 1);
-  
-    // Update the tree data in the context
-    context.currentTree = newSourceTree;
-    context.targetTree = newTargetTree;
-  
-    // Call the updateData function from the context to update the states
-    context.updateData(newTargetTree, newSourceTree);
-    context.setContext(context);
   };
 
   const generateTreeData = () =>
@@ -170,22 +142,22 @@ export default function SocialCircles()
             userContext.data.socials &&
             userContext.data.socials.length > 0 &&
             !userContext.requestingData &&
-            <TreeViewProvider treeData={generateTreeData()} targetData={[
-              {
-                title: <h4>Drop your connections here</h4>,
-                children: []
-              }
-            ]} onDragEnd={handleDragEnd}>
-              <DroppableTreeView id="connections.source" />
-              <DroppableTreeView id="connections.target" target
-                style={{
-                  height: '206px',
-                  overflowY: 'auto',
-                  margin: '12px 0px 0px 0px',
-                  padding: '0px 0px 0px 0px',
-                  backgroundColor: 'white',
-                  borderRadius: '8px',
-                }}/>
+            <TreeViewProvider treeData={generateTreeData()} targetData={targetTreeHeader}>
+              {context => (
+                <>
+                  <DroppableTreeView id="connections.0.source" context={context} />
+                  <DroppableTreeView id="connections.0.target" context={context}
+                    style={{
+                      height: '206px',
+                      overflowY: 'auto',
+                      margin: '12px 0px 0px 0px',
+                      padding: '0px 0px 0px 0px',
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                    }}
+                  />
+                </>
+              )}
             </TreeViewProvider>
           }
           

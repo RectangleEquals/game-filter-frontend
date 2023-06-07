@@ -1,12 +1,13 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 
 export const TreeViewContext = createContext();
 export const useTreeViewContext = () => useContext(TreeViewContext);
 
-export function TreeViewProvider({ treeData, targetData, onDragEnd, children })
+export function TreeViewProvider({ treeData, targetData, children })
 {
-  const [context, setContext] = useState(useTreeViewContext());
+  const context = useTreeViewContext();
+  const providerRef = useRef(null);
   const [generated, setGenerated] = useState([false, false]);
   const [currentTree, setCurrentTree] = useState(treeData);
   const [targetTree, setTargetTree] = useState(targetData);
@@ -14,12 +15,16 @@ export function TreeViewProvider({ treeData, targetData, onDragEnd, children })
 
   useEffect(_ => {
     setCurrentTree(generateIds(treeData));
-    setGenerated(previousGenerated => [true, previousGenerated[1]]);
+    setGenerated(previousGenerated => {
+      return [true, previousGenerated[1]]
+    });
   }, [treeData]);
 
   useEffect(_ => {
     setTargetTree(generateIds(targetData));
-    setGenerated(previousGenerated => [previousGenerated[0], true]);
+    setGenerated(previousGenerated => {
+      return [previousGenerated[0], true]
+    });
   }, [targetData]);
 
   function generateIds(data) {
@@ -84,17 +89,31 @@ export function TreeViewProvider({ treeData, targetData, onDragEnd, children })
     }
   };
 
+  const handleRegenerate = (id) => {
+    console.log(`[REGEN]: ${id}`);
+  }
+
   const handleDragEnd = (result) => {
-    if(onDragEnd)
-      onDragEnd(result, context);
+    console.log("[DROPPED]");
   };
+
+  const ChildrenWithContext = () => {
+    if(!generated[0] || !generated[1])
+      return null;
+      
+    const childElements = children({currentTree, targetTree, handleNodeClick, handleRegenerate});
+    return childElements;
+  };
+
+  if(!generated)
+    return;
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <TreeViewContext.Provider
+        ref={providerRef}
         value={{
-          context,
-          setContext,
+          providerRef,
           generated,
           currentTree,
           targetTree,
@@ -106,7 +125,7 @@ export function TreeViewProvider({ treeData, targetData, onDragEnd, children })
           handleDragEnd
         }}
       >
-        {children}
+        <ChildrenWithContext />
       </TreeViewContext.Provider>
     </DragDropContext>
   );
