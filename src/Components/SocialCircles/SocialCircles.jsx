@@ -23,9 +23,10 @@ export default function SocialCircles()
   const [circleName, setCircleName] = useState('');
 
   // Handler function for refreshing the SocialCircle list
-  const handleRefreshList = (e) => {
+  const handleRefreshLists = (e) => {
     e.preventDefault();
     userContext.requestData();
+    // TODO: Also make sure that all nodes from the target tree have been removed
   }
 
   // Handler function for saving a social circle
@@ -61,8 +62,8 @@ export default function SocialCircles()
               className="mt-3"
               variant={"dark"}
               disabled={userContext.requestingData}
-              onClick={handleRefreshList}>
-                Refresh List
+              onClick={handleRefreshLists}>
+                Refresh Lists
             </Button>
           </Container>
         ),

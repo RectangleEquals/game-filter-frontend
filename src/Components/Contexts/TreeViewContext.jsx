@@ -12,23 +12,24 @@ export function TreeViewProvider({ sourceData, targetData, children })
   const [history, setHistory] = useState([]);
 
   useEffect(_ => {
-    setSourceTree(generateIds(sourceData));
+    setSourceTree(generateMetadata(sourceData));
     setGenerated(previousGenerated => {
       return [true, previousGenerated[1]]
     });
   }, [sourceData]);
 
   useEffect(_ => {
-    setTargetTree(generateIds(targetData));
+    setTargetTree(generateMetadata(targetData));
     setGenerated(previousGenerated => {
       return [previousGenerated[0], true]
     });
   }, [targetData]);
 
-  function generateIds(data) {
+  function generateMetadata(data) {
     let idCounter = 0;
+    let path = "root";
   
-    const traverse = (node, depth, topNode) => {
+    const traverse = (node, depth, topNode, parentPath) => {
       const { children, ...rest } = node;
       let id = (idCounter++).toString();
       let isDraggable = rest.isDraggable !== undefined ? rest.isDraggable : !children || children.length < 1;
@@ -43,19 +44,23 @@ export function TreeViewProvider({ sourceData, targetData, children })
       const updatedNode = {
         id,
         ...rest,
+        depth,
         isDraggable,
         isTopNode: topNode,
         isBack: id.endsWith('.back') || id.endsWith('.back.header'),
-        isHeader: id.endsWith('.header')
+        isHeader: id.endsWith('.header'),
+        path: parentPath || path
       };
   
       if (children)
-        updatedNode.children = children.map((child, index) => traverse(child, depth + 1, index === 0));
+        updatedNode.children = children.map((child, index) => traverse(child, depth + 1, index === 0, `${updatedNode.path}.children[${index}]`));
   
       return updatedNode;
     };
   
-    return data.map((node, index) => traverse(node, 0, index === 0));
+    return data.map((node, index) => {
+      return traverse(node, 0, index === 0, `${path}[${index}]`)
+    });
   }
 
   const updateData = (newTargetTree, newSourceTree) => {
@@ -77,9 +82,9 @@ export function TreeViewProvider({ sourceData, targetData, children })
       handleGoBack();
       return;
     }
-    setHistory((prevHistory) => [
+    setHistory(prevHistory => [
       ...prevHistory,
-      { tree: sourceTree, parentIndex: sourceTree.findIndex((element) => element.id === node.id) },
+      { tree: sourceTree, parentIndex: sourceTree.findIndex(element => element.id === node.id) },
     ]);
     setSourceTree(node.children);
   };
@@ -97,13 +102,31 @@ export function TreeViewProvider({ sourceData, targetData, children })
     // Return if the item is dropped outside a droppable area
     if (!destination) {
       // If it was dragged from the target tree, remove it and place it back in the source tree
-      if(source.droppableId.endsWith("target"))
-      {
+      if (source.droppableId.endsWith("target")) {
         const draggedNode = targetTree[source.index];
-        const newSourceTree = [...sourceTree, draggedNode];
+        const draggedNodePath = draggedNode.path;
+        const newSourceTree = [...sourceTree];
         const newTargetTree = [...targetTree];
         newTargetTree.splice(source.index, 1);
-        updateData(newSourceTree, newTargetTree);
+    
+        const pathSegments = draggedNodePath.split(".");
+        let currentNode = newSourceTree;
+    
+        // Traverse the path to find the parent node and place the dragged node back in its original position
+        for (let i = 1; i < pathSegments.length; i++) {
+          const segment = pathSegments[i];
+          const indexMatch = segment.match(/\[(\d+)\]/);
+          if (indexMatch) {
+            const index = parseInt(indexMatch[1]);
+            if (i === pathSegments.length - 1) {
+              currentNode.splice(index, 0, draggedNode);
+            } else {
+              currentNode = currentNode[index].children;
+            }
+          }
+        }
+    
+        updateData(newTargetTree, newSourceTree);
       }
       return;
     }
