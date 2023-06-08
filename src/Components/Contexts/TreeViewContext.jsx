@@ -61,10 +61,14 @@ export function TreeViewProvider({ sourceData, targetData, children })
   const updateData = (newTargetTree, newSourceTree) => {
     //setGenerated([false, false]);
     setSourceTree(previousSourceTree => {
-      return newSourceTree || previousSourceTree || sourceTree
+      const tree = newSourceTree || sourceTree || previousSourceTree;
+      tree.sort((a, b) => a.id.localeCompare(b.id));
+      return tree;
     });
     setTargetTree(previousTargetTree => {
-      return newTargetTree || previousTargetTree || targetTree
+      const tree = newTargetTree || targetTree || previousTargetTree;
+      tree.sort((a, b) => a.id.localeCompare(b.id));
+      return tree;
     });
   }
 
@@ -92,26 +96,43 @@ export function TreeViewProvider({ sourceData, targetData, children })
     
     // Return if the item is dropped outside a droppable area
     if (!destination) {
-      // TODO: Delete the item instead if it was dragged from the target tree
+      // If it was dragged from the target tree, remove it and place it back in the source tree
+      if(source.droppableId.endsWith("target"))
+      {
+        const draggedNode = targetTree[source.index];
+        const newSourceTree = [...sourceTree, draggedNode];
+        const newTargetTree = [...targetTree];
+        newTargetTree.splice(source.index, 1);
+        updateData(newSourceTree, newTargetTree);
+      }
       return;
     }
-  
+
+    let srcTree, destTree;
+    const srcTarget = source.droppableId.endsWith("target");
+    if(srcTarget) {
+      srcTree = targetTree;
+      destTree = sourceTree;
+    } else {
+      srcTree = sourceTree;
+      destTree = targetTree;
+    }
+
+    if(source.droppableId === destination.droppableId)
+      return;
+
     // Retrieve the dragged node from the source tree
-    const draggedNode = sourceTree[source.index];
+    const draggedNode = srcTree[source.index];
   
     // Create a copy of the target tree and insert the dragged node at the destination index
-    const newTargetTree = [...targetTree, draggedNode];
+    const newTargetTree = [...destTree, draggedNode];
   
     // Create a copy of the source tree and remove the dragged node from its original position
-    const newSourceTree = [...sourceTree];
+    const newSourceTree = [...srcTree];
     newSourceTree.splice(source.index, 1);
   
-    // Update the tree data in the context
-    setSourceTree(newSourceTree);
-    setTargetTree(newTargetTree);
-  
-    // Call the updateData function from the context to update the states
-    updateData(newTargetTree, newSourceTree);
+    // Update the tree data
+    updateData(srcTarget ? newSourceTree : newTargetTree, srcTarget ? newTargetTree : newSourceTree);
   };
 
   const ChildrenWithContext = () => {

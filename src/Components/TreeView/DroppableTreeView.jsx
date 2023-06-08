@@ -11,7 +11,7 @@ export default function DroppableTreeView({ id, tree, onClick, style })
     return null;
 
   const getNodes = () => {
-    return tree.map((node, index) => (
+    return tree.map((node, index) => node && (
       <DraggableTreeNode
         key={node.id}
         node={node}
