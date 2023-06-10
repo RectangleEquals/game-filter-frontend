@@ -4,7 +4,7 @@ import { Button, Container, Form, Modal } from 'react-bootstrap';
 import { useAriaContext } from 'contexts/AriaContext';
 import SlidingPuzzle from 'modals/Aria/SlidingPuzzle';
 import AriaModal from 'modals/Aria/AriaModal';
-import Aria from 'assets/aria.png';
+import MarkAriaBW from 'assets/mark_and_aria_bw.png';
 
 export default function ScavengerHunt({shown})
 {
@@ -37,7 +37,13 @@ export default function ScavengerHunt({shown})
               type="text"
               value={secretText}
               placeholder="Enter the next secret code"
-              onChange={e => setSecretText(e.target.value)} />
+              onChange={e => setSecretText(e.target.value)}
+              onKeyDown={e => {
+                if(e.key === "Enter") {
+                  handleSubmit(e);
+                }
+              }}
+              />
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -46,9 +52,9 @@ export default function ScavengerHunt({shown})
       </Modal>
     ) : (
       !ariaContext.solved ? (
-        <SlidingPuzzle shown={shown} image={Aria} onSolved={_ => ariaContext.setSolved(true)} maxRowsCols={3} />
+        <SlidingPuzzle shown={shown} image={MarkAriaBW} onSolved={_ => ariaContext.setSolved(true)} maxRowsCols={3} />
       ) : (
-        <AriaModal shown={shown} image={Aria}>
+        <AriaModal shown={shown}>
           <Container fluid className='d-flex flex-row justify-content-center align-items-center'>
             <h5>{ariaContext.finalMessage}</h5>
           </Container>

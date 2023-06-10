@@ -140,7 +140,7 @@ export default function Debug()
     if(authContext.isDebugMode && command === 'linkdiscord') {
       authContext.log('Requesting Discord account link...')
       socialCircleContext.requestAccountLink('Discord');
-    } else if (userContext.data && userContext.data.roles && userContext.data.roles.includes("Owner") && command === 'hunt') {
+    } else if (userContext.data && userContext.data.roles && userContext.data.roles.includes("Owner") && command.toLowerCase() === 'hunt') {
       ariaContext.setShown(true);
     } else if (command.startsWith('logError ')) {
       const message = command.substring(command.indexOf(" ") + 1);
@@ -186,6 +186,11 @@ export default function Debug()
               placeholder="command"
               value={command}
               onChange={e => setCommand(e.target.value)}
+              onKeyDown={e => {
+                if(e.key === "Enter") {
+                  handleSubmit(e);
+                }
+              }}
             />
             <Button className="mb-3" onClick={handleSubmit}>
               Submit

@@ -40,13 +40,13 @@ export default function AriaModal({shown, children})
     <>
       <Modal className="verify-account-modal" show={shown} onHide={handleClose} centered backdrop={true}>
         <Modal.Header className="verify-account-modal-header" closeButton={true}>
-          <Modal.Title>Happy Birthday, Aria!</Modal.Title>
+          <Modal.Title>Happy (belated) Birthday!</Modal.Title>
         </Modal.Header>
         <Modal.Body
           className="verify-account-modal-body d-flex flex-column flex-grow-1 flex-shrink-1 container-fluid justify-content-center align-items-center"
           style={imageStyle}>
           {showConfetti && <Confetti style={confettiStyle}/>}
-          <ImageAsset className={`asset-aria`} />
+          <ImageAsset className={`asset-markaria-color`} />
         </Modal.Body>
         <Modal.Footer>{children}</Modal.Footer>
       </Modal>

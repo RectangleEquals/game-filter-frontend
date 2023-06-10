@@ -19,6 +19,7 @@ export default defineConfig({
       'contexts': path.resolve(process.cwd(), './src/Components/Contexts'),
       'modals': path.resolve(process.cwd(), './src/Components/Dialogs'),
       'utils': path.resolve(process.cwd(), './src/utility'),
+      'testdata': path.resolve(process.cwd(), './src/testdata'),
       'react-router-dom': path.resolve(process.cwd(), 'node_modules/react-router-dom'),
       '~bootstrap': path.resolve(process.cwd(), 'node_modules/react-bootstrap')
     }

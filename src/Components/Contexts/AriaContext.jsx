@@ -4,21 +4,21 @@ import ScavengerHunt from '../Dialogs/Aria/ScavengerHunt';
 export const AriaContext = createContext();
 
 const _riddles = [
-  "Search where time ticks and tocks, find the code inside the clock",
-  "In a cozy corner where stories are read, find me hiding near the place where you rest your head",
-  "Where clothes are washed and socks are spun, seek me where the laundry is done",
-  "Look for me where food is stored, among the shelves where pots are bored",
-  "Where water flows and bubbles rise, find me near the sink's disguise",
-  "Toasty warmth and crackling fire, seek me where flames climb higher",
-  "In a room of dreams and peaceful sleep, find me where secrets you shall keep",
-  "Amongst toys and games galore, search for me on the playroom floor",
-  "Where creativity blooms and colors unite, seek me where brushes take flight"
+  "You're about to have an eventful day... Find a secret code where time ticks away",
+  "(next riddle goes here)",
+  "(next riddle goes here)",
+  "(next riddle goes here)",
+  "(next riddle goes here)",
+  "(next riddle goes here)",
+  "(next riddle goes here)",
+  "(next riddle goes here)",
+  "(next riddle goes here)"
 ];
 
-const _finalMessage = "The final place to search is buried not too far beneath the earth...";
+const _finalMessage = "The end of your search is coming in hot... Search in the backyard where \"X marks the spot\"";
 
 const _secrets = [
-  'a',
+  'ticktock',
   'b',
   'c',
   'd',
@@ -27,7 +27,6 @@ const _secrets = [
   'g',
   'h',
   'i',
-  'j',
 ];
 
 export function AriaProvider({ children })

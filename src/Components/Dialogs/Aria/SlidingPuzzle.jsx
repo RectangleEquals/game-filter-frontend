@@ -1,7 +1,9 @@
 import '../VerifyAccountModal.css';
+import 'react-tooltip/dist/react-tooltip.css';
 import { useEffect, useState } from 'react';
 import { Button, Col, Container, Image as BootstrapImage, Modal, Row } from 'react-bootstrap';
 import { useAriaContext } from 'contexts/AriaContext';
+import { Tooltip } from 'react-tooltip'
 
 const getRandomAdjacentTile = (tiles, numRowsAndCols) => {
   const emptyTileIndex = tiles.findIndex(tile => tile.isEmpty);
@@ -44,6 +46,19 @@ const getRandomAdjacentTile = (tiles, numRowsAndCols) => {
   return null;
 };
 
+const shuffleTiles = (tiles, numRowsAndCols, iterations) => {
+  const shuffledTiles = [...tiles];
+  for (let i = 0; i < iterations; i++) {
+    const emptyIndex = shuffledTiles.findIndex(t => t.isEmpty);
+    const tileToSwap = getRandomAdjacentTile(shuffledTiles, numRowsAndCols);
+    if(tileToSwap)
+      [shuffledTiles[emptyIndex], shuffledTiles[tileToSwap.index]] = [shuffledTiles[tileToSwap.index], shuffledTiles[emptyIndex]];
+    else
+      iterations++;
+  }
+  return shuffledTiles;
+};
+
 const generateTiles = (image, numRowsAndCols, maxIterations) => {
   // Split the image into tiles
   const tileSize = Math.floor(image.height / numRowsAndCols);
@@ -68,7 +83,8 @@ const generateTiles = (image, numRowsAndCols, maxIterations) => {
         tileSize
       );
 
-      const tile = { index: row * numRowsAndCols + col, originalIndex: row * numRowsAndCols + col, isEmpty: false, url: canvas.toDataURL() };
+      const tileIndex = row * numRowsAndCols + col;
+      const tile = { index: tileIndex, originalIndex: tileIndex, isEmpty: false, url: canvas.toDataURL() };
       tiles.push(tile);
     }
   }
@@ -76,22 +92,13 @@ const generateTiles = (image, numRowsAndCols, maxIterations) => {
   // Set the last tile to be the empty tile
   tiles[tiles.length - 1].isEmpty = true;
 
-  // Randomly shuffle the tiles
+  // Shuffle the tiles `iterations` number of times
   const min = tiles.length * 2;
   const max = min * 2;
   const iterations = Math.min(Math.floor(Math.random() * (max - min + 1)) + min, maxIterations);
-  for (let i = 0; i < iterations; i++) {
-    const emptyIndex = tiles.findIndex(t => t.isEmpty);
-    const tileToSwap = getRandomAdjacentTile(tiles, numRowsAndCols);
-    if (tileToSwap) {
-      // Swap the two tiles within the tiles array
-      [tiles[emptyIndex], tiles[tileToSwap.index]] = [tiles[tileToSwap.index], tiles[emptyIndex]];
-    } else {
-      iterations++;
-    }
-  }
+  const shuffledTiles = shuffleTiles(tiles, numRowsAndCols, iterations);
 
-  return tiles;
+  return shuffledTiles;
 };
 
 const SlidingPuzzle = ({ shown, image, onSolved, maxRowsCols = 5, maxIterations = 32 }) => {
@@ -125,6 +132,11 @@ const SlidingPuzzle = ({ shown, image, onSolved, maxRowsCols = 5, maxIterations 
     const updatedAdjacentTiles = tiles.filter(tile => isAdjacent(tile));
     setAdjacentTiles(updatedAdjacentTiles);
   }, [tiles]);
+
+  useEffect(_ => {
+    if(solved && onSolved)
+      onSolved();
+  }, [solved]);
 
   const handleClose = () => {
     ariaContext.setShown(false);
@@ -201,11 +213,16 @@ const SlidingPuzzle = ({ shown, image, onSolved, maxRowsCols = 5, maxIterations 
             {tiles.map((tile, index) => {
               // Check if the tile is in the adjacentTiles array
               const isAdjacentTile = adjacentTiles.includes(tile);
+              // Generate a unique tooltip ID
+              const tooltipId = `tooltip-${tile.index}-${tile.originalIndex}`;
 
               return (
                 <Col key={index} className="m-0 p-0">
                   <div
                     className={`tile ${tile.isEmpty ? 'empty' : ''}`}
+                    data-tip
+                    data-for={tooltipId}
+                    data-tooltip-id={tooltipId}
                     style={{
                       opacity: !solved && tile.isEmpty ? 0 : 1,
                       width: tileSize,
@@ -222,7 +239,8 @@ const SlidingPuzzle = ({ shown, image, onSolved, maxRowsCols = 5, maxIterations 
                     onMouseEnter={_ => !solved ? handleTileHover(index) : null}
                     onMouseLeave={handleTileLeave}
                   >
-                    <BootstrapImage src={tile.url} alt={`Tile ${index}`} />
+                    <BootstrapImage src={tile.url} />
+                    <Tooltip id={tooltipId}>{`Index: ${tile.index}, Original Index: ${tile.originalIndex}`}</Tooltip>
                   </div>
                 </Col>
               )}
@@ -232,11 +250,9 @@ const SlidingPuzzle = ({ shown, image, onSolved, maxRowsCols = 5, maxIterations 
       </Modal.Body>
       <Modal.Footer>
         <Container fluid className="m-auto d-flex flex-row justify-content-center align-items-center">
-          {solved ? (
-            <Button className="w-100" variant="success" onClick={_ => onSolved ? onSolved() : {}}>Get The Final Clue</Button>
-          ) : (
+          {!solved &&
             <Button className="w-100" variant="danger" onClick={_ => setTiles([])}>Retry</Button>
-          )}
+          }
         </Container>
       </Modal.Footer>
     </Modal>
