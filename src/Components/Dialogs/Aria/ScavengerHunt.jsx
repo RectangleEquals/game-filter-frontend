@@ -1,5 +1,5 @@
 import '../VerifyAccountModal.css';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button, Container, Form, Modal } from 'react-bootstrap';
 import { useAriaContext } from 'contexts/AriaContext';
 import SlidingPuzzle from 'modals/Aria/SlidingPuzzle';
@@ -10,6 +10,13 @@ export default function ScavengerHunt({shown})
 {
   const ariaContext = useAriaContext();
   const [secretText, setSecretText] = useState('');
+  const secretTextboxRef = useRef(null);
+
+  useEffect(() => {
+    if (shown && secretTextboxRef.current) {
+      secretTextboxRef.current.focus();
+    }
+  }, [shown]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -33,6 +40,7 @@ export default function ScavengerHunt({shown})
           <Form style={{textAlign: 'center', padding: 2}}>
             <span>{ariaContext.riddles[ariaContext.step]}</span>
             <Form.Control
+              ref={secretTextboxRef}
               className='mt-3 mb-1'
               type="text"
               value={secretText}
