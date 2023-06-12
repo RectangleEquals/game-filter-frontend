@@ -4,24 +4,29 @@ import { useEffect, useState } from 'react';
 import { Button, Col, Container, Image as BootstrapImage, Modal, Row } from 'react-bootstrap';
 import { useAriaContext } from 'contexts/AriaContext';
 import { Tooltip } from 'react-tooltip';
-import { Board, Solver } from 'utils/puzzle.js';
+import { Board } from 'utils/puzzle.js';
 
-// TODO: Finish implementing this component, using the `Board` and `Solver` classes
-//  to keep proper board states and determine what the solution is
-
-// TODO: Instead of statically defining `initialBoard` here, we need to dynamically
-//  generate it based upon `numRowsAndCols` below
-const initialTiles = [
+const maxIterations = 15000;
+const numRowsAndCols = 3;
+const initialState = [
   [0, 1, 2],
   [3, 4, 5],
-  [6, 7, 8]
+  [6, 7, 8],
 ];
 
-const SlidingPuzzle = ({ shown, image, onSolved, numRowsAndCols = 3 }) => {
+const goalState = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+];
+
+//const blankTile = 9;
+
+const SlidingPuzzle = ({ shown, image, onSolved }) => {
   const ariaContext = useAriaContext();
   const [imageElement, setImageElement] = useState(null);
   const [tileImages, setTileImages] = useState(null);
-  const [board, setBoard] = useState(new Board(initialTiles));
+  const [board, setBoard] = useState();
   const [hoveredTileIndex, setHoveredTileIndex] = useState(null);
   const [solution, setSolution] = useState([]);
   const [solved, setSolved] = useState(false);
@@ -35,27 +40,52 @@ const SlidingPuzzle = ({ shown, image, onSolved, numRowsAndCols = 3 }) => {
       };
     }
   }, [image, numRowsAndCols]);
-
+  
   useEffect(_ => {
     if (imageElement && imageElement.width > 0 && imageElement.height > 0) {
       setTileImages(generateTileImages());
-      if(board) {
-        updateSolution(board);
-        board.shuffle();
-      }
     }
   }, [imageElement, numRowsAndCols]);
 
-  const updateSolution = (boardToSolve) => {
-    const solver = new Solver(boardToSolve);
-    solver.solve();
-    setSolution(solver);
-  }
+  useEffect(_ => {
+    if(!board)
+      createNewBoard();
+  }, [board]);
 
   useEffect(_ => {
     if(solved && onSolved)
       onSolved();
   }, [solved]);
+
+  const handleClose = () => {
+    ariaContext.setShown(false);
+  };
+
+  const handleTileHover = (index) => {
+    setHoveredTileIndex(index);
+  };
+  
+  const handleTileLeave = () => {
+    setHoveredTileIndex(null);
+  };
+
+  const handleRetry = () => {
+    // Start a new game
+    createNewBoard(true);
+  }
+
+  const createNewBoard = (shuffle = true) => {
+    let newBoard;
+    
+    if(!board)
+      newBoard = new Board(initialState, goalState, maxIterations, null, shuffle);
+    else
+      newBoard = new Board(board.getCurrentState(), board.getGoalState(), maxIterations, shuffle);
+
+    newBoard.solve();
+    setBoard(newBoard);
+    setSolution(newBoard.getSolution());
+  }
 
   if (!imageElement || numRowsAndCols < 2) {
     return null; // Return null or a loading state while the image is loading
@@ -93,12 +123,13 @@ const SlidingPuzzle = ({ shown, image, onSolved, numRowsAndCols = 3 }) => {
     return generatedTileImages;
   };
 
-  if(!tileImages || tileImages.length < 1)
-    return null;
-
-  const handleClose = () => {
-    ariaContext.setShown(false);
-  };
+  const updateBoard = (shuffle) => {
+    if(shuffle)
+      board.shuffle();
+    board.solve();
+    setTileImages(generateTileImages());
+    setSolution(board.getSolution());
+  }
 
   const handleTileClick = (index) => {
     // Get the row and column of the clicked tile
@@ -106,55 +137,30 @@ const SlidingPuzzle = ({ shown, image, onSolved, numRowsAndCols = 3 }) => {
     const col = index % numRowsAndCols;
   
     // Get the row and column of the blank tile
-    const blankRow = board.getBlankRow();
-    const blankCol = board.getBlankCol();
-  
+    const blankIndex = board.getBlankIndex();
+    
     // Check if the clicked tile is adjacent to the blank tile
     const isAdjacent =
-      (row === blankRow && Math.abs(col - blankCol) === 1) ||
-      (col === blankCol && Math.abs(row - blankRow) === 1);
+      (row === blankIndex.row && Math.abs(col - blankIndex.col) === 1) ||
+      (col === blankIndex.col && Math.abs(row - blankIndex.row) === 1);
   
     if (isAdjacent) {
-      // Create a copy of the current board tiles
-      const newTiles = board.cloneTiles();
-  
       // Swap the clicked tile with the blank tile
-      board.swapTiles(newTiles, row, col, blankRow, blankCol);
-  
-      // Update the board and tileImages states
-      const newBoard = new Board(newTiles);
-      setBoard(newBoard);
-      setTileImages(generateTileImages());
-  
-      // Check if the puzzle is solved
-      if (newBoard.isGoal()) {
+      board.performSwapAtIndex({row: row, col: col});
+
+      if (board.isGoal()) {
         setSolved(true);
-      } else {
-        updateSolution(newBoard);
+        return;
       }
+
+      updateBoard(false);
     }
   };
 
-  const handleTileHover = (index) => {
-    setHoveredTileIndex(index);
-  };
-  
-  const handleTileLeave = () => {
-    setHoveredTileIndex(null);
-  };
-
-  const handleRetry = () => {
-    // Start a new game
-    const newBoard = new Board(board.cloneTiles());
-    newBoard.shuffle();
-    setBoard(newBoard);
-    updateSolution(newBoard);
-  }
-
   const getTiles = () => {
-    const boardTiles = board.getFlattenedTiles();
+    const boardState = board.getFlattenedState();
 
-    const tiles = boardTiles.map((tile, index) => {
+    const tiles = boardState.map((tile, index) => {
       // TODO: Generate a unique key
       const key = `${index}`;
 
@@ -166,9 +172,9 @@ const SlidingPuzzle = ({ shown, image, onSolved, numRowsAndCols = 3 }) => {
 
       // Generate a unique tooltip ID
       const tooltipId = `tooltip-${key}`;
-      let tooltipText = `index: ${boardTiles[index]}, hamming: ${board.hamming()}, manhattan: ${board.manhattan()}`;
+      let tooltipText = `index: ${boardState[index]}, manhattan: ${board.getManhattanDistance()}, solvable: ${board.isSolvable()}`;
       if(solution) {
-        tooltipText += `, Solution: [${solution.getSolutionIndices().join(',')}]`;
+        tooltipText += `, Solution: [${solution.join(',')}]`;
       } else {
         tooltipText += `, Solution: None found`;
       }
@@ -188,6 +194,9 @@ const SlidingPuzzle = ({ shown, image, onSolved, numRowsAndCols = 3 }) => {
 
     return tiles;
   };
+
+  if(!tileImages || tileImages.length < 1)
+    return null;
 
   return (
     <Modal className="verify-account-modal" show={shown} onHide={handleClose} centered>

@@ -1,46 +1,67 @@
+// =====
+// BOARD
+// =====
+
 export class Board
 {
-  constructor(tiles) {
-    this.tiles = tiles;
-    this.n = tiles.length;
+  constructor(initialState, goalState, maxIterations, solver, performShuffle) {
+    this.currentState = initialState;
+    this.goalState = goalState || [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+    ];
+    this.maxIterations = maxIterations || 0;
+
+    if (performShuffle)
+      this.shuffle();
+
+    this.solver = solver || this.getSolver();
   }
 
-  tileAt(row, col) {
-    return this.tiles[row][col];
+  getTileAt(row, col) {
+    return this.currentState[row][col];
   }
 
-  size() {
-    return this.n;
+  getRowSize() {
+    return this.currentState.length;
+  }
+
+  getColSize() {
+    return this.currentState[0].length;
   }
 
   shuffle() {
-    const flattenTiles = this.tiles.flat();
-    let solvable = false;
-  
-    while (!solvable) {
-      // Perform a random shuffle using Fisher-Yates algorithm
-      for (let i = flattenTiles.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [flattenTiles[i], flattenTiles[j]] = [flattenTiles[j], flattenTiles[i]];
+    // Fisher-Yates shuffle algorithm for 2D arrays
+    const rowSize = this.getRowSize();
+    const colSize = this.getColSize();
+
+    for (let i = rowSize - 1; i >= 0; i--) {
+      for (let j = colSize - 1; j >= 0; j--) {
+        const randomRow = Math.floor(Math.random() * (i + 1));
+        const randomCol = Math.floor(Math.random() * (j + 1));
+
+        const temp = this.currentState[i][j];
+        this.currentState[i][j] = this.currentState[randomRow][randomCol];
+        this.currentState[randomRow][randomCol] = temp;
       }
-      solvable = this.isSolvable();
-    }
-  
-    // Reshape the flattened tiles back into a 2D array
-    this.tiles = [];
-    for (let i = 0; i < this.n; i++) {
-      this.tiles.push(flattenTiles.slice(i * this.n, (i + 1) * this.n));
     }
   }
 
-  isSolvable() {
-    const flatTiles = this.tiles.flat();
-    const inversions = this.countInversions(flatTiles);
-    const blankRow = this.getBlankRow();
+  getSolver() {
+    if(this.solver === undefined || this.solver === null || !(this.solver instanceof Solver))
+      this.solver = new Solver(this);
+    return this.solver;
+  }
 
-    if (this.n % 2 === 0) {
+  isSolvable() {
+    const inversions = this.countInversions(this.getFlattenedState());
+    const blankIndex = this.getBlankIndex();
+    const rowSize = this.getRowSize();
+  
+    if (rowSize % 2 === 0) {
       // For even-sized boards
-      if (blankRow % 2 === 0) {
+      if (blankIndex.row % 2 === 0) {
         // If the blank is on an even row counting from the bottom
         return inversions % 2 === 1;
       } else {
@@ -52,11 +73,11 @@ export class Board
       return inversions % 2 === 0;
     }
   }
-
+  
   countInversions(arr) {
     let inversions = 0;
     const length = arr.length;
-
+  
     for (let i = 0; i < length - 1; i++) {
       for (let j = i + 1; j < length; j++) {
         if (arr[i] > arr[j]) {
@@ -64,17 +85,29 @@ export class Board
         }
       }
     }
-
+  
     return inversions;
   }
 
-  hamming() {
+  solve() {
+    let solver = null;
+    while(solver === undefined || solver === null)
+      solver = this.getSolver();
+    const solution = solver.solve();
+    return solution && solution.length > 0;
+  }
+
+  getSolution() {
+    return this.getSolver().getSolutionIndices();
+  }
+
+  getHammingDistance() {
     let count = 0;
-    const goal = this.n * this.n;
-    for (let i = 0; i < this.n; i++) {
-      for (let j = 0; j < this.n; j++) {
-        const value = this.tiles[i][j];
-        if (value !== 0 && value !== i * this.n + j + 1) {
+    const goal = this.getRowSize() * this.getRowSize();
+    for (let i = 0; i < this.getRowSize(); i++) {
+      for (let j = 0; j < this.getRowSize(); j++) {
+        const value = this.currentState[i][j];
+        if (value !== 0 && value !== i * this.getRowSize() + j + 1) {
           count++;
         }
       }
@@ -82,14 +115,14 @@ export class Board
     return count;
   }
 
-  manhattan() {
+  getManhattanDistance() {
     let distance = 0;
-    for (let i = 0; i < this.n; i++) {
-      for (let j = 0; j < this.n; j++) {
-        const value = this.tiles[i][j];
+    for (let i = 0; i < this.getRowSize(); i++) {
+      for (let j = 0; j < this.getRowSize(); j++) {
+        const value = this.currentState[i][j];
         if (value !== 0) {
-          const goalRow = Math.floor((value - 1) / this.n);
-          const goalCol = (value - 1) % this.n;
+          const goalRow = Math.floor((value - 1) / this.getRowSize());
+          const goalCol = (value - 1) % this.getRowSize();
           distance += Math.abs(i - goalRow) + Math.abs(j - goalCol);
         }
       }
@@ -97,22 +130,25 @@ export class Board
     return distance;
   }
 
-  isGoal() {
-    const flattenedTiles = this.tiles.flat();
-    for (let i = 0; i < flattenedTiles.length; i++) {
-      if(flattenedTiles[i] !== i)
-        return false;
-    }
-    return true;
+  getGoalBoard() {
+    return new Board(this.goalState, this.goalState, this.maxIterations, this.getSolver());
   }
 
-  equals(y) {
-    if (!(y instanceof Board) || y.size() !== this.size()) {
+  getMaxIterations() {
+    return this.maxIterations;
+  }
+
+  isGoal() {
+    return this.isEqualToState(this.getGoalBoard());
+  }
+
+  isEqualToState(y) {
+    if (!(y instanceof Board) || y.getRowSize() !== this.getRowSize()) {
       return false;
     }
-    for (let i = 0; i < this.n; i++) {
-      for (let j = 0; j < this.n; j++) {
-        if (this.tiles[i][j] !== y.tileAt(i, j)) {
+    for (let i = 0; i < this.getRowSize(); i++) {
+      for (let j = 0; j < this.getRowSize(); j++) {
+        if (this.currentState[i][j] !== y.getTileAt(i, j)) {
           return false;
         }
       }
@@ -120,71 +156,105 @@ export class Board
     return true;
   }
 
-  neighbors() {
-    const blankRow = this.getBlankRow();
-    const blankCol = this.getBlankCol();
-    const neighbors = [];
+  getPossibleStates() {
+    const possibleStates = [];
+    const blankIndex = this.getBlankIndex();
+    const rowSize = this.getRowSize();
+    const colSize = this.getColSize();
 
-    const offsets = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-    for (const [dx, dy] of offsets) {
-      const newRow = blankRow + dx;
-      const newCol = blankCol + dy;
-      if (this.isValidPosition(newRow, newCol)) {
-        const neighborTiles = this.cloneTiles();
-        this.swapTiles(neighborTiles, blankRow, blankCol, newRow, newCol);
-        const neighborBoard = new Board(neighborTiles);
-        neighbors.push(neighborBoard);
+    const directions = [
+      { row: -1, col: 0 }, // up
+      { row: 1, col: 0 }, // down
+      { row: 0, col: -1 }, // left
+      { row: 0, col: 1 }, // right
+    ];
+
+    for (const { row, col } of directions) {
+      const newRow = blankIndex.row + row;
+      const newCol = blankIndex.col + col;
+
+      if (newRow >= 0 && newRow < rowSize && newCol >= 0 && newCol < colSize) {
+        const newState = this.createStateWithSwappedTiles(
+          blankIndex.row,
+          blankIndex.col,
+          newRow,
+          newCol
+        );
+        possibleStates.push(new Board(newState, this.goalState, this.maxIterations, this.getSolver()));
       }
     }
 
-    return neighbors;
+    return possibleStates;
   }
 
-  getBlankRow() {
-    for (let i = 0; i < this.n; i++) {
-      for (let j = 0; j < this.n; j++) {
-        if (this.tiles[i][j] === 0) {
-          return i;
+  createStateWithSwappedTiles(row1, col1, row2, col2) {
+    const newState = this.currentState.map((row) => [...row]);
+    const temp = newState[row1][col1];
+    newState[row1][col1] = newState[row2][col2];
+    newState[row2][col2] = temp;
+    return newState;
+  }
+
+  performSwapAtIndex(index) {
+    const blankIndex = this.getBlankIndex();
+    const rowSize = this.getRowSize();
+    const colSize = this.getColSize();
+  
+    // Check if the given index is within the valid boundaries of the board
+    if (
+      index.row >= 0 &&
+      index.row < rowSize &&
+      index.col >= 0 &&
+      index.col < colSize
+    ) {
+      // Calculate the absolute row and column differences between the blank tile and the given index
+      const rowDiff = Math.abs(index.row - blankIndex.row);
+      const colDiff = Math.abs(index.col - blankIndex.col);
+  
+      // Ensure that the given index is adjacent to the blank tile (i.e., the row or column difference is 1, and the other difference is 0)
+      if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+        // Perform the in-place swap of the tiles
+        const temp = this.currentState[index.row][index.col];
+        this.currentState[index.row][index.col] = this.currentState[blankIndex.row][blankIndex.col];
+        this.currentState[blankIndex.row][blankIndex.col] = temp;
+      }
+    }
+  }
+
+  getBlankIndex() {
+    for (let i = 0; i < this.getRowSize(); i++) {
+      for (let j = 0; j < this.currentState[i].length; j++) {
+        if (this.currentState[i][j] === 0) {
+          return { row: i, col: j };
         }
       }
     }
-    return -1; // Blank tile not found
+    return null; // Blank tile not found
   }
 
-  getBlankCol() {
-    for (let i = 0; i < this.n; i++) {
-      for (let j = 0; j < this.n; j++) {
-        if (this.tiles[i][j] === 0) {
-          return j;
-        }
-      }
-    }
-    return -1; // Blank tile not found
+  getCurrentState() {
+    return this.currentState;
   }
 
-  isValidPosition(row, col) {
-    return row >= 0 && row < this.n && col >= 0 && col < this.n;
+  getGoalState() {
+    return this.goalState;
   }
 
-  cloneTiles() {
-    return this.tiles.map(row => [...row]);
-  }
-
-  swapTiles(tiles, row1, col1, row2, col2) {
-    const temp = tiles[row1][col1];
-    tiles[row1][col1] = tiles[row2][col2];
-    tiles[row2][col2] = temp;
-  }
-
-  getFlattenedTiles() {
-    return this.tiles.flat();
+  getFlattenedState() {
+    return this.currentState.flat();
   }
 }
 
-export class Solver {
+// ======
+// SOLVER
+// ======
+
+export class Solver
+{
   constructor(initialBoard) {
     this.initialBoard = initialBoard;
     this.moves = []; // Stores the sequence of moves to reach the solution
+    this.maxIterations = initialBoard.getMaxIterations(); // The maximum number of moves allowed in order to solve
   }
 
   // Solves the puzzle and returns the sequence of moves
@@ -193,10 +263,12 @@ export class Solver {
     const visited = new Set(); // Set to keep track of visited board states
 
     // Create a search node with the initial board
-    const initialNode = new SearchNode(this.initialBoard, null, 0, this.initialBoard.manhattan());
+    const initialNode = new SearchNode(this.initialBoard, null, 0, this.initialBoard.getManhattanDistance());
 
     // Add the initial node to the priority queue
     priorityQueue.insert(initialNode);
+
+    let iterations = 0;
 
     while (!priorityQueue.isEmpty()) {
       // Remove the node with the minimum priority from the priority queue
@@ -209,20 +281,23 @@ export class Solver {
         return this.moves;
       }
 
+      if (this.maxIterations > 0 && ++iterations > this.maxIterations)
+        return null; // Move limit reached
+
       visited.add(currentNode.board);
 
       // Generate all neighboring boards
-      const neighbors = currentNode.board.neighbors();
+      const possibleStates = currentNode.board.getPossibleStates();
 
-      for (const neighborBoard of neighbors) {
+      for (const boardState of possibleStates) {
         // Check if the neighbor board has been visited
-        if (!visited.has(neighborBoard)) {
+        if (!visited.has(boardState)) {
           // Create a search node for the neighbor board
           const neighborNode = new SearchNode(
-            neighborBoard,
+            boardState,
             currentNode,
             currentNode.moves + 1,
-            neighborBoard.manhattan()
+            boardState.getManhattanDistance()
           );
 
           // Add the neighbor node to the priority queue
@@ -251,7 +326,8 @@ export class Solver {
   getSolutionIndices() {
     const indices = [];
     for (const move of this.moves) {
-      indices.push(move.getBlankRow() * move.size() + move.getBlankCol());
+      const blankIndex = move.getBlankIndex();
+      indices.push(`[${blankIndex.col},${blankIndex.row}]`);
     }
     return indices;
   }
