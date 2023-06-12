@@ -1,3 +1,88 @@
+// ===========
+// BOARD TILES
+// ===========
+
+export class BoardTiles
+{
+  constructor(sourceImage, onLoaded, rows = 3, cols = 3) {
+    this.sourceImage = sourceImage;
+    this.imageElement = new Image();
+    this.imageElement.src = this.sourceImage;
+    this.onLoaded = onLoaded;
+    this.rows = rows;
+    this.cols = cols;
+    this.tileSize = 0;
+    this.width = 0;
+    this.height = 0;
+    this.tiles = null;
+    this.load();
+  }
+
+  getTiles() {
+    return this.tiles;
+  }
+
+  getElement() {
+    return this.imageElement;
+  }
+
+  getWidth() {
+    return this.width;
+  }
+
+  getHeight() {
+    return this.height;
+  }
+
+  getRows() {
+    return this.rows;
+  }
+
+  getCols() {
+    return this.cols;
+  }
+
+  getTileSize() {
+    return this.tileSize;
+  }
+
+  load() {
+    this.imageElement.onload = () => {
+      this.width = this.imageElement.width;
+      this.height = this.imageElement.height;
+      this.tileSize = Math.floor(this.imageElement.height / this.rows);
+      this.generate();
+      if(this.onLoaded)
+        this.onLoaded(this.imageElement);
+    };
+  };
+
+  generate() {
+    // Split the source image into tiles
+    const tiles = [];
+
+    for (let row = 0; row < this.rows; row++) {
+      for (let col = 0; col < this.cols; col++) {
+        const canvas = document.createElement('canvas');
+        canvas.width = this.tileSize;
+        canvas.height = this.tileSize;
+  
+        const context = canvas.getContext('2d');
+        context.drawImage(
+          this.imageElement,
+          col * this.tileSize, row * this.tileSize,
+          this.tileSize, this.tileSize, 0, 0,
+          this.tileSize, this.tileSize
+        );
+  
+        tiles.push(canvas.toDataURL());
+      }
+    }
+  
+    this.tiles = tiles;
+  }
+}
+
 // =====
 // BOARD
 // =====
@@ -12,11 +97,16 @@ export class Board
       [6, 7, 8],
     ];
     this.maxIterations = maxIterations || 0;
+    this.solutionDirections = [];
 
     if (performShuffle)
       this.shuffle();
 
     this.solver = solver || this.getSolver();
+  }
+
+  getSolutionDirections() {
+    return this.solutionDirections;
   }
 
   getTileAt(row, col) {
@@ -33,19 +123,24 @@ export class Board
 
   shuffle() {
     // Fisher-Yates shuffle algorithm for 2D arrays
-    const rowSize = this.getRowSize();
-    const colSize = this.getColSize();
+    // const rowSize = this.getRowSize();
+    // const colSize = this.getColSize();
 
-    for (let i = rowSize - 1; i >= 0; i--) {
-      for (let j = colSize - 1; j >= 0; j--) {
-        const randomRow = Math.floor(Math.random() * (i + 1));
-        const randomCol = Math.floor(Math.random() * (j + 1));
+    // for (let i = rowSize - 1; i >= 0; i--) {
+    //   for (let j = colSize - 1; j >= 0; j--) {
+    //     const randomRow = Math.floor(Math.random() * (i + 1));
+    //     const randomCol = Math.floor(Math.random() * (j + 1));
 
-        const temp = this.currentState[i][j];
-        this.currentState[i][j] = this.currentState[randomRow][randomCol];
-        this.currentState[randomRow][randomCol] = temp;
-      }
-    }
+    //     const temp = this.currentState[i][j];
+    //     this.currentState[i][j] = this.currentState[randomRow][randomCol];
+    //     this.currentState[randomRow][randomCol] = temp;
+    //   }
+    // }
+    const shuffler = new BoardShuffler(this, 10, 14);
+    const lastMove = shuffler.moves[shuffler.moves.length - 1];
+    this.currentState = lastMove.getCurrentState();
+    this.solve();
+    this.solutionDirections = shuffler.getMoveDirections();
   }
 
   getSolver() {
@@ -245,6 +340,112 @@ export class Board
   }
 }
 
+// ==============
+// BOARD SHUFFLER
+// ==============
+
+export class BoardShuffler {
+  constructor(board, moveGoal, distanceGoal) {
+    this.board = board;
+    this.moveGoal = moveGoal;
+    this.distanceGoal = distanceGoal;
+    this.moves = [];
+    this.shuffle();
+  }
+
+  shuffle() {
+    const priorityQueue = new MaxHeap(); // Priority queue to store the board states
+    const visited = new Set(); // Set to keep track of visited board states
+
+    // Create a search node with the goal board
+    const goalBoard = this.board.getGoalBoard();
+    const initialNode = new SearchNode(goalBoard, null, 0, goalBoard.getManhattanDistance());
+
+    // Add the initial node to the priority queue
+    priorityQueue.insert(initialNode);
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return Math.random() >= 0.6667 ? shuffleArray(array) : array;
+    }
+
+    while (!priorityQueue.isEmpty()) {
+      // Remove the node with the maximum priority from the priority queue
+      const currentNode = priorityQueue.delMax();
+
+      if (currentNode.moves >= this.moveGoal) {
+        // Reached the desired number of moves
+        if (currentNode.board.getManhattanDistance() >= this.distanceGoal) {
+          // Reached the desired distance, store the sequence of moves
+          this.moves = this.getMoves(currentNode);
+          return;
+        }  
+      }
+
+      visited.add(currentNode.board);
+
+      // Generate all neighboring boards
+      let possibleStates = currentNode.board.getPossibleStates();
+      possibleStates = shuffleArray(possibleStates);
+
+      for (const boardState of possibleStates) {
+        // Check if the neighbor board has been visited
+        if (!visited.has(boardState)) {
+          // Create a search node for the neighbor board
+          const neighborNode = new SearchNode(
+            boardState,
+            currentNode,
+            currentNode.moves + 1,
+            boardState.getManhattanDistance()
+          );
+
+          // Add the neighbor node to the priority queue
+          priorityQueue.insert(neighborNode);
+        }
+      }
+    }
+  }
+
+  getMoves(currentNode) {
+    const moves = [];
+    let node = currentNode;
+
+    while (node !== null) {
+      moves.unshift(node.board);
+      node = node.prevNode;
+    }
+
+    return moves;
+  }
+
+  getMoveDirections() {
+    const directions = [];
+    for (let i = this.moves.length - 1; i >= 0; i--) {
+      const currentBoard = this.moves[i];
+      const prevBoard = i > 0 ? this.moves[i - 1] : null;
+      const currentBlankIndex = currentBoard.getBlankIndex();
+      const prevBlankIndex = prevBoard?.getBlankIndex() || {row: null, col: null};
+
+      if (prevBlankIndex.row !== null && prevBlankIndex.col !== null) {
+        if (prevBlankIndex.row > currentBlankIndex.row) {
+          directions.push('⬇️');
+        } else if (prevBlankIndex.row < currentBlankIndex.row) {
+          directions.push('⬆️');
+        } else if (prevBlankIndex.col > currentBlankIndex.col) {
+          directions.push('➡️');
+        } else if (prevBlankIndex.col < currentBlankIndex.col) {
+          directions.push('⬅️');
+        }
+      }
+    }
+
+    return directions;
+  }
+}
+
 // ======
 // SOLVER
 // ======
@@ -394,6 +595,72 @@ class MinHeap {
   }
 }
 
+// Helper class for priority queue
+class MaxHeap {
+  constructor() {
+    this.heap = [];
+  }
+
+  isEmpty() {
+    return this.heap.length === 0;
+  }
+
+  insert(item) {
+    this.heap.push(item);
+    this.swim(this.heap.length - 1);
+  }
+
+  delMax() {
+    const max = this.heap[0];
+    const last = this.heap.pop();
+
+    if (!this.isEmpty()) {
+      this.heap[0] = last;
+      this.sink(0);
+    }
+
+    return max;
+  }
+
+  swim(index) {
+    const parentIndex = Math.floor((index - 1) / 2);
+
+    if (parentIndex >= 0 && this.heap[parentIndex].priority < this.heap[index].priority) {
+      this.swap(parentIndex, index);
+      this.swim(parentIndex);
+    }
+  }
+
+  sink(index) {
+    const leftChildIndex = 2 * index + 1;
+    const rightChildIndex = 2 * index + 2;
+    let maxIndex = index;
+
+    if (
+      leftChildIndex < this.heap.length &&
+      this.heap[leftChildIndex].priority > this.heap[maxIndex].priority
+    ) {
+      maxIndex = leftChildIndex;
+    }
+
+    if (
+      rightChildIndex < this.heap.length &&
+      this.heap[rightChildIndex].priority > this.heap[maxIndex].priority
+    ) {
+      maxIndex = rightChildIndex;
+    }
+
+    if (maxIndex !== index) {
+      this.swap(maxIndex, index);
+      this.sink(maxIndex);
+    }
+  }
+
+  swap(i, j) {
+    [this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]];
+  }
+}
+
 // Helper class to represent a search node
 class SearchNode {
   constructor(board, prevNode, moves, priority) {
@@ -404,4 +671,4 @@ class SearchNode {
   }
 }
 
-export default { Board, Solver };
+export default { BoardTiles, Board, BoardShuffler, Solver };

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Button, Col, Container, Image as BootstrapImage, Modal, Row } from 'react-bootstrap';
 import { useAriaContext } from 'contexts/AriaContext';
 import { Tooltip } from 'react-tooltip';
-import { Board } from 'utils/puzzle.js';
+import { BoardTiles, Board } from 'utils/puzzle.js';
 
 const maxIterations = 15000;
 const numRowsAndCols = 3;
@@ -20,37 +20,22 @@ const goalState = [
   [6, 7, 8],
 ];
 
-//const blankTile = 9;
-
 const SlidingPuzzle = ({ shown, image, onSolved }) => {
   const ariaContext = useAriaContext();
-  const [imageElement, setImageElement] = useState(null);
-  const [tileImages, setTileImages] = useState(null);
-  const [board, setBoard] = useState();
+  const [boardTiles, setBoardTiles] = useState(null);
+  const [board, setBoard] = useState(null);
   const [hoveredTileIndex, setHoveredTileIndex] = useState(null);
   const [solution, setSolution] = useState([]);
   const [solved, setSolved] = useState(false);
 
   useEffect(_ => {
-    if (numRowsAndCols > 1) {
-      const imageElement = new Image();
-      imageElement.src = image;
-      imageElement.onload = () => {
-        setImageElement(imageElement);
-      };
+    if(image && !boardTiles) {
+      const newBoardTiles = new BoardTiles(image, _ => {
+        createNewBoard();
+      })
+      setBoardTiles(newBoardTiles);
     }
-  }, [image, numRowsAndCols]);
-  
-  useEffect(_ => {
-    if (imageElement && imageElement.width > 0 && imageElement.height > 0) {
-      setTileImages(generateTileImages());
-    }
-  }, [imageElement, numRowsAndCols]);
-
-  useEffect(_ => {
-    if(!board)
-      createNewBoard();
-  }, [board]);
+  }, [image]);
 
   useEffect(_ => {
     if(solved && onSolved)
@@ -76,59 +61,29 @@ const SlidingPuzzle = ({ shown, image, onSolved }) => {
 
   const createNewBoard = (shuffle = true) => {
     let newBoard;
-    
-    if(!board)
-      newBoard = new Board(initialState, goalState, maxIterations, null, shuffle);
-    else
-      newBoard = new Board(board.getCurrentState(), board.getGoalState(), maxIterations, shuffle);
 
-    newBoard.solve();
-    setBoard(newBoard);
-    setSolution(newBoard.getSolution());
+    const newBoardTiles = new BoardTiles(image, _ => {
+      if(!board)
+        newBoard = new Board(initialState, goalState, maxIterations, null, shuffle);
+      else
+        newBoard = new Board(initialState, goalState, maxIterations, board.getSolver(), shuffle);
+  
+      newBoard.solve();
+      setBoard(newBoard);
+      setSolution(newBoard.getSolutionDirections());
+    });
+    setBoardTiles(newBoardTiles);
   }
 
-  if (!imageElement || numRowsAndCols < 2) {
-    return null; // Return null or a loading state while the image is loading
-  }
-
-  const tileSize = Math.floor(imageElement.height / numRowsAndCols);
-
-  const generateTileImages = () => {
-    // Split the image into tiles
-    const generatedTileImages = [];
-  
-    for (let row = 0; row < numRowsAndCols; row++) {
-      for (let col = 0; col < numRowsAndCols; col++) {
-        const canvas = document.createElement('canvas');
-        canvas.width = tileSize;
-        canvas.height = tileSize;
-  
-        const context = canvas.getContext('2d');
-        context.drawImage(
-          imageElement,
-          col * tileSize,
-          row * tileSize,
-          tileSize,
-          tileSize,
-          0,
-          0,
-          tileSize,
-          tileSize
-        );
-  
-        generatedTileImages.push(canvas.toDataURL());
-      }
-    }
-  
-    return generatedTileImages;
-  };
+  if(!boardTiles)
+    return null;
 
   const updateBoard = (shuffle) => {
     if(shuffle)
       board.shuffle();
     board.solve();
-    setTileImages(generateTileImages());
-    setSolution(board.getSolution());
+    setBoardTiles(boardTiles);
+    setSolution(board.getSolutionDirections());
   }
 
   const handleTileClick = (index) => {
@@ -157,6 +112,10 @@ const SlidingPuzzle = ({ shown, image, onSolved }) => {
     }
   };
 
+  const tileImages = boardTiles.getTiles();
+  if(!tileImages || !tileImages.length > 0)
+    return null;
+
   const getTiles = () => {
     const boardState = board.getFlattenedState();
 
@@ -174,13 +133,10 @@ const SlidingPuzzle = ({ shown, image, onSolved }) => {
       const tooltipId = `tooltip-${key}`;
       let tooltipText = `index: ${boardState[index]}, manhattan: ${board.getManhattanDistance()}, solvable: ${board.isSolvable()}`;
       if(solution) {
-        tooltipText += `, Solution: [${solution.join(',')}]`;
+        tooltipText += `, Solution: [${solution.join('')}]`;
       } else {
         tooltipText += `, Solution: None found`;
       }
-
-      // Get the corresponding tile image
-      const image = tileImages[tile];
 
       return {
         key,
@@ -188,15 +144,12 @@ const SlidingPuzzle = ({ shown, image, onSolved }) => {
         isAdjacent,
         tooltipId,
         tooltipText,
-        image
+        image: tileImages[tile]
       };
     });
 
     return tiles;
   };
-
-  if(!tileImages || tileImages.length < 1)
-    return null;
 
   return (
     <Modal className="verify-account-modal" show={shown} onHide={handleClose} centered>
@@ -205,8 +158,8 @@ const SlidingPuzzle = ({ shown, image, onSolved }) => {
       </Modal.Header>
       <Modal.Body className="verify-account-modal-body m-auto align-items-center">
         <Container fluid className="m-0 p-0" style={{
-          maxWidth: imageElement.width + 2,
-          maxHeight: imageElement.height + 2,
+          maxWidth: boardTiles.getWidth() + 2,
+          maxHeight: boardTiles.getHeight() + 2,
           border: "1px solid black"
           }}>
           <Row className="m-0 p-0">
@@ -220,8 +173,8 @@ const SlidingPuzzle = ({ shown, image, onSolved }) => {
                     data-tooltip-id={tile.tooltipId}
                     style={{
                       opacity: !solved && tile.isBlank ? 0.33 : 1,
-                      width: tileSize,
-                      height: tileSize,
+                      width: boardTiles.getTileSize(),
+                      height: boardTiles.getTileSize(),
                       userSelect: 'none',
                       scale: !solved && tile.isAdjacent && hoveredTileIndex === index ? '1.2' : '1',
                       transition: 'all 0.2s ease-in-out',
