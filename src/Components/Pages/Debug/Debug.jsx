@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
-import { Button, Col, Container, Form, ListGroup, Row } from 'react-bootstrap';
+import { useEffect, useState, useRef } from 'react';
+import { Button, Col, Container, Form, ListGroup, Row, Spinner } from 'react-bootstrap';
 import { useAuthContext } from 'contexts/AuthContext';
 import { useAriaContext } from 'contexts/AriaContext';
 import { useUserContext } from 'contexts/UserContext';
 import { useNavbarContext } from 'contexts/NavbarContext';
 import { useSocialCircleContext } from 'contexts/SocialCircleContext';
+
+const refreshTimeout = 3000;
 
 export default function Debug()
 {
@@ -13,12 +15,38 @@ export default function Debug()
   const userContext = useUserContext();
   const navbarContext = useNavbarContext();
   const socialCircleContext = useSocialCircleContext();
+  const refreshTimeoutRef = useRef(null);
+  const [contextsLoaded, setContextsLoaded] = useState(false);
   const [command, setCommand] = useState('');
   const [consoleComponent, setConsoleComponent] = useState(null);
   const [selectedUser, setSelectedUser] = useState('ALL');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [logs, setLogs] = useState([]);
   const [filteredLogs, setFilteredLogs] = useState([]);
+
+  useEffect(() => {
+    if (authContext !== undefined &&
+      ariaContext !== undefined &&
+      userContext !== undefined &&
+      navbarContext !== undefined &&
+      socialCircleContext !== undefined) {
+      setContextsLoaded(true);
+    }
+  }, [authContext, ariaContext, userContext, navbarContext, socialCircleContext]);
+
+  useEffect(() => {
+    if (!contextsLoaded) {
+      refreshTimeoutRef.current = setTimeout(() => {
+        window.location.reload(); // Refresh the page
+      }, refreshTimeout);
+    } else {
+      clearTimeout(refreshTimeoutRef.current);
+    }
+    
+    return () => {
+      clearTimeout(refreshTimeoutRef.current);
+    };
+  }, [contextsLoaded]);
 
   useEffect(_ => {
     const formattedLogs = [];
@@ -172,6 +200,29 @@ export default function Debug()
           <ListGroup.Item>{`User Roles: ${userContext.data.roles}`}</ListGroup.Item>
         }
       </>
+    )
+  }
+
+  if (!contextsLoaded) {
+    return (
+      <div
+        className="d-flex flex-column"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000
+        }}
+      >
+        <Spinner animation="border" variant="light" />
+        <span style={{color: 'white', fontFamily: 'Bruno Ace SC', fontSize: '16pt'}}>Loading...</span>
+      </div>
     )
   }
 
